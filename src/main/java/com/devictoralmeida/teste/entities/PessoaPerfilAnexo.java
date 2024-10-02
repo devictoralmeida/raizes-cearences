@@ -1,5 +1,6 @@
 package com.devictoralmeida.teste.entities;
 
+import com.devictoralmeida.teste.dto.request.AnexoRequestDto;
 import com.devictoralmeida.teste.enums.TipoDocumento;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -33,5 +34,11 @@ public class PessoaPerfilAnexo implements Serializable {
   @Column(name = "tipo_documento", nullable = false)
   @Enumerated(EnumType.STRING)
   private TipoDocumento tipoDocumento;
+
+  public PessoaPerfilAnexo(AnexoRequestDto request, Usuario usuario) {
+    anexo = new Anexo(request);
+    tipoDocumento = request.getTipoDocumento();
+    pessoaPerfil = usuario.getPessoaPerfil();
+  }
 
 }

@@ -1,5 +1,6 @@
 package com.devictoralmeida.teste.entities;
 
+import com.devictoralmeida.teste.dto.request.AnexoRequestDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -27,13 +28,17 @@ public class Anexo implements Serializable {
   private UUID id;
 
   @Column(name = "nome_anexo", nullable = false)
-  private String nomeAnexo;
+  private String nome;
 
   @Column(name = "tipo_mime", nullable = false, length = 5)
-  private String tipoMime;
+  private String tipo;
 
   @JsonIgnore
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "anexo")
   private List<PessoaPerfilAnexo> pessoaPerfilAnexos = new ArrayList<>();
 
+  public Anexo(AnexoRequestDto request) {
+    this.nome = request.getNome();
+    this.tipo = request.getTipo();
+  }
 }

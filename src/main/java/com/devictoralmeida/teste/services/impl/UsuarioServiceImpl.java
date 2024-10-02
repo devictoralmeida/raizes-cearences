@@ -1,24 +1,38 @@
 package com.devictoralmeida.teste.services.impl;
 
+import com.devictoralmeida.teste.dto.request.AnexoRequestDto;
 import com.devictoralmeida.teste.dto.request.UsuarioRequestDto;
-import com.devictoralmeida.teste.entities.DadosPessoaFisica;
-import com.devictoralmeida.teste.entities.DadosPessoaJuridica;
-import com.devictoralmeida.teste.entities.PessoaPerfil;
-import com.devictoralmeida.teste.entities.Usuario;
+import com.devictoralmeida.teste.entities.*;
 import com.devictoralmeida.teste.enums.TipoPerfil;
 import com.devictoralmeida.teste.repositories.DadosPessoaFisicaRepository;
 import com.devictoralmeida.teste.repositories.DadosPessoaJuridicaRepository;
+import com.devictoralmeida.teste.repositories.PessoaPerfilAnexoRepository;
 import com.devictoralmeida.teste.repositories.UsuarioRepository;
+import com.devictoralmeida.teste.services.FileService;
 import com.devictoralmeida.teste.services.UsuarioService;
-import lombok.RequiredArgsConstructor;
+import com.devictoralmeida.teste.services.rules.RegraPessoaPerfilAnexo;
+import com.devictoralmeida.teste.shared.exceptions.NegocioException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.List;
+
 @Service
-@RequiredArgsConstructor
 public class UsuarioServiceImpl implements UsuarioService {
-  private final UsuarioRepository usuarioRepository;
-  private final DadosPessoaFisicaRepository dadosPessoaFisicaRepository;
-  private final DadosPessoaJuridicaRepository dadosPessoaJuridicaRepository;
+  private UsuarioRepository usuarioRepository;
+  private DadosPessoaFisicaRepository dadosPessoaFisicaRepository;
+  private DadosPessoaJuridicaRepository dadosPessoaJuridicaRepository;
+  private FileService fileService;
+  private PessoaPerfilAnexoRepository pessoaPerfilAnexoRepository;
+
+  public UsuarioServiceImpl(UsuarioRepository usuarioRepository, DadosPessoaFisicaRepository dadosPessoaFisicaRepository, DadosPessoaJuridicaRepository dadosPessoaJuridicaRepository, @Qualifier("local") FileService fileService, PessoaPerfilAnexoRepository pessoaPerfilAnexoRepository) {
+    this.usuarioRepository = usuarioRepository;
+    this.dadosPessoaFisicaRepository = dadosPessoaFisicaRepository;
+    this.dadosPessoaJuridicaRepository = dadosPessoaJuridicaRepository;
+    this.fileService = fileService;
+    this.pessoaPerfilAnexoRepository = pessoaPerfilAnexoRepository;
+  }
 
   @Override
   public void save(UsuarioRequestDto request) {
@@ -62,5 +76,26 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   private boolean isCooperativaAssociacao(Usuario usuario) {
     return TipoPerfil.COOPERATIVA.equals(usuario.getTipoPerfil()) || TipoPerfil.ASSOCIACAO.equals(usuario.getTipoPerfil());
+  }
+
+  public void uploadAnexos(List<AnexoRequestDto> anexos) {
+    Usuario usuario = obterUltimo();
+    RegraPessoaPerfilAnexo.validar(anexos, usuario.getTipoPerfil());
+
+    anexos.forEach(anexo -> {
+      try {
+        fileService.upload(anexo.getArquivo());
+        anexo.setNome(anexo.getArquivo().getOriginalFilename() + '.' + anexo.getTipo());
+        PessoaPerfilAnexo pessoaPerfilAnexo = new PessoaPerfilAnexo(anexo, usuario);
+        usuario.getPessoaPerfil().getAnexos().add(pessoaPerfilAnexo);
+        pessoaPerfilAnexoRepository.save(pessoaPerfilAnexo);
+      } catch (IOException e) {
+        throw new NegocioException("Erro ao fazer upload do arquivo " + anexo.getArquivo().getOriginalFilename() + "Mensagem erro: " + e.getMessage());
+      }
+    });
+  }
+
+  public Usuario obterUltimo() {
+    return usuarioRepository.obterUltimo();
   }
 }
