@@ -50,22 +50,18 @@ public class PessoaPerfilRequestDto implements Serializable {
   @NotNull(message = PessoaPerfilValidationMessages.ENDERECO_OBRIGATORIO)
   private @Valid EnderecoRequestDto endereco;
 
-  //  private @Valid List<PessoaPerfilAnexo> anexos = new ArrayList<>();
-
   public void validar(TipoPerfil tipoPerfil) {
     validarExistenciaDadosPessoais();
-    validacoesTipoUsuario();
     contato.validar();
 
     boolean isCooperativaAssociacao = TipoPerfil.COOPERATIVA.equals(tipoPerfil) || TipoPerfil.ASSOCIACAO.equals(tipoPerfil);
     vinculo.validar(isCooperativaAssociacao);
+    validacoesTipoUsuario(isCooperativaAssociacao);
 
     if (isCooperativaAssociacao) {
       validarCooperativaAssociacao();
-    } else {
-      if (presidente != null) {
-        throw new NegocioException(PessoaPerfilValidationMessages.PRESIDENTE_NAO_PERMITIDO);
-      }
+    } else if (presidente != null) {
+      throw new NegocioException(PessoaPerfilValidationMessages.PRESIDENTE_NAO_PERMITIDO);
     }
   }
 
@@ -79,17 +75,24 @@ public class PessoaPerfilRequestDto implements Serializable {
     }
 
     dadosPessoaJuridica.validarCooperativaAssociacao();
-    dadosPessoaFisica.validarDadosPresidente();
+    presidente.validar();
   }
 
-  private void validacoesTipoUsuario() {
+  private void validacoesTipoUsuario(boolean isCooperativaAssociacao) {
     if (TipoUsuario.PESSOA_FISICA.equals(tipoUsuario)) {
-      validarCPF();
-      validarDadosPessoaFisica();
+      validarPessoaFisica(isCooperativaAssociacao);
     } else if (TipoUsuario.PESSOA_JURIDICA.equals(tipoUsuario)) {
       validarCNPJ();
       validarDadosPessoaJuridica();
     }
+  }
+
+  private void validarPessoaFisica(boolean isCooperativaAssociacao) {
+    if (isCooperativaAssociacao) {
+      throw new NegocioException(PessoaPerfilValidationMessages.PESSOA_FISICA_NAO_PERMITIDA);
+    }
+    validarCPF();
+    validarDadosPessoaFisica();
   }
 
   private void validarExistenciaDadosPessoais() {

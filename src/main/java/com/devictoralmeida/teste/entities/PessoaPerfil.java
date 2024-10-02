@@ -61,25 +61,21 @@ public class PessoaPerfil implements Serializable {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "pessoaPerfil")
   private List<PessoaPerfilAnexo> anexos = new ArrayList<>();
 
-  public PessoaPerfil(PessoaPerfilRequestDto request, Usuario usuario, DadosPessoaJuridica dadosPessoaJuridica) {
-    tipoUsuario = request.getTipoUsuario();
-    documento = request.getDocumento();
-    dadosPessoaId = dadosPessoaJuridica.getId();
-    this.usuario = usuario;
-    vinculo = new Vinculo(request.getVinculo());
-    contato = new Contato(request.getContato());
-    endereco = new Endereco(request.getEndereco());
-    presidente = request.getPresidente() != null ? new Presidente(request.getPresidente(), this) : null;
+  public PessoaPerfil(PessoaPerfilRequestDto request, Usuario usuario, UUID dadosPessoaId) {
+    this(request, usuario, dadosPessoaId, null);
   }
 
-  public PessoaPerfil(PessoaPerfilRequestDto request, Usuario usuario, DadosPessoaFisica dadosPessoaFisica) {
+  public PessoaPerfil(PessoaPerfilRequestDto request, Usuario usuario, UUID dadosPessoaId, UUID idDadosPessoaisPresidente) {
     tipoUsuario = request.getTipoUsuario();
     documento = request.getDocumento();
-    dadosPessoaId = dadosPessoaFisica.getId();
+    this.dadosPessoaId = dadosPessoaId;
     this.usuario = usuario;
     vinculo = new Vinculo(request.getVinculo());
     contato = new Contato(request.getContato());
     endereco = new Endereco(request.getEndereco());
-    presidente = request.getPresidente() != null ? new Presidente(request.getPresidente(), this) : null;
+
+    if (idDadosPessoaisPresidente != null) {
+      presidente = new Presidente(request.getPresidente(), this, idDadosPessoaisPresidente);
+    }
   }
 }

@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,6 +34,6 @@ public class Anexo implements Serializable {
 
   @JsonIgnore
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "anexo")
-  private List<PessoaPerfilAnexo> pessoaPerfilAnexos;
+  private List<PessoaPerfilAnexo> pessoaPerfilAnexos = new ArrayList<>();
 
 }

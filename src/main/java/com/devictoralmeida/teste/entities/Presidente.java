@@ -37,11 +37,11 @@ public class Presidente implements Serializable {
   private UUID dadosPessoaId;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "contato_id", referencedColumnName = "id")
+  @JoinColumn(name = "contato_id", referencedColumnName = "id", nullable = false)
   private Contato contato;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "endereco_id", referencedColumnName = "id")
+  @JoinColumn(name = "endereco_id", referencedColumnName = "id", nullable = false)
   private Endereco endereco;
 
   @JsonDeserialize(using = LocalDateDeserializer.class)
@@ -56,14 +56,14 @@ public class Presidente implements Serializable {
 
   @JsonIgnore
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "pessoa_perfil_id", nullable = false)
+  @JoinColumn(name = "pessoa_perfil_id", referencedColumnName = "id", nullable = false)
   private PessoaPerfil pessoaPerfil;
 
-  public Presidente(PresidenteRequestDto request, PessoaPerfil pessoaPerfil) {
+  public Presidente(PresidenteRequestDto request, PessoaPerfil pessoaPerfil, UUID idDadosPessoaisPresidente) {
     documento = request.getDocumento();
     dataInicioMandato = request.getDataInicioMandato();
     dataFinalMandato = request.getDataFinalMandato();
-    dadosPessoaId = pessoaPerfil.getDadosPessoaId();
+    dadosPessoaId = idDadosPessoaisPresidente;
     this.pessoaPerfil = pessoaPerfil;
     contato = new Contato(request.getContato());
     endereco = new Endereco(request.getEndereco());

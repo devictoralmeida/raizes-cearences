@@ -10,6 +10,7 @@ public class ContatoValidationMessages {
   public static final String EMAIL_TAMANHO = "O e-mail deve ter no máximo 320 caracteres";
   public static final String EMAIL_OBRIGATORIO = "Conforme a preferencia de contato selecionada, o e-mail é obrigatório!";
   public static final String CONTATO_PREFERENCIA_CONTATO_DIVERGENTE = "Conforme a preferencia de contato selecionada, o número de Whatsapp é obrigatório!";
+  public static final String CONTATO_WHATSAPP_OBRIGATORIO = "O número de Whatsapp é obrigatório!";
 
   private ContatoValidationMessages() {
   }

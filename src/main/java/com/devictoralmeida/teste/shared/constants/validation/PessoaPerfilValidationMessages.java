@@ -15,6 +15,7 @@ public class PessoaPerfilValidationMessages {
   public static final String DADOS_PESSOA_JURIDICA_OBRIGATORIO = "É obrigatório informar os dados da pessoa jurídica";
   public static final String PRESIDENTE_OBRIGATORIO = "É obrigatório informar os dados do presidente";
   public static final String PRESIDENTE_NAO_PERMITIDO = "O presidente não é permitido para este tipo de perfil";
+  public static final String PESSOA_FISICA_NAO_PERMITIDA = "Pessoa física não é permitida para este tipo de perfil";
 
   private PessoaPerfilValidationMessages() {
   }

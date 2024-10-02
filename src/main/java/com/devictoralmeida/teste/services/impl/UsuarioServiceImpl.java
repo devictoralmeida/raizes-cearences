@@ -5,6 +5,7 @@ import com.devictoralmeida.teste.entities.DadosPessoaFisica;
 import com.devictoralmeida.teste.entities.DadosPessoaJuridica;
 import com.devictoralmeida.teste.entities.PessoaPerfil;
 import com.devictoralmeida.teste.entities.Usuario;
+import com.devictoralmeida.teste.enums.TipoPerfil;
 import com.devictoralmeida.teste.repositories.DadosPessoaFisicaRepository;
 import com.devictoralmeida.teste.repositories.DadosPessoaJuridicaRepository;
 import com.devictoralmeida.teste.repositories.UsuarioRepository;
@@ -29,18 +30,37 @@ public class UsuarioServiceImpl implements UsuarioService {
   }
 
   private PessoaPerfil createPessoaPerfil(UsuarioRequestDto request, Usuario usuario) {
-    PessoaPerfil pessoaPerfil;
-
     if (request.getPessoaPerfil().getDadosPessoaFisica() != null) {
-      DadosPessoaFisica dadosPessoaFisica = new DadosPessoaFisica(request.getPessoaPerfil().getDadosPessoaFisica());
-      dadosPessoaFisicaRepository.save(dadosPessoaFisica);
-      pessoaPerfil = new PessoaPerfil(request.getPessoaPerfil(), usuario, dadosPessoaFisica);
+      return createPessoaPerfilFisica(request, usuario);
     } else {
-      DadosPessoaJuridica dadosPessoaJuridica = new DadosPessoaJuridica(request.getPessoaPerfil().getDadosPessoaJuridica());
-      dadosPessoaJuridicaRepository.save(dadosPessoaJuridica);
-      pessoaPerfil = new PessoaPerfil(request.getPessoaPerfil(), usuario, dadosPessoaJuridica);
+      return createPessoaPerfilJuridica(request, usuario);
     }
+  }
 
-    return pessoaPerfil;
+  private PessoaPerfil createPessoaPerfilFisica(UsuarioRequestDto request, Usuario usuario) {
+    DadosPessoaFisica dadosPessoaFisica = new DadosPessoaFisica(request.getPessoaPerfil().getDadosPessoaFisica());
+    dadosPessoaFisicaRepository.save(dadosPessoaFisica);
+    return new PessoaPerfil(request.getPessoaPerfil(), usuario, dadosPessoaFisica.getId());
+  }
+
+  private PessoaPerfil createPessoaPerfilJuridica(UsuarioRequestDto request, Usuario usuario) {
+    DadosPessoaJuridica dadosPessoaJuridica = new DadosPessoaJuridica(request.getPessoaPerfil().getDadosPessoaJuridica());
+    dadosPessoaJuridicaRepository.save(dadosPessoaJuridica);
+
+    if (isCooperativaAssociacao(usuario)) {
+      return createPessoaPerfilComPresidente(request, usuario, dadosPessoaJuridica);
+    } else {
+      return new PessoaPerfil(request.getPessoaPerfil(), usuario, dadosPessoaJuridica.getId());
+    }
+  }
+
+  private PessoaPerfil createPessoaPerfilComPresidente(UsuarioRequestDto request, Usuario usuario, DadosPessoaJuridica dadosPessoaJuridica) {
+    DadosPessoaFisica dadosPresidente = new DadosPessoaFisica(request.getPessoaPerfil().getPresidente().getDadosPessoais());
+    dadosPessoaFisicaRepository.save(dadosPresidente);
+    return new PessoaPerfil(request.getPessoaPerfil(), usuario, dadosPessoaJuridica.getId(), dadosPresidente.getId());
+  }
+
+  private boolean isCooperativaAssociacao(Usuario usuario) {
+    return TipoPerfil.COOPERATIVA.equals(usuario.getTipoPerfil()) || TipoPerfil.ASSOCIACAO.equals(usuario.getTipoPerfil());
   }
 }

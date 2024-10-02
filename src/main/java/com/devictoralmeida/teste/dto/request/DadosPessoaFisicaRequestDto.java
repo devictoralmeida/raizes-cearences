@@ -5,7 +5,6 @@ import com.devictoralmeida.teste.enums.Sexo;
 import com.devictoralmeida.teste.shared.constants.SharedConstants;
 import com.devictoralmeida.teste.shared.constants.validation.DadosPessoaFisicaValidationMessages;
 import com.devictoralmeida.teste.shared.constants.validation.PresidenteValidationMessages;
-import com.devictoralmeida.teste.shared.exceptions.NegocioException;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -56,20 +55,4 @@ public class DadosPessoaFisicaRequestDto implements Serializable {
 
   @Size(max = 150, message = PresidenteValidationMessages.NOME_PAI_TAMANHO)
   private String nomePai;
-
-  public void validarDadosPresidente() {
-    validarNomePais();
-  }
-
-  private void validarNomePais() {
-    if (nomePai.isBlank()) {
-      throw new NegocioException(PresidenteValidationMessages.NOME_PAI_OBRIGATORIO);
-    }
-
-    if (nomeMae.isBlank()) {
-      throw new NegocioException(PresidenteValidationMessages.NOME_MAE_OBRIGATORIO);
-    }
-  }
-
-
 }

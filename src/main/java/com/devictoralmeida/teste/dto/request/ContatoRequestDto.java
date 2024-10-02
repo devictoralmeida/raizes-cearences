@@ -52,6 +52,10 @@ public class ContatoRequestDto implements Serializable {
     if (isWhatsapp && numeroContato != null) {
       numeroWhatsapp = numeroContato;
     }
+
+    if (isWhatsapp && numeroContato == null && numeroWhatsapp == null) {
+      throw new NegocioException(ContatoValidationMessages.CONTATO_WHATSAPP_OBRIGATORIO);
+    }
   }
 
   private void validaExistenciaContato() {
