@@ -34,3 +34,4 @@ build/
 .vscode/
 
 /src/main/resources/raizes-cearences-firebase-adminsdk-9c1mf-c0364ca5df.json
+minio
