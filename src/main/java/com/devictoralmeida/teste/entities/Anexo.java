@@ -1,11 +1,15 @@
 package com.devictoralmeida.teste.entities;
 
 import com.devictoralmeida.teste.dto.request.AnexoRequestDto;
+import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.AuditTable;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -17,8 +21,10 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "anexo")
+@Audited
+@AuditTable("anexo_aud")
 @NoArgsConstructor
-public class Anexo implements Serializable {
+public class Anexo extends BaseAuditoria implements Serializable {
   @Serial
   private static final long serialVersionUID = 5255144870691782603L;
 
@@ -34,11 +40,12 @@ public class Anexo implements Serializable {
   private String tipo;
 
   @JsonIgnore
+  @NotAudited
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "anexo")
   private List<PessoaPerfilAnexo> pessoaPerfilAnexos = new ArrayList<>();
 
   public Anexo(AnexoRequestDto request) {
-    this.nome = request.getNome();
-    this.tipo = request.getTipo();
+    nome = request.getNome();
+    tipo = request.getTipo();
   }
 }

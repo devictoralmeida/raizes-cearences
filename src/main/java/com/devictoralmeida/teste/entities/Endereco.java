@@ -1,10 +1,13 @@
 package com.devictoralmeida.teste.entities;
 
 import com.devictoralmeida.teste.dto.request.EnderecoRequestDto;
+import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.AuditTable;
+import org.hibernate.envers.Audited;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -14,8 +17,10 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "endereco")
+@Audited
+@AuditTable("endereco_aud")
 @NoArgsConstructor
-public class Endereco implements Serializable {
+public class Endereco extends BaseAuditoria implements Serializable {
   @Serial
   private static final long serialVersionUID = 8519377956416295703L;
 

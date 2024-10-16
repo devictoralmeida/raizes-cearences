@@ -1,6 +1,7 @@
 package com.devictoralmeida.teste.entities;
 
 import com.devictoralmeida.teste.dto.request.DadosPessoaJuridicaRequestDto;
+import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -9,6 +10,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.AuditTable;
+import org.hibernate.envers.Audited;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -19,8 +22,10 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "dados_pessoa_juridica")
+@Audited
+@AuditTable("dados_pessoa_juridica_aud")
 @NoArgsConstructor
-public class DadosPessoaJuridica implements Serializable {
+public class DadosPessoaJuridica extends BaseAuditoria implements Serializable {
   @Serial
   private static final long serialVersionUID = -878915797050051145L;
 

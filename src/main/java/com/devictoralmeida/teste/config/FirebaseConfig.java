@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,13 +20,19 @@ import java.io.InputStream;
 public class FirebaseConfig {
   private static final Logger log = LoggerFactory.getLogger(FirebaseConfig.class);
 
+  @Value("${private.key.address}")
+  private String privateKeyAddress;
+
+  @Value("${firebase.database.url}")
+  private String databaseUrl;
+
   @PostConstruct
   public void initialize() throws IOException {
     try {
-      InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("./raizes-cearences-firebase-adminsdk-9c1mf-c0364ca5df.json");
+      InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream(privateKeyAddress);
       FirebaseOptions options = new FirebaseOptions.Builder()
               .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-              .setDatabaseUrl("https://raizes-cearences-default-rtdb.firebaseio.com")
+              .setDatabaseUrl(databaseUrl)
               .build();
 
       if (FirebaseApp.getApps().isEmpty()) {

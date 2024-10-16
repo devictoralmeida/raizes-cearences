@@ -2,11 +2,14 @@ package com.devictoralmeida.teste.entities;
 
 import com.devictoralmeida.teste.dto.request.PessoaPerfilRequestDto;
 import com.devictoralmeida.teste.enums.TipoUsuario;
+import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.AuditTable;
+import org.hibernate.envers.Audited;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -19,7 +22,9 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @Table(name = "pessoa_perfil")
-public class PessoaPerfil implements Serializable {
+@Audited
+@AuditTable("pessoa_perfil_aud")
+public class PessoaPerfil extends BaseAuditoria implements Serializable {
   @Serial
   private static final long serialVersionUID = -7349150015441550944L;
 

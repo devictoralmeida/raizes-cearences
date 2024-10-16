@@ -2,6 +2,7 @@ package com.devictoralmeida.teste.entities;
 
 import com.devictoralmeida.teste.dto.request.VinculoRequestDto;
 import com.devictoralmeida.teste.enums.RegistroSanitario;
+import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -10,6 +11,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.AuditTable;
+import org.hibernate.envers.Audited;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -20,8 +23,10 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "vinculo")
+@Audited
+@AuditTable("vinculo_aud")
 @NoArgsConstructor
-public class Vinculo implements Serializable {
+public class Vinculo extends BaseAuditoria implements Serializable {
   @Serial
   private static final long serialVersionUID = 7002155743022020905L;
 
