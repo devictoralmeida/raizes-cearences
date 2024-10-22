@@ -8,4 +8,5 @@ import java.util.UUID;
 
 @Repository
 public interface PessoaPerfilRepository extends JpaRepository<PessoaPerfil, UUID> {
+
 }

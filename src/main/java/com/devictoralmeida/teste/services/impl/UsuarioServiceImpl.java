@@ -13,11 +13,9 @@ import com.devictoralmeida.teste.services.rules.RegraPessoaPerfilAnexo;
 import com.devictoralmeida.teste.shared.constants.validation.ContatoValidationMessages;
 import com.devictoralmeida.teste.shared.constants.validation.UsuarioValidationMessages;
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,26 +27,19 @@ public class UsuarioServiceImpl implements UsuarioService {
   private final UsuarioRepository usuarioRepository;
   private final FileService fileService;
   private final CodigoVerificacaoService codigoVerificacaoService;
-  private final FirebaseAuthService firebaseAuthService;
+  private final FirebaseService firebaseService;
   private final EmailService emailService;
-  private final PasswordEncoder passwordEncoder;
+  private final MensagemService mensagemService;
   private final DadosPessoaPerfilRepository dadosPessoaPerfilRepository;
 
   @Override
-  public void save(UsuarioRequestDto request) throws FirebaseAuthException {
+  public void save(UsuarioRequestDto request) {
     request.validar();
-    ContatoRequestDto pessoaContatoRequest = request.getPessoaPerfil().getContato();
+    validarDocumentoExistente(request);
+    validarContatoExistente(request.getPessoaPerfil().getContato());
 
-    if (pessoaContatoRequest.getEmail() != null) {
-      verificarEmailExistente(pessoaContatoRequest.getEmail());
-    }
-
-    if (pessoaContatoRequest.getNumeroWhatsapp() != null) {
-      verificarWhatsappExistente(pessoaContatoRequest.getNumeroWhatsapp());
-    }
-
-    UserRecord usuarioFirebase = firebaseAuthService.criarUsuarioFirebase(request);
-    Usuario usuario = new Usuario(request, passwordEncoder.encode(request.getSenha()));
+    UserRecord usuarioFirebase = firebaseService.criarUsuarioFirebase(request);
+    Usuario usuario = new Usuario(request);
     PessoaPerfil pessoaPerfil = createPessoaPerfil(request, usuario);
     usuario.setPessoaPerfil(pessoaPerfil);
     usuario.setFirebaseUID(usuarioFirebase.getUid());
@@ -56,9 +47,8 @@ public class UsuarioServiceImpl implements UsuarioService {
     usuario.setCodigoVerificacao(codigoVerificacao);
     usuarioRepository.save(usuario);
 
-    if (TipoContato.EMAIL.equals(usuario.getPessoaPerfil().getContato().getPreferenciaContato())) {
-      emailService.enviarEmail(usuario.getPessoaPerfil().getContato().getEmail(), codigoVerificacao.getCodigo());
-    }
+//    TipoContato preferenciaContato = usuario.getPessoaPerfil().getContato().getPreferenciaContato();
+//    enviarCodigo(usuario, codigoVerificacao, preferenciaContato);
   }
 
   @Override
@@ -72,27 +62,39 @@ public class UsuarioServiceImpl implements UsuarioService {
   }
 
   @Override
-  public void validarCodigo(String login, String codigo) throws FirebaseAuthException {
+  public Usuario findByFirebaseUID(String uid) {
+    return usuarioRepository.findByFirebaseUID(uid).orElseThrow(() -> new NegocioException(UsuarioValidationMessages.USUARIO_NAO_ENCONTRADO + " no Firebase"));
+  }
+
+  @Override
+  public void validarCodigo(String login, String codigo) {
     Usuario usuario = findByLogin(login);
     codigoVerificacaoService.validarCodigoConfirmacao(usuario, codigo);
 
     if (TipoContato.EMAIL.equals(usuario.getPessoaPerfil().getContato().getPreferenciaContato())) {
-      firebaseAuthService.emailVerificado(usuario.getFirebaseUID());
+      firebaseService.emailVerificado(usuario.getFirebaseUID());
     }
 
     usuarioRepository.save(usuario);
   }
 
   @Override
-  public void enviarCodigo(String login) {
+  public void reenviarCodigo(String login, TipoContato canalEnvio) {
     Usuario usuario = findByLogin(login);
+    Contato contato = usuario.getPessoaPerfil().getContato();
+
+    if (TipoContato.EMAIL.equals(canalEnvio) && contato.getEmail() == null) {
+      throw new NegocioException(UsuarioValidationMessages.EMAIL_NAO_CADASTRADO);
+    }
+
+    if (TipoContato.WHATSAPP.equals(canalEnvio) && contato.getNumeroWhatsapp() == null) {
+      throw new NegocioException(UsuarioValidationMessages.WHATSAPP_NAO_CADASTRADO);
+    }
+
     CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(codigoVerificacaoService.generateVerificationCode());
     usuario.setCodigoVerificacao(codigoVerificacao);
     usuarioRepository.save(usuario);
-
-    if (TipoContato.EMAIL.equals(usuario.getPessoaPerfil().getContato().getPreferenciaContato())) {
-      emailService.enviarEmail(usuario.getPessoaPerfil().getContato().getEmail(), codigoVerificacao.getCodigo());
-    }
+    enviarCodigo(usuario, codigoVerificacao, canalEnvio);
   }
 
   @Override
@@ -107,6 +109,37 @@ public class UsuarioServiceImpl implements UsuarioService {
       usuario.getPessoaPerfil().getAnexos().add(pessoaPerfilAnexo);
       dadosPessoaPerfilRepository.getPessoaPerfilAnexoRepository().save(pessoaPerfilAnexo);
     });
+  }
+
+  @Override
+  public void delete(UUID id) {
+    Usuario usuario = findById(id);
+    firebaseService.deletarUsuarioFirebase(usuario.getFirebaseUID());
+    usuarioRepository.delete(usuario);
+  }
+
+  private void enviarCodigo(Usuario usuario, CodigoVerificacao codigoVerificacao, TipoContato preferenciaContato) {
+    if (TipoContato.EMAIL.equals(preferenciaContato)) {
+      emailService.enviarEmail(usuario.getPessoaPerfil().getContato().getEmail(), codigoVerificacao.getCodigo());
+    } else if (TipoContato.WHATSAPP.equals(preferenciaContato)) {
+      mensagemService.enviarWhatsapp(usuario.getPessoaPerfil().getContato().getNumeroWhatsapp(), codigoVerificacao.getCodigo());
+    }
+  }
+
+  private void validarDocumentoExistente(UsuarioRequestDto request) {
+    if (usuarioRepository.findByLogin(request.getLogin()).isPresent()) {
+      throw new NegocioException(UsuarioValidationMessages.DOCUMENTO_EXISTENTE);
+    }
+  }
+
+  private void validarContatoExistente(ContatoRequestDto contato) {
+    if (contato.getEmail() != null) {
+      verificarEmailExistente(contato.getEmail());
+    }
+
+    if (contato.getNumeroWhatsapp() != null) {
+      verificarWhatsappExistente(contato.getNumeroWhatsapp());
+    }
   }
 
   private void verificarWhatsappExistente(String numeroWhatsapp) {

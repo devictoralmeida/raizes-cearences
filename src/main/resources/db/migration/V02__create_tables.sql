@@ -13,7 +13,6 @@ CREATE TABLE "usuario"
   "login"                  VARCHAR(14) NOT NULL,
   "tipo_perfil"            VARCHAR(13) NOT NULL,
   "firebase_uid"           VARCHAR(28) NOT NULL,
-  "senha"                  VARCHAR(255) NULL DEFAULT NULL,
   "codigo_verificacao"     UUID                 DEFAULT NULL,
   "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
   "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,

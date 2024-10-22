@@ -18,4 +18,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
   @Query(value = "select * from usuario u where u.login = :login", nativeQuery = true)
   Optional<Usuario> findByLogin(String login);
+
+  @Query(value = "select * from usuario u where u.firebase_uid = :uid", nativeQuery = true)
+  Optional<Usuario> findByFirebaseUID(String uid);
 }

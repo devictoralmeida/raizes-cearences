@@ -28,7 +28,7 @@ public class Usuario extends BaseAuditoria implements Serializable {
   private static final long serialVersionUID = 5017933890529895923L;
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   @Column(name = "id")
   private UUID id;
 
@@ -49,16 +49,11 @@ public class Usuario extends BaseAuditoria implements Serializable {
   @JoinColumn(name = "codigo_verificacao")
   private CodigoVerificacao codigoVerificacao;
 
-  @JsonIgnore
-  @Column(name = "senha")
-  private String senha;
-
   @OneToOne(cascade = CascadeType.ALL, mappedBy = "usuario")
   private PessoaPerfil pessoaPerfil;
 
-  public Usuario(UsuarioRequestDto request, String senha) {
+  public Usuario(UsuarioRequestDto request) {
     login = request.getLogin();
     tipoPerfil = request.getTipoPerfil();
-    this.senha = senha;
   }
 }

@@ -31,7 +31,7 @@ public class Vinculo extends BaseAuditoria implements Serializable {
   private static final long serialVersionUID = 7002155743022020905L;
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   @Column(name = "id")
   private UUID id;
 

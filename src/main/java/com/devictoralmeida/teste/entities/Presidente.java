@@ -31,7 +31,7 @@ public class Presidente extends BaseAuditoria implements Serializable {
   private static final long serialVersionUID = -6357371464647851857L;
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   @Column(name = "id")
   private UUID id;
 

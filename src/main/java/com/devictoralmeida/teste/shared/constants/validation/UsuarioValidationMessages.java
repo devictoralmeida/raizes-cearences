@@ -3,6 +3,7 @@ package com.devictoralmeida.teste.shared.constants.validation;
 public class UsuarioValidationMessages {
   public static final String TIPO_PERFIL_OBRIGATORIO = "O tipo de perfil do usuário é obrigatório";
   public static final String PESSOA_PERFIL_OBRIGATORIA = "O perfil da pessoa é obrigatório";
+  public static final String LOGIN_OBRIGATORIO = "O login é obrigatório";
   public static final String SENHA_OBRIGATORIA = "A senha é obrigatória";
   public static final String SENHA_TAMANHO = "A senha deve ter entre 8 e 32 caracteres";
   public static final String SENHA_INVALIDA = "Para criar uma senha mais segura, use números, letras maiúsculas, letras minúsculas e caracteres especiais.";
@@ -12,6 +13,9 @@ public class UsuarioValidationMessages {
   public static final String CODIGO_INVALIDO = "Código informado inválido!";
   public static final String CODIGO_NAO_INFORMADO = "Código não informado!";
   public static final String USUARIO_NAO_ENCONTRADO = "Usuário não encontrado!";
+  public static final String DOCUMENTO_EXISTENTE = "O documento informado já está cadastrado no sistema";
+  public static final String EMAIL_NAO_CADASTRADO = "O usuário não possui e-mail cadastrado no sistema";
+  public static final String WHATSAPP_NAO_CADASTRADO = "O usuário não possui número de Whatsapp cadastrado no sistema";
 
   private UsuarioValidationMessages() {
   }

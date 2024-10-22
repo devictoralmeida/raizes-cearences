@@ -1,6 +1,7 @@
 package com.devictoralmeida.teste.shared.constants;
 
 public class SharedConstants {
+  public static final String PERMISSOES = "permissoes";
   public static final String REGEX_APENAS_NUMEROS = "^\\d+$";
   public static final String REGEX_ALFANUMERICO = "^[a-zA-Z0-9]+$";
 

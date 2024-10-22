@@ -25,8 +25,6 @@ public class UsuarioRequestDto implements Serializable {
   @NotNull(message = UsuarioValidationMessages.TIPO_PERFIL_OBRIGATORIO)
   private TipoPerfil tipoPerfil;
 
-  private String firebaseUID;
-
   @NotBlank(message = UsuarioValidationMessages.SENHA_OBRIGATORIA)
   @Size(min = 8, max = 32, message = UsuarioValidationMessages.SENHA_TAMANHO)
   @Pattern(regexp = SharedConstants.REGEX_VALIDA_SENHA, message = UsuarioValidationMessages.SENHA_INVALIDA)

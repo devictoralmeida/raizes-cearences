@@ -26,7 +26,7 @@ public class Contato extends BaseAuditoria implements Serializable {
   private static final long serialVersionUID = 1479232788245807261L;
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   @Column(name = "id")
   private UUID id;
 

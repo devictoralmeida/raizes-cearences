@@ -29,7 +29,7 @@ public class PessoaPerfil extends BaseAuditoria implements Serializable {
   private static final long serialVersionUID = -7349150015441550944L;
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   @Column(name = "id")
   private UUID id;
 

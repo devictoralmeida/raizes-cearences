@@ -23,7 +23,7 @@ public class CodigoVerificacao implements Serializable {
   private static final long serialVersionUID = -4375495652608782563L;
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   @Column(name = "id")
   private UUID id;
 

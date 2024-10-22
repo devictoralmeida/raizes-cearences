@@ -32,7 +32,7 @@ public class DadosPessoaFisica extends BaseAuditoria implements Serializable {
   private static final long serialVersionUID = -9139757556305789780L;
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   @Column(name = "id")
   private UUID id;
 

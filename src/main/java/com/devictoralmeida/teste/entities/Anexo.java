@@ -29,7 +29,7 @@ public class Anexo extends BaseAuditoria implements Serializable {
   private static final long serialVersionUID = 5255144870691782603L;
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   @Column(name = "id")
   private UUID id;
 

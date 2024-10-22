@@ -11,6 +11,7 @@ public class PessoaPerfilValidationMessages {
   public static final String DADOS_PESSOAIS_OBRIGATORIOS = "É obrigatório informar os dados pessoais";
   public static final String DOCUMENTO_CPF_TAMANHO = "O documento de pessoa física deve ter 11 caracteres";
   public static final String DOCUMENTO_CNPJ_TAMANHO = "O documento de pessoa jurídica deve ter 14 caracteres";
+
   public static final String DADOS_PESSOA_FISICA_OBRIGATORIO = "É obrigatório informar os dados da pessoa física";
   public static final String DADOS_PESSOA_JURIDICA_OBRIGATORIO = "É obrigatório informar os dados da pessoa jurídica";
   public static final String PRESIDENTE_OBRIGATORIO = "É obrigatório informar os dados do presidente";

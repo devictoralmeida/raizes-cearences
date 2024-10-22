@@ -25,7 +25,7 @@ public class Endereco extends BaseAuditoria implements Serializable {
   private static final long serialVersionUID = 8519377956416295703L;
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   @Column(name = "id")
   private UUID id;
 

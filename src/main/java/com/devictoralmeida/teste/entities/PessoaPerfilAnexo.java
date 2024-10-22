@@ -26,7 +26,7 @@ public class PessoaPerfilAnexo extends BaseAuditoria implements Serializable {
   private static final long serialVersionUID = -1476036932706673337L;
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.UUID)
   @Column(name = "id")
   private UUID id;
 
