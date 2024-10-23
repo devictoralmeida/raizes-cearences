@@ -11,6 +11,8 @@ public class VinculoValidationMessages {
   public static final String SERVICOS_ATER_OBRIGATORIO = "Informe se recebe serviços de ATER";
   public static final String REGISTRO_SANITARIO_OBRIGATORIO = "O registro sanitário é obrigatório quando informado que possui registro sanitário";
 
+  public static final String SERVICOS_OFERTA_CEASA_OBRIGATORIA = "Informe se oferta produtos na CEASA";
+
   private VinculoValidationMessages() {
   }
 }

@@ -13,8 +13,10 @@ public class DadosPessoaFisicaValidationMessages {
   public static final String DATA_EXPEDICAO_TAMANHO = "A data de expedição deve ter 8 caracteres";
   public static final String DATA_NASCIMENTO_TAMANHO = "A data de nascimento deve ter 8 caracteres";
   public static final String DATA_NASCIMENTO_OBRIGATORIA = "A data de nascimento é obrigatória!";
-  public static final String DATA_NASCIMENTO_PASSADO = "A data de nascimento deve ser no passado";
+  public static final String DATA_NASCIMENTO_PASSADO = "A data de nascimento deve ser posterior a 01/01/1900";
   public static final String SEXO_OBRIGATORIO = "O sexo é obrigatório";
+  public static final String ORG_EXPEDIDOR_APENAS_LETRAS = "O órgão expedidor deve conter apenas letras";
+  public static final String DATA_EXPEDICAO_PASSADO = "A data de expedição deve ser posterior a 01/01/1900";
 
   private DadosPessoaFisicaValidationMessages() {
   }

@@ -5,6 +5,8 @@ import com.devictoralmeida.teste.entities.Usuario;
 import com.devictoralmeida.teste.enums.TipoPerfil;
 import com.devictoralmeida.teste.services.AuthService;
 import com.devictoralmeida.teste.services.UsuarioService;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -15,9 +17,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
   private final UsuarioService usuarioService;
+  private final FirebaseAuth firebaseAuth;
 
   @Override
-  public String login(LoginRequestDto request) {
+  public String login(LoginRequestDto request) throws FirebaseAuthException {
+    Usuario usuario = usuarioService.findByLogin(request.getLogin());
+    if (usuario.getPessoaPerfil().getContato().getEmail() != null) {
+      return null;
+    }
     return null;
   }
 

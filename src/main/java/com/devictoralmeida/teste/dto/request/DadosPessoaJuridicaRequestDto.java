@@ -5,7 +5,6 @@ import com.devictoralmeida.teste.shared.constants.validation.DadosPessoaJuridica
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
 import com.devictoralmeida.teste.shared.utils.ValidateDadosUtils;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -24,63 +23,70 @@ public class DadosPessoaJuridicaRequestDto implements Serializable {
 
   private UUID id;
 
-  @Size(max = 150, message = DadosPessoaJuridicaValidationMessages.SIGLA_TAMANHO)
-  private String sigla;
-
   @NotBlank(message = DadosPessoaJuridicaValidationMessages.RAZAO_SOCIAL_OBRIGATORIA)
-  @Size(max = 100, message = DadosPessoaJuridicaValidationMessages.RAZAO_SOCIAL_TAMANHO)
+  @Pattern(regexp = SharedConstants.REGEX_ALFANUMERICO, message = DadosPessoaJuridicaValidationMessages.RAZAO_SOCIAL_ALFANUMERICO)
+  @Size(max = 150, message = DadosPessoaJuridicaValidationMessages.RAZAO_SOCIAL_TAMANHO_COOPERATIVA_ASSOCIACAO)
   private String razaoSocial;
 
-  @Size(max = 100, message = DadosPessoaJuridicaValidationMessages.NOME_FANTASIA_TAMANHO)
+  @Pattern(regexp = SharedConstants.REGEX_ALFANUMERICO, message = DadosPessoaJuridicaValidationMessages.NOME_FANTASIA_ALFANUMERICO)
+  @Size(max = 150, message = DadosPessoaJuridicaValidationMessages.NOME_FANTASIA_TAMANHO_COOPERATIVA_ASSOCIACAO)
   private String nomeFantasia;
 
-  @Pattern(regexp = SharedConstants.REGEX_APENAS_NUMEROS, message = DadosPessoaJuridicaValidationMessages.INSCRICAO_JUNTA_COMERCIAL_APENAS_NUMEROS)
   @Size(max = 50, message = DadosPessoaJuridicaValidationMessages.INSCRICAO_JUNTA_COMERCIAL_TAMANHO)
   private String inscricaoJuntaComercial;
 
+  @Pattern(regexp = SharedConstants.REGEX_APENAS_NUMEROS, message = DadosPessoaJuridicaValidationMessages.INSCRICAO_ESTADUAL_APENAS_NUMEROS)
   @Size(max = 12, message = DadosPessoaJuridicaValidationMessages.INSCRICAO_ESTADUAL_TAMANHO)
   private String inscricaoEstadual;
 
-  @Past(message = DadosPessoaJuridicaValidationMessages.DATA_FUNDACAO_PASSADO_PRESENTE)
   private LocalDate dataFundacao;
 
+  @Size(max = 11, message = DadosPessoaJuridicaValidationMessages.CAF_TAMANHO)
+  private String caf;
+
+  private LocalDate dataValidadeCaf;
+
+  public void validar() {
+    validarTamanhoCampo(razaoSocial, 100, DadosPessoaJuridicaValidationMessages.RAZAO_SOCIAL_TAMANHO_PADRAO);
+    validarTamanhoCampo(nomeFantasia, 100, DadosPessoaJuridicaValidationMessages.NOME_FANTASIA_TAMANHO_PADRAO);
+    resetarCamposNaoPermitidos();
+  }
+
+  private void validarTamanhoCampo(String campo, int tamanhoMaximo, String mensagemErro) {
+    if (campo != null && campo.length() > tamanhoMaximo) {
+      throw new NegocioException(mensagemErro);
+    }
+  }
+
+  private void resetarCamposNaoPermitidos() {
+    dataValidadeCaf = null;
+    caf = null;
+    dataFundacao = null;
+    inscricaoEstadual = null;
+    inscricaoJuntaComercial = null;
+  }
+
   public void validarCooperativaAssociacao() {
-    validarSigla();
-    validarNomeFantasia();
-    validarDataFundacao();
-    validarInscricaoJuntaComercial();
-    validarInscricaoEstadual();
+    validarCampoObrigatorio(nomeFantasia, DadosPessoaJuridicaValidationMessages.NOME_FANTASIA_OBRIGATORIO);
+    validarData(dataFundacao, DadosPessoaJuridicaValidationMessages.DATA_FUNDACAO_OBRIGATORIA, DadosPessoaJuridicaValidationMessages.DATA_FUNDACAO_PASSADO);
+    validarCampoObrigatorio(inscricaoJuntaComercial, DadosPessoaJuridicaValidationMessages.INSCRICAO_JUNTA_COMERCIAL_OBRIGATORIA);
+    validarCampoObrigatorio(inscricaoEstadual, DadosPessoaJuridicaValidationMessages.INSCRICAO_ESTADUAL_OBRIGATORIA);
+    validarData(dataValidadeCaf, null, DadosPessoaJuridicaValidationMessages.DATA_VALIDADE_CAF_PASSADO);
   }
 
-  private void validarSigla() {
-    if (ValidateDadosUtils.isNullOrStringVazia(sigla)) {
-      throw new NegocioException(DadosPessoaJuridicaValidationMessages.SIGLA_OBRIGATORIA);
+  private void validarCampoObrigatorio(String campo, String mensagemErro) {
+    if (ValidateDadosUtils.isNullOrStringVazia(campo)) {
+      throw new NegocioException(mensagemErro);
     }
   }
 
-  private void validarNomeFantasia() {
-    if (ValidateDadosUtils.isNullOrStringVazia(nomeFantasia)) {
-      throw new NegocioException(DadosPessoaJuridicaValidationMessages.NOME_FANTASIA_OBRIGATORIO);
+  private void validarData(LocalDate data, String mensagemErroObrigatorio, String mensagemErroPassado) {
+    if (data == null) {
+      if (mensagemErroObrigatorio != null) {
+        throw new NegocioException(mensagemErroObrigatorio);
+      }
+    } else if (data.isBefore(SharedConstants.DATA_MINIMA)) {
+      throw new NegocioException(mensagemErroPassado);
     }
   }
-
-  private void validarDataFundacao() {
-    if (dataFundacao == null) {
-      throw new NegocioException(DadosPessoaJuridicaValidationMessages.DATA_FUNDACAO_OBRIGATORIA);
-    }
-  }
-
-  private void validarInscricaoJuntaComercial() {
-    if (ValidateDadosUtils.isNullOrStringVazia(inscricaoJuntaComercial)) {
-      throw new NegocioException(DadosPessoaJuridicaValidationMessages.INSCRICAO_JUNTA_COMERCIAL_OBRIGATORIA);
-    }
-  }
-
-  private void validarInscricaoEstadual() {
-    if (ValidateDadosUtils.isNullOrStringVazia(inscricaoEstadual)) {
-      throw new NegocioException(DadosPessoaJuridicaValidationMessages.INSCRICAO_ESTADUAL_OBRIGATORIA);
-    }
-  }
-
-
 }

@@ -1,5 +1,7 @@
 package com.devictoralmeida.teste.shared.constants;
 
+import java.time.LocalDate;
+
 public class SharedConstants {
   public static final String PERMISSOES = "permissoes";
   public static final String REGEX_APENAS_NUMEROS = "^\\d+$";
@@ -10,6 +12,8 @@ public class SharedConstants {
   public static final int TAMANHO_CPF = 11;
   public static final int TAMANHO_MAXIMO_RG = 20;
   public static final int TAMANHO_CNPJ = 14;
+
+  public static final LocalDate DATA_MINIMA = LocalDate.of(1900, 1, 1);
 
   public static final int TAMANHO_KB = 1024;
 

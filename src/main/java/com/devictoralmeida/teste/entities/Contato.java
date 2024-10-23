@@ -30,7 +30,7 @@ public class Contato extends BaseAuditoria implements Serializable {
   @Column(name = "id")
   private UUID id;
 
-  @Column(name = "preferencia_contato", nullable = false)
+  @Column(name = "preferencia_contato")
   @Enumerated(EnumType.STRING)
   private TipoContato preferenciaContato;
 

@@ -11,9 +11,8 @@ public class PresidenteValidationMessages {
   public static final String DATA_INICIO_MANDATO_PASSADO_OU_PRESENTE = "A data de início do mandato deve ser no passado ou presente!";
   public static final String DATA_FINAL_MANDATO_OBRIGATORIA = "A data de final do mandato é obrigatória!";
   public static final String DATA_FINAL_MANDATO_FUTURO_OU_PRESENTE = "A data de final do mandato deve ser no futuro ou presente!";
-  public static final String NOME_PAI_TAMANHO = "O nome do pai deve ter no máximo 150 caracteres";
-  public static final String NOME_MAE_OBRIGATORIO = "O nome da mãe é obrigatório!";
-  public static final String NOME_MAE_TAMANHO = "O nome da mãe deve ter no máximo 150 caracteres";
+  public static final String DATA_INICIO_MANDATO_PASSADO = "A data de início do mandato deve ser posterior a 01/01/1900";
+  public static final String DATA_FINAL_MANDATO_PASSADO = "A data de final do mandato deve ser posterior a 01/01/1900";
 
   private PresidenteValidationMessages() {
   }

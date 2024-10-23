@@ -46,7 +46,7 @@ public class AnexoRequestDto implements Serializable {
   }
 
   private void verificaTipoArquivo() {
-    List<String> formatosPermitidos = List.of("pdf", "png", "doc", "docx", "odt");
+    List<String> formatosPermitidos = List.of("pdf");
 
     if (!formatosPermitidos.contains(tipo)) {
       throw new NegocioException(AnexoValidationMessages.TIPO_INVALIDO);

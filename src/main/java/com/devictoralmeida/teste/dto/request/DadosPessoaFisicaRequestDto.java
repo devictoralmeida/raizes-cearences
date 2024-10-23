@@ -4,7 +4,7 @@ import com.devictoralmeida.teste.enums.GrauInstrucao;
 import com.devictoralmeida.teste.enums.Sexo;
 import com.devictoralmeida.teste.shared.constants.SharedConstants;
 import com.devictoralmeida.teste.shared.constants.validation.DadosPessoaFisicaValidationMessages;
-import com.devictoralmeida.teste.shared.constants.validation.PresidenteValidationMessages;
+import com.devictoralmeida.teste.shared.exceptions.NegocioException;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,6 +35,7 @@ public class DadosPessoaFisicaRequestDto implements Serializable {
   @Size(max = SharedConstants.TAMANHO_MAXIMO_RG, message = DadosPessoaFisicaValidationMessages.RG_TAMANHO)
   private String rg;
 
+  @Pattern(regexp = SharedConstants.REGEX_APENAS_LETRAS, message = DadosPessoaFisicaValidationMessages.ORG_EXPEDIDOR_APENAS_LETRAS)
   @Size(max = 15, message = DadosPessoaFisicaValidationMessages.ORG_EXPEDIDOR_TAMANHO)
   private String orgaoExpeditor;
 
@@ -42,7 +43,6 @@ public class DadosPessoaFisicaRequestDto implements Serializable {
   private LocalDate dataExpedicao;
 
   @NotNull(message = DadosPessoaFisicaValidationMessages.DATA_NASCIMENTO_OBRIGATORIA)
-  @Past(message = DadosPessoaFisicaValidationMessages.DATA_NASCIMENTO_PASSADO)
   private LocalDate dataNascimento;
 
   @NotNull(message = DadosPessoaFisicaValidationMessages.SEXO_OBRIGATORIO)
@@ -50,9 +50,17 @@ public class DadosPessoaFisicaRequestDto implements Serializable {
 
   private GrauInstrucao grauInstrucao;
 
-  @Size(max = 150, message = PresidenteValidationMessages.NOME_MAE_TAMANHO)
-  private String nomeMae;
+  void validar() {
+    validarDatas();
+  }
 
-  @Size(max = 150, message = PresidenteValidationMessages.NOME_PAI_TAMANHO)
-  private String nomePai;
+  private void validarDatas() {
+    if (dataNascimento.isBefore(SharedConstants.DATA_MINIMA)) {
+      throw new NegocioException(DadosPessoaFisicaValidationMessages.DATA_NASCIMENTO_PASSADO);
+    }
+
+    if (dataExpedicao != null && dataExpedicao.isBefore(SharedConstants.DATA_MINIMA)) {
+      throw new NegocioException(DadosPessoaFisicaValidationMessages.DATA_EXPEDICAO_PASSADO);
+    }
+  }
 }

@@ -34,9 +34,6 @@ public class DadosPessoaJuridica extends BaseAuditoria implements Serializable {
   @Column(name = "id")
   private UUID id;
 
-  @Column(name = "sigla")
-  private String sigla;
-
   @Column(name = "razao_social", nullable = false)
   private String razaoSocial;
 
@@ -54,12 +51,21 @@ public class DadosPessoaJuridica extends BaseAuditoria implements Serializable {
   @Column(name = "dat_fundacao")
   private LocalDate dataFundacao;
 
+  @Column(name = "caf")
+  private String caf;
+
+  @JsonDeserialize(using = LocalDateDeserializer.class)
+  @JsonSerialize(using = LocalDateSerializer.class)
+  @Column(name = "dat_validade_caf")
+  private LocalDate dataValidadeCaf;
+
   public DadosPessoaJuridica(DadosPessoaJuridicaRequestDto request) {
-    sigla = request.getSigla();
     razaoSocial = request.getRazaoSocial();
     nomeFantasia = request.getNomeFantasia();
     inscricaoJuntaComercial = request.getInscricaoJuntaComercial();
     inscricaoEstadual = request.getInscricaoEstadual();
     dataFundacao = request.getDataFundacao();
+    caf = request.getCaf();
+    dataValidadeCaf = request.getDataValidadeCaf();
   }
 }

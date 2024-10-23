@@ -3,7 +3,6 @@ package com.devictoralmeida.teste.dto.request;
 import com.devictoralmeida.teste.shared.constants.SharedConstants;
 import com.devictoralmeida.teste.shared.constants.validation.PresidenteValidationMessages;
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
-import com.devictoralmeida.teste.shared.utils.ValidateDadosUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -30,22 +29,26 @@ public class PresidenteRequestDto implements Serializable {
   @NotNull(message = PresidenteValidationMessages.CONTATO_OBRIGATORIO)
   private @Valid ContatoRequestDto contato;
 
-  @NotNull(message = PresidenteValidationMessages.ENDERECO_OBRIGATORIO)
-  private @Valid EnderecoRequestDto endereco;
-
   @NotNull(message = PresidenteValidationMessages.DATA_INICIO_MANDATO_OBRIGATORIA)
   @PastOrPresent(message = PresidenteValidationMessages.DATA_INICIO_MANDATO_PASSADO_OU_PRESENTE)
   private LocalDate dataInicioMandato;
 
   @NotNull(message = PresidenteValidationMessages.DATA_FINAL_MANDATO_OBRIGATORIA)
-  @FutureOrPresent(message = PresidenteValidationMessages.DATA_FINAL_MANDATO_FUTURO_OU_PRESENTE)
   private LocalDate dataFinalMandato;
 
   public void validar() {
-    if (ValidateDadosUtils.isNullOrStringVazia(dadosPessoais.getNomeMae())) {
-      throw new NegocioException(PresidenteValidationMessages.NOME_MAE_OBRIGATORIO);
+    validarDatasMandato();
+    dadosPessoais.validar();
+    contato.validacoesPresidente();
+  }
+
+  private void validarDatasMandato() {
+    if (dataInicioMandato.isBefore(SharedConstants.DATA_MINIMA)) {
+      throw new NegocioException(PresidenteValidationMessages.DATA_INICIO_MANDATO_PASSADO);
     }
 
-    contato.validar();
+    if (dataFinalMandato.isBefore(SharedConstants.DATA_MINIMA)) {
+      throw new NegocioException(PresidenteValidationMessages.DATA_FINAL_MANDATO_PASSADO);
+    }
   }
 }

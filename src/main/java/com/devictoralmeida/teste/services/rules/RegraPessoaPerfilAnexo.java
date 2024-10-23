@@ -16,13 +16,13 @@ public class RegraPessoaPerfilAnexo {
     anexos.forEach(AnexoRequestDto::validar);
 
     switch (tipoPerfil) {
-      case AGRICULTOR, CONSUMIDOR -> throw new NegocioException(AnexoValidationMessages.TIPO_PERFIL_INVALIDO);
-      case AGROINDUSTRIA, COOPERATIVA -> validarAnexosAgroindustriaCooperativa(anexos);
+      case COOPERATIVA -> validarAnexosCooperativa(anexos);
       case ASSOCIACAO -> validarAnexosAssociacao(anexos);
+      default -> throw new NegocioException(AnexoValidationMessages.TIPO_PERFIL_INVALIDO);
     }
   }
 
-  public static void validarAnexosAgroindustriaCooperativa(List<AnexoRequestDto> anexos) {
+  public static void validarAnexosCooperativa(List<AnexoRequestDto> anexos) {
     validarDocumentosObrigatorios(anexos, List.of(
             TipoDocumento.ATA_ASSEMBLEIA_GERAL,
             TipoDocumento.ATA_FUNDACAO,

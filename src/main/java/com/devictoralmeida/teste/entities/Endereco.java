@@ -35,16 +35,13 @@ public class Endereco extends BaseAuditoria implements Serializable {
   @Column(name = "municipio", nullable = false)
   private String municipio;
 
-  @Column(name = "distrito", nullable = false)
-  private String distrito;
-
-  @Column(name = "localidade", nullable = false)
+  @Column(name = "localidade")
   private String localidade;
 
-  @Column(name = "logradouro", nullable = false)
+  @Column(name = "logradouro")
   private String logradouro;
 
-  @Column(name = "numero", nullable = false)
+  @Column(name = "numero")
   private String numero;
 
   @Column(name = "complemento")
@@ -62,7 +59,6 @@ public class Endereco extends BaseAuditoria implements Serializable {
   public Endereco(EnderecoRequestDto request) {
     cep = request.getCep();
     municipio = request.getMunicipio();
-    distrito = request.getDistrito();
     localidade = request.getLocalidade();
     logradouro = request.getLogradouro();
     numero = request.getNumero();

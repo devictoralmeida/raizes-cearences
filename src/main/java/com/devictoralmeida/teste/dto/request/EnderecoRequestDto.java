@@ -27,19 +27,15 @@ public class EnderecoRequestDto implements Serializable {
   @Size(max = 100, message = EnderecoValidationMessages.MUNICIPIO_TAMANHO)
   private String municipio;
 
-  @NotBlank(message = EnderecoValidationMessages.DISTRITO_OBRIGATORIO)
-  @Size(max = 100, message = EnderecoValidationMessages.DISTRITO_TAMANHO)
-  private String distrito;
-
-  @NotBlank(message = EnderecoValidationMessages.LOCALIDADE_OBRIGATORIA)
+  //  @NotBlank(message = EnderecoValidationMessages.LOCALIDADE_OBRIGATORIA)
   @Size(max = 100, message = EnderecoValidationMessages.LOCALIDADE_TAMANHO)
   private String localidade;
 
-  @NotBlank(message = EnderecoValidationMessages.LOGRADOURO_OBRIGATORIO)
+  //  @NotBlank(message = EnderecoValidationMessages.LOGRADOURO_OBRIGATORIO)
   @Size(max = 100, message = EnderecoValidationMessages.LOGRADOURO_TAMANHO)
   private String logradouro;
 
-  @NotBlank(message = EnderecoValidationMessages.NUMERO_OBRIGATORIO)
+  //  @NotBlank(message = EnderecoValidationMessages.NUMERO_OBRIGATORIO)
   @Pattern(regexp = SharedConstants.REGEX_ALFANUMERICO, message = EnderecoValidationMessages.NUMERO_ALFANUMERICO)
   @Size(max = 10, message = EnderecoValidationMessages.NUMERO_TAMANHO)
   private String numero;

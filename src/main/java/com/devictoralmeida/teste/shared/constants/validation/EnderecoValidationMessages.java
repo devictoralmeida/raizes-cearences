@@ -6,8 +6,6 @@ public class EnderecoValidationMessages {
   public static final String CEP_OBRIGATORIO = "O CEP é obrigatório!";
   public static final String MUNICIPIO_TAMANHO = "O município deve ter no máximo 100 caracteres";
   public static final String MUNICIPIO_OBRIGATORIO = "O município é obrigatório!";
-  public static final String DISTRITO_TAMANHO = "O distrito deve ter no máximo 100 caracteres";
-  public static final String DISTRITO_OBRIGATORIO = "O distrito é obrigatório!";
   public static final String LOCALIDADE_TAMANHO = "A localidade deve ter no máximo 100 caracteres";
   public static final String LOCALIDADE_OBRIGATORIA = "A localidade é obrigatória!";
   public static final String LOGRADOURO_TAMANHO = "O logradouro deve ter no máximo 100 caracteres";

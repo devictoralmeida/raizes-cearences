@@ -45,10 +45,6 @@ public class Presidente extends BaseAuditoria implements Serializable {
   @JoinColumn(name = "contato_id", referencedColumnName = "id", nullable = false)
   private Contato contato;
 
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "endereco_id", referencedColumnName = "id", nullable = false)
-  private Endereco endereco;
-
   @JsonDeserialize(using = LocalDateDeserializer.class)
   @JsonSerialize(using = LocalDateSerializer.class)
   @Column(name = "dat_inicio_mandato", nullable = false)
@@ -71,7 +67,6 @@ public class Presidente extends BaseAuditoria implements Serializable {
     dadosPessoaId = idDadosPessoaisPresidente;
     this.pessoaPerfil = pessoaPerfil;
     contato = new Contato(request.getContato());
-    endereco = new Endereco(request.getEndereco());
   }
 
 }

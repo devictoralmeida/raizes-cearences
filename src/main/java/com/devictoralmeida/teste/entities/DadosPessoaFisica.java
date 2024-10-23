@@ -62,15 +62,9 @@ public class DadosPessoaFisica extends BaseAuditoria implements Serializable {
   @Enumerated(EnumType.STRING)
   private Sexo sexo;
 
-  @Column(name = "grau_instrucao", nullable = false)
+  @Column(name = "grau_instrucao")
   @Enumerated(EnumType.STRING)
   private GrauInstrucao grauInstrucao;
-
-  @Column(name = "nome_mae")
-  private String nomeMae;
-
-  @Column(name = "nome_pai")
-  private String nomePai;
 
   public DadosPessoaFisica(DadosPessoaFisicaRequestDto request) {
     rg = request.getRg();
@@ -81,7 +75,5 @@ public class DadosPessoaFisica extends BaseAuditoria implements Serializable {
     dataNascimento = request.getDataNascimento();
     sexo = request.getSexo();
     grauInstrucao = request.getGrauInstrucao();
-    nomeMae = request.getNomeMae();
-    nomePai = request.getNomePai();
   }
 }
