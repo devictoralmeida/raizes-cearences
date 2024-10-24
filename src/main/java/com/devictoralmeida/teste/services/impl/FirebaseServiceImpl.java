@@ -5,6 +5,7 @@ import com.devictoralmeida.teste.services.FirebaseService;
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class FirebaseServiceImpl implements FirebaseService {
+  private final FirebaseAuth firebaseAuth;
+
   @Override
   public UserRecord criarUsuarioFirebase(UsuarioRequestDto dto) {
     String nome = dto.getPessoaPerfil().getDadosPessoaFisica() != null
@@ -20,13 +23,13 @@ public class FirebaseServiceImpl implements FirebaseService {
 
     try {
       UserRecord.CreateRequest request = createFirebaseUserRequest(dto, nome);
-      UserRecord firebaseUser = FirebaseAuth.getInstance().createUser(request);
+      UserRecord firebaseUser = firebaseAuth.createUser(request);
 //      Set<String> permissoes = new HashSet<>();
 //      permissoes.add("AGRICULTOR");
 //
 //      HashMap<String, Object> claims = new HashMap<>();
 //      claims.put(SharedConstants.PERMISSOES, permissoes);
-//      FirebaseAuth.getInstance().setCustomUserClaims(firebaseUser.getUid(), claims);
+//      firebaseAuth.setCustomUserClaims(firebaseUser.getUid(), claims);
       return firebaseUser;
     } catch (FirebaseAuthException e) {
       throw new NegocioException("Erro ao criar o usuário no Firebase");
@@ -55,7 +58,7 @@ public class FirebaseServiceImpl implements FirebaseService {
   public void emailVerificado(String uid) {
     try {
       UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(uid).setEmailVerified(true);
-      FirebaseAuth.getInstance().updateUser(request);
+      firebaseAuth.updateUser(request);
     } catch (FirebaseAuthException e) {
       throw new NegocioException("Erro ao verificar o e-mail do usuário no Firebase");
     }
@@ -64,9 +67,14 @@ public class FirebaseServiceImpl implements FirebaseService {
   @Override
   public void deletarUsuarioFirebase(String uid) {
     try {
-      FirebaseAuth.getInstance().deleteUser(uid);
+      firebaseAuth.deleteUser(uid);
     } catch (FirebaseAuthException e) {
       throw new NegocioException("Erro ao deletar usuário no Firebase");
     }
+  }
+
+  @Override
+  public FirebaseToken verificarToken(String idToken) throws FirebaseAuthException {
+    return firebaseAuth.verifyIdToken(idToken);
   }
 }

@@ -11,9 +11,13 @@ import lombok.Setter;
 import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -23,7 +27,7 @@ import java.util.UUID;
 @Table(name = "usuario")
 @Audited
 @AuditTable("usuario_aud")
-public class Usuario extends BaseAuditoria implements Serializable {
+public class Usuario extends BaseAuditoria implements UserDetails, Serializable {
   @Serial
   private static final long serialVersionUID = 5017933890529895923L;
 
@@ -44,6 +48,10 @@ public class Usuario extends BaseAuditoria implements Serializable {
   private String firebaseUID;
 
   @JsonIgnore
+  @Column(name = "senha")
+  private String senha;
+
+  @JsonIgnore
   @OneToOne
   @NotAudited
   @JoinColumn(name = "codigo_verificacao")
@@ -52,8 +60,50 @@ public class Usuario extends BaseAuditoria implements Serializable {
   @OneToOne(cascade = CascadeType.ALL, mappedBy = "usuario")
   private PessoaPerfil pessoaPerfil;
 
-  public Usuario(UsuarioRequestDto request) {
+  @ManyToMany
+  @JoinTable(name = "usuario_perfil_acesso",
+          joinColumns = @JoinColumn(name = "usuario_id"),
+          inverseJoinColumns = @JoinColumn(name = "perfil_acesso_id"))
+  private List<PerfilAcesso> perfisAcessos;
+
+  public Usuario(UsuarioRequestDto request, String senha) {
     login = request.getLogin();
     tipoPerfil = request.getTipoPerfil();
+    this.senha = senha;
+  }
+
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return List.of();
+  }
+
+  @Override
+  public String getPassword() {
+    return senha;
+  }
+
+  @Override
+  public String getUsername() {
+    return login;
+  }
+
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    return true;
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return true;
   }
 }

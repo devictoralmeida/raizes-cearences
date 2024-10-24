@@ -8,6 +8,7 @@ import com.devictoralmeida.teste.shared.constants.validation.UsuarioValidationMe
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Random;
@@ -17,6 +18,7 @@ import java.util.Random;
 public class CodigoVerificacaoServiceImpl implements CodigoVerificacaoService {
   private final CodigoVerificacaoRepository repository;
 
+  @Transactional
   @Override
   public CodigoVerificacao save(String codigo) {
     LocalDateTime dataExpiracao = LocalDateTime.now().plusMinutes(15);

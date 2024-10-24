@@ -13,6 +13,7 @@ CREATE TABLE "usuario"
   "login"                  VARCHAR(14) NOT NULL,
   "tipo_perfil"            VARCHAR(13) NOT NULL,
   "firebase_uid"           VARCHAR(28) NOT NULL,
+  "senha" VARCHAR(255) NULL DEFAULT NULL,
   "codigo_verificacao"     UUID                 DEFAULT NULL,
   "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
   "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,
@@ -297,29 +298,118 @@ CREATE TABLE "presidente_aud"
   CONSTRAINT "fk_tbpresidente_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
-CREATE TABLE "perfil"
+CREATE TABLE "perfil_acesso"
 (
-  "id"   UUID PRIMARY KEY,
-  "nome" VARCHAR
+  "id"                     UUID PRIMARY KEY,
+  "nome"                   VARCHAR   NOT NULL,
+  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,
+  "dat_criacao"            TIMESTAMP NOT NULL DEFAULT (now()),
+  "dat_atualizacao"        TIMESTAMP NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "perfil_acesso_aud"
+(
+  "id"           UUID    NOT NULL,
+  "nome"         VARCHAR NOT NULL,
+  "cd_auditoria" BIGINT  NOT NULL,
+  "tp_movimento" SMALLINT NULL DEFAULT NULL,
+  CONSTRAINT "pk_tbperfil_acesso_aud" PRIMARY KEY ("id", "cd_auditoria"),
+  CONSTRAINT "fk_tbperfil_acesso_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 CREATE TABLE "modulo"
 (
-  "id"   UUID PRIMARY KEY,
-  "nome" VARCHAR
+  "id"                     UUID PRIMARY KEY,
+  "nome"                   VARCHAR   NOT NULL,
+  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,
+  "dat_criacao"            TIMESTAMP NOT NULL DEFAULT (now()),
+  "dat_atualizacao"        TIMESTAMP NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "modulo_aud"
+(
+  "id"           UUID    NOT NULL,
+  "nome"         VARCHAR NOT NULL,
+  "cd_auditoria" BIGINT  NOT NULL,
+  "tp_movimento" SMALLINT NULL DEFAULT NULL,
+  CONSTRAINT "pk_tbmodulo_aud" PRIMARY KEY ("id", "cd_auditoria"),
+  CONSTRAINT "fk_tbmodulo_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 CREATE TABLE "permissao"
 (
-  "id"        UUID PRIMARY KEY,
-  "nome"      VARCHAR,
-  "modulo_id" UUID
+  "id"                     UUID PRIMARY KEY,
+  "nome"                   VARCHAR   NOT NULL,
+  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,
+  "dat_criacao"            TIMESTAMP NOT NULL DEFAULT (now()),
+  "dat_atualizacao"        TIMESTAMP NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "permissao_aud"
+(
+  "id"           UUID    NOT NULL,
+  "nome"         VARCHAR NOT NULL,
+  "cd_auditoria" BIGINT  NOT NULL,
+  "tp_movimento" SMALLINT NULL DEFAULT NULL,
+  CONSTRAINT "pk_tbpermissao_aud" PRIMARY KEY ("id", "cd_auditoria"),
+  CONSTRAINT "fk_tbpermissao_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 CREATE TABLE "perfil_permissao"
 (
   "perfil_id"    UUID,
-  "permissao_id" UUID
+  "permissao_id" UUID,
+  CONSTRAINT "fk_perfil_permissao_perfil" FOREIGN KEY ("perfil_id") REFERENCES "perfil_acesso" ("id"),
+  CONSTRAINT "fk_perfil_permissao_permissao" FOREIGN KEY ("permissao_id") REFERENCES "permissao" ("id")
+);
+
+CREATE TABLE "perfil_permissao_aud"
+(
+  "perfil_id"    UUID   NOT NULL,
+  "permissao_id" UUID   NOT NULL,
+  "cd_auditoria" BIGINT NOT NULL,
+  "tp_movimento" SMALLINT NULL DEFAULT NULL,
+  CONSTRAINT "pk_perfil_permissao_aud" PRIMARY KEY ("perfil_id", "permissao_id", "cd_auditoria"),
+  CONSTRAINT "fk_perfil_permissao_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+CREATE TABLE "modulo_permissao"
+(
+  "modulo_id"    UUID NOT NULL,
+  "permissao_id" UUID NOT NULL,
+  CONSTRAINT "fk_modulo_permissao_modulo" FOREIGN KEY ("modulo_id") REFERENCES "modulo" ("id"),
+  CONSTRAINT "fk_modulo_permissao_permissao" FOREIGN KEY ("permissao_id") REFERENCES "permissao" ("id")
+);
+
+CREATE TABLE "modulo_permissao_aud"
+(
+  "modulo_id"    UUID   NOT NULL,
+  "permissao_id" UUID   NOT NULL,
+  "cd_auditoria" BIGINT NOT NULL,
+  "tp_movimento" SMALLINT NULL DEFAULT NULL,
+  CONSTRAINT "pk_modulo_permissao_aud" PRIMARY KEY ("modulo_id", "permissao_id", "cd_auditoria"),
+  CONSTRAINT "fk_modulo_permissao_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+CREATE TABLE "usuario_perfil_acesso"
+(
+  "usuario_id"       UUID NOT NULL,
+  "perfil_acesso_id" UUID NOT NULL,
+  CONSTRAINT "fk_tbusuarioperfilacesso_tbusuario" FOREIGN KEY ("usuario_id") REFERENCES "usuario" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT "fk_tbusuarioperfilacesso_tbperfilacesso" FOREIGN KEY ("perfil_acesso_id") REFERENCES "perfil_acesso" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+CREATE TABLE "usuario_perfil_acesso_aud"
+(
+  "cd_auditoria"     BIGINT NOT NULL,
+  "usuario_id"       UUID   NOT NULL,
+  "perfil_acesso_id" UUID   NOT NULL,
+  "tp_movimento"     SMALLINT NULL DEFAULT NULL,
+  CONSTRAINT "pk_tbusuarioperfilacessoaud" PRIMARY KEY ("cd_auditoria", "usuario_id", "perfil_acesso_id"),
+  CONSTRAINT "fk_tbusuarioperfilacessoaud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 ALTER TABLE "pessoa_perfil"
@@ -344,19 +434,7 @@ ALTER TABLE "presidente"
   ADD FOREIGN KEY ("contato_id") REFERENCES "contato" ("id");
 
 ALTER TABLE "presidente"
-  ADD FOREIGN KEY ("endereco_id") REFERENCES "endereco" ("id");
-
-ALTER TABLE "presidente"
   ADD FOREIGN KEY ("pessoa_perfil_id") REFERENCES "pessoa_perfil" ("id");
 
 ALTER TABLE "presidente"
   ADD FOREIGN KEY ("dados_pessoa_id") REFERENCES "dados_pessoa_fisica" ("id");
-
-ALTER TABLE "permissao"
-  ADD FOREIGN KEY ("modulo_id") REFERENCES "modulo" ("id");
-
-ALTER TABLE "perfil_permissao"
-  ADD FOREIGN KEY ("perfil_id") REFERENCES "perfil" ("id");
-
-ALTER TABLE "perfil_permissao"
-  ADD FOREIGN KEY ("permissao_id") REFERENCES "permissao" ("id");

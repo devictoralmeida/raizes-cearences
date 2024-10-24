@@ -13,10 +13,17 @@ import com.devictoralmeida.teste.services.rules.RegraPessoaPerfilAnexo;
 import com.devictoralmeida.teste.shared.constants.validation.ContatoValidationMessages;
 import com.devictoralmeida.teste.shared.constants.validation.UsuarioValidationMessages;
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +38,9 @@ public class UsuarioServiceImpl implements UsuarioService {
   private final EmailService emailService;
   private final MensagemService mensagemService;
   private final DadosPessoaPerfilRepository dadosPessoaPerfilRepository;
+  private final PasswordEncoder passwordEncoder;
 
+  @Transactional
   @Override
   public void save(UsuarioRequestDto request) {
     request.validar();
@@ -39,7 +48,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     validarContatoExistente(request.getPessoaPerfil().getContato());
 
     UserRecord usuarioFirebase = firebaseService.criarUsuarioFirebase(request);
-    Usuario usuario = new Usuario(request);
+    Usuario usuario = new Usuario(request, passwordEncoder.encode(request.getSenha()));
     PessoaPerfil pessoaPerfil = createPessoaPerfil(request, usuario);
     usuario.setPessoaPerfil(pessoaPerfil);
     usuario.setFirebaseUID(usuarioFirebase.getUid());
@@ -51,21 +60,25 @@ public class UsuarioServiceImpl implements UsuarioService {
 //    enviarCodigo(usuario, codigoVerificacao, preferenciaContato);
   }
 
+  @Transactional(readOnly = true)
   @Override
   public Usuario findById(UUID id) {
     return usuarioRepository.findById(id).orElseThrow(() -> new NegocioException(UsuarioValidationMessages.USUARIO_NAO_ENCONTRADO));
   }
 
+  @Transactional(readOnly = true)
   @Override
   public Usuario findByLogin(String login) {
     return usuarioRepository.findByLogin(login).orElseThrow(() -> new NegocioException(UsuarioValidationMessages.USUARIO_NAO_ENCONTRADO));
   }
 
+  @Transactional(readOnly = true)
   @Override
   public Usuario findByFirebaseUID(String uid) {
     return usuarioRepository.findByFirebaseUID(uid).orElseThrow(() -> new NegocioException(UsuarioValidationMessages.USUARIO_NAO_ENCONTRADO + " no Firebase"));
   }
 
+  @Transactional
   @Override
   public void validarCodigo(String login, String codigo) {
     Usuario usuario = findByLogin(login);
@@ -78,6 +91,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     usuarioRepository.save(usuario);
   }
 
+  @Transactional
   @Override
   public void reenviarCodigo(String login, TipoContato canalEnvio) {
     Usuario usuario = findByLogin(login);
@@ -97,6 +111,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     enviarCodigo(usuario, codigoVerificacao, canalEnvio);
   }
 
+  @Transactional
   @Override
   public void uploadAnexos(String login, @Valid List<AnexoRequestDto> anexos) {
     Usuario usuario = findByLogin(login);
@@ -111,11 +126,17 @@ public class UsuarioServiceImpl implements UsuarioService {
     });
   }
 
+  @Transactional(propagation = Propagation.SUPPORTS)
   @Override
   public void delete(UUID id) {
     Usuario usuario = findById(id);
     firebaseService.deletarUsuarioFirebase(usuario.getFirebaseUID());
     usuarioRepository.delete(usuario);
+  }
+
+  @Override
+  public FirebaseToken verificarToken(String idToken) throws FirebaseAuthException {
+    return firebaseService.verificarToken(idToken);
   }
 
   private void enviarCodigo(Usuario usuario, CodigoVerificacao codigoVerificacao, TipoContato preferenciaContato) {
@@ -187,5 +208,10 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   private boolean isCooperativaAssociacao(Usuario usuario) {
     return TipoPerfil.COOPERATIVA.equals(usuario.getTipoPerfil()) || TipoPerfil.ASSOCIACAO.equals(usuario.getTipoPerfil());
+  }
+
+  @Override
+  public UserDetails loadUserByUsername(String uid) throws UsernameNotFoundException {
+    return findByFirebaseUID(uid);
   }
 }
