@@ -2,9 +2,10 @@ package com.devictoralmeida.teste.services.impl;
 
 import com.devictoralmeida.teste.entities.CodigoVerificacao;
 import com.devictoralmeida.teste.entities.Usuario;
+import com.devictoralmeida.teste.enums.TipoCodigoVerificacao;
 import com.devictoralmeida.teste.repositories.CodigoVerificacaoRepository;
 import com.devictoralmeida.teste.services.CodigoVerificacaoService;
-import com.devictoralmeida.teste.shared.constants.validation.UsuarioValidationMessages;
+import com.devictoralmeida.teste.shared.constants.errors.UsuarioErrorsMessageConstants;
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,32 +21,43 @@ public class CodigoVerificacaoServiceImpl implements CodigoVerificacaoService {
 
   @Transactional
   @Override
-  public CodigoVerificacao save(String codigo) {
-    LocalDateTime dataExpiracao = LocalDateTime.now().plusMinutes(15);
-    CodigoVerificacao codigoVerificacao = new CodigoVerificacao(codigo, dataExpiracao);
-    return repository.save(codigoVerificacao);
+  public CodigoVerificacao save(TipoCodigoVerificacao tipo) {
+    if (TipoCodigoVerificacao.CONTATO.equals(tipo)) {
+      LocalDateTime dataExpiracao = LocalDateTime.now().plusMinutes(15);
+      CodigoVerificacao codigoVerificacao = new CodigoVerificacao(gerarCodigoVerificacaoContato(), dataExpiracao);
+      return repository.save(codigoVerificacao);
+    } else {
+      return null;
+    }
   }
 
   @Override
-  public String generateVerificationCode() {
+  public String gerarCodigoVerificacaoContato() {
     return String.format("%05d", new Random().nextInt(100000));
   }
 
   @Override
+  public String gerarCodigoVerificacaoSenha(LocalDateTime dataCadastroUsuario) {
+    String ano = String.valueOf(dataCadastroUsuario.getYear()).substring(2);
+    String mes = String.format("%02d", dataCadastroUsuario.getMonthValue());
+
+    Random random = new Random();
+    int primeiroNumero = random.nextInt(9);
+    int segundoNumero = (primeiroNumero + 1) % 10;
+    String numerosSequenciais = String.format("%d%d", primeiroNumero, segundoNumero);
+
+    return ano + mes + numerosSequenciais;
+  }
+
+  @Override
   public void validarCodigoConfirmacao(Usuario usuario, String codigo) {
-    if (usuario.getCodigoVerificacao() != null) {
-      LocalDateTime dataAtual = LocalDateTime.now();
-      LocalDateTime dataExpiracao = usuario.getCodigoVerificacao().getDataExpiracao();
+    LocalDateTime dataAtual = LocalDateTime.now();
+    LocalDateTime dataExpiracao = usuario.getCodigoVerificacao().getDataExpiracao();
+    boolean codigoInvalido = !usuario.getCodigoVerificacao().getCodigo().equals(codigo);
+    boolean codigoExpirado = !dataAtual.isBefore(dataExpiracao);
 
-      if (!dataAtual.isBefore(dataExpiracao)) {
-        throw new NegocioException(UsuarioValidationMessages.CODIGO_EXPIRADO);
-      }
-
-      if (!usuario.getCodigoVerificacao().getCodigo().equals(codigo)) {
-        throw new NegocioException(UsuarioValidationMessages.CODIGO_INVALIDO);
-      }
-    } else {
-      throw new NegocioException(UsuarioValidationMessages.CODIGO_NAO_INFORMADO);
+    if (codigoInvalido || codigoExpirado) {
+      throw new NegocioException(UsuarioErrorsMessageConstants.CODIGO_INVALIDO_EXPIRADO);
     }
 
     usuario.getCodigoVerificacao().setValido(true);

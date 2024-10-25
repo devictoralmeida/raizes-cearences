@@ -4,6 +4,10 @@ import com.devictoralmeida.teste.dto.request.UsuarioRequestDto;
 import com.devictoralmeida.teste.enums.TipoPerfil;
 import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,13 +16,16 @@ import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -48,6 +55,7 @@ public class Usuario extends BaseAuditoria implements UserDetails, Serializable 
   private String firebaseUID;
 
   @JsonIgnore
+  @NotAudited
   @Column(name = "senha")
   private String senha;
 
@@ -60,11 +68,11 @@ public class Usuario extends BaseAuditoria implements UserDetails, Serializable 
   @OneToOne(cascade = CascadeType.ALL, mappedBy = "usuario")
   private PessoaPerfil pessoaPerfil;
 
-  @ManyToMany
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "usuario_perfil_acesso",
           joinColumns = @JoinColumn(name = "usuario_id"),
           inverseJoinColumns = @JoinColumn(name = "perfil_acesso_id"))
-  private List<PerfilAcesso> perfisAcessos;
+  private Set<PerfilAcesso> perfisAcessos = new HashSet<>();
 
   public Usuario(UsuarioRequestDto request, String senha) {
     login = request.getLogin();
@@ -72,14 +80,24 @@ public class Usuario extends BaseAuditoria implements UserDetails, Serializable 
     this.senha = senha;
   }
 
+  public String toStringMapper() throws JsonProcessingException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    return objectMapper.writeValueAsString(this);
+  }
+
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of();
+    return perfisAcessos.stream()
+            .map(perfil -> new SimpleGrantedAuthority(perfil.getNome()))
+            .collect(Collectors.toSet());
   }
 
   @Override
   public String getPassword() {
-    return senha;
+    return null;
   }
 
   @Override

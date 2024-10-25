@@ -1,6 +1,7 @@
 package com.devictoralmeida.teste.shared.exceptions;
 
 import com.devictoralmeida.teste.dto.response.ResponseDto;
+import com.devictoralmeida.teste.shared.constants.MessageCommonsConstants;
 import com.devictoralmeida.teste.shared.constants.validation.AnexoValidationMessages;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.slf4j.Logger;
@@ -73,7 +74,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             .toList();
 
     ResponseDto<?> res = ResponseDto.fromData(null, HttpStatus.BAD_REQUEST,
-            "Favor verifique todos os campos com validação", erros);
+            MessageCommonsConstants.MENSAGEM_VERIFICAR_CAMPOS, erros);
 
     return handleExceptionInternal(ex, res, headers, HttpStatus.BAD_REQUEST, request);
   }
@@ -94,7 +95,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
               .collect(Collectors.toList());
 
       String errorMessage = String.format(
-              "Valor inválido para o tipo %s: %s. Valores aceitos são: %s.",
+              MessageCommonsConstants.MENSAGEM_VALOR_INVALIDO,
               enumType, invalidValue, enumValues);
 
       ResponseDto<?> res = ResponseDto.fromData(null, HttpStatus.BAD_REQUEST, errorMessage);
@@ -171,5 +172,27 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     Object obj = ResponseDto.fromData(null, HttpStatus.BAD_REQUEST, error, Arrays.asList(field));
     return handleExceptionInternal(ex, obj, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+  }
+
+  @ExceptionHandler({RecursoNaoEncontradoException.class})
+  public ResponseEntity<?> handleRecursoNaoEncontradoException(RecursoNaoEncontradoException ex, WebRequest request) {
+    LOGGER.error(" =============== RecursoNaoEncontradoException ==========================");
+
+    String field = ex.getMessage();
+    String error = ex.getMessage();
+
+    Object obj = ResponseDto.fromData(null, HttpStatus.NOT_FOUND, error, Arrays.asList(field));
+    return handleExceptionInternal(ex, obj, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+  }
+
+  @ExceptionHandler({SemAutorizacaoException.class})
+  public ResponseEntity<?> handleSemAutorizacaoExceptionException(SemAutorizacaoException ex, WebRequest request) {
+    LOGGER.error(" =============== SemAutorizacaoException ==========================");
+
+    String field = ex.getMessage();
+    String error = ex.getMessage();
+
+    Object obj = ResponseDto.fromData(null, HttpStatus.UNAUTHORIZED, error, Arrays.asList(field));
+    return handleExceptionInternal(ex, obj, new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
   }
 }

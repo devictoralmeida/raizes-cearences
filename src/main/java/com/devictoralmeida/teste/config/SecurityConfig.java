@@ -1,10 +1,12 @@
 package com.devictoralmeida.teste.config;
 
 import com.devictoralmeida.teste.config.filters.FirebaseAuthenticationFilter;
+import com.devictoralmeida.teste.shared.constants.RotasPermitidasConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -31,8 +33,9 @@ public class SecurityConfig {
             .cors(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> {
-              auth.requestMatchers("/home").authenticated();
-              auth.anyRequest().permitAll();
+              auth.requestMatchers(HttpMethod.POST, "/usuario").permitAll()
+                      .requestMatchers(RotasPermitidasConstants.ROTAS_PERMITIDAS).permitAll()
+                      .anyRequest().authenticated();
             })
 //            .formLogin((withDefaults()));
 //            .addFilterAfter(new FirebaseAuthenticationFilter(authService), BasicAuthenticationFilter.class);

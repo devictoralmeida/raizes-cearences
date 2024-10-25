@@ -2,30 +2,32 @@ package com.devictoralmeida.teste.services.impl;
 
 import com.devictoralmeida.teste.dto.request.AnexoRequestDto;
 import com.devictoralmeida.teste.dto.request.ContatoRequestDto;
+import com.devictoralmeida.teste.dto.request.ContatoUpdateRequestDto;
 import com.devictoralmeida.teste.dto.request.UsuarioRequestDto;
 import com.devictoralmeida.teste.entities.*;
+import com.devictoralmeida.teste.enums.TipoCodigoVerificacao;
 import com.devictoralmeida.teste.enums.TipoContato;
 import com.devictoralmeida.teste.enums.TipoPerfil;
 import com.devictoralmeida.teste.factories.DadosPessoaPerfilRepository;
 import com.devictoralmeida.teste.repositories.UsuarioRepository;
 import com.devictoralmeida.teste.services.*;
 import com.devictoralmeida.teste.services.rules.RegraPessoaPerfilAnexo;
-import com.devictoralmeida.teste.shared.constants.validation.ContatoValidationMessages;
-import com.devictoralmeida.teste.shared.constants.validation.UsuarioValidationMessages;
+import com.devictoralmeida.teste.shared.auditoria.CustomRevisionListener;
+import com.devictoralmeida.teste.shared.constants.errors.ContatoErrorsMessageConstants;
+import com.devictoralmeida.teste.shared.constants.errors.UsuarioErrorsMessageConstants;
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
+import com.devictoralmeida.teste.shared.exceptions.RecursoNaoEncontradoException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.firebase.auth.UserRecord;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -52,7 +54,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     PessoaPerfil pessoaPerfil = createPessoaPerfil(request, usuario);
     usuario.setPessoaPerfil(pessoaPerfil);
     usuario.setFirebaseUID(usuarioFirebase.getUid());
-    CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(codigoVerificacaoService.generateVerificationCode());
+    CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO);
     usuario.setCodigoVerificacao(codigoVerificacao);
     usuarioRepository.save(usuario);
 
@@ -63,19 +65,19 @@ public class UsuarioServiceImpl implements UsuarioService {
   @Transactional(readOnly = true)
   @Override
   public Usuario findById(UUID id) {
-    return usuarioRepository.findById(id).orElseThrow(() -> new NegocioException(UsuarioValidationMessages.USUARIO_NAO_ENCONTRADO));
+    return usuarioRepository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException(UsuarioErrorsMessageConstants.USUARIO_NAO_ENCONTRADO));
   }
 
   @Transactional(readOnly = true)
   @Override
   public Usuario findByLogin(String login) {
-    return usuarioRepository.findByLogin(login).orElseThrow(() -> new NegocioException(UsuarioValidationMessages.USUARIO_NAO_ENCONTRADO));
+    return usuarioRepository.findByLogin(login).orElseThrow(() -> new RecursoNaoEncontradoException(UsuarioErrorsMessageConstants.USUARIO_NAO_ENCONTRADO));
   }
 
   @Transactional(readOnly = true)
   @Override
   public Usuario findByFirebaseUID(String uid) {
-    return usuarioRepository.findByFirebaseUID(uid).orElseThrow(() -> new NegocioException(UsuarioValidationMessages.USUARIO_NAO_ENCONTRADO + " no Firebase"));
+    return usuarioRepository.findByFirebaseUID(uid).orElseThrow(() -> new RecursoNaoEncontradoException(UsuarioErrorsMessageConstants.USUARIO_NAO_ENCONTRADO));
   }
 
   @Transactional
@@ -93,19 +95,10 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   @Transactional
   @Override
-  public void reenviarCodigo(String login, TipoContato canalEnvio) {
+  public void reenviarCodigo(String login) {
     Usuario usuario = findByLogin(login);
-    Contato contato = usuario.getPessoaPerfil().getContato();
-
-    if (TipoContato.EMAIL.equals(canalEnvio) && contato.getEmail() == null) {
-      throw new NegocioException(UsuarioValidationMessages.EMAIL_NAO_CADASTRADO);
-    }
-
-    if (TipoContato.WHATSAPP.equals(canalEnvio) && contato.getNumeroWhatsapp() == null) {
-      throw new NegocioException(UsuarioValidationMessages.WHATSAPP_NAO_CADASTRADO);
-    }
-
-    CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(codigoVerificacaoService.generateVerificationCode());
+    TipoContato canalEnvio = usuario.getPessoaPerfil().getContato().getPreferenciaContato();
+    CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO);
     usuario.setCodigoVerificacao(codigoVerificacao);
     usuarioRepository.save(usuario);
     enviarCodigo(usuario, codigoVerificacao, canalEnvio);
@@ -134,14 +127,39 @@ public class UsuarioServiceImpl implements UsuarioService {
     usuarioRepository.delete(usuario);
   }
 
+  @Transactional
   @Override
-  public FirebaseToken verificarToken(String idToken) throws FirebaseAuthException {
-    return firebaseService.verificarToken(idToken);
+  public void alterarContato(String login, ContatoUpdateRequestDto request) throws JsonProcessingException {
+    request.validar();
+    Usuario usuario = findByLogin(login);
+    Contato contato = usuario.getPessoaPerfil().getContato();
+
+    boolean houveMudanca = contato.validarMudancaUpdateCodigo(request);
+
+    if (houveMudanca) {
+      if (!contato.getNumeroWhatsapp().equals(request.getNumeroWhatsapp())) {
+        verificarWhatsappExistente(request.getNumeroWhatsapp());
+      }
+
+      if (!contato.getEmail().equals(request.getEmail())) {
+        verificarEmailExistente(request.getEmail());
+      }
+
+      CustomRevisionListener.setDadosAntigos(usuario.toStringMapper());
+      contato.aplicarMudancaUpdateCodigo(request);
+    }
+
+    CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO);
+    usuario.setCodigoVerificacao(codigoVerificacao);
+    Usuario updatedUser = usuarioRepository.save(usuario);
+    boolean usuarioPossuiEmail = Objects.nonNull(updatedUser.getPessoaPerfil().getContato().getEmail());
+    firebaseService.atualizarContatoUsuarioFirebase(updatedUser.getFirebaseUID(), request, usuarioPossuiEmail);
+    enviarCodigo(usuario, codigoVerificacao, updatedUser.getPessoaPerfil().getContato().getPreferenciaContato());
   }
 
   private void enviarCodigo(Usuario usuario, CodigoVerificacao codigoVerificacao, TipoContato preferenciaContato) {
     if (TipoContato.EMAIL.equals(preferenciaContato)) {
-      emailService.enviarEmail(usuario.getPessoaPerfil().getContato().getEmail(), codigoVerificacao.getCodigo());
+//      emailService.enviarEmail(usuario.getPessoaPerfil().getContato().getEmail(), codigoVerificacao.getCodigo());
     } else if (TipoContato.WHATSAPP.equals(preferenciaContato)) {
       mensagemService.enviarWhatsapp(usuario.getPessoaPerfil().getContato().getNumeroWhatsapp(), codigoVerificacao.getCodigo());
     }
@@ -149,7 +167,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   private void validarDocumentoExistente(UsuarioRequestDto request) {
     if (usuarioRepository.findByLogin(request.getLogin()).isPresent()) {
-      throw new NegocioException(UsuarioValidationMessages.DOCUMENTO_EXISTENTE);
+      throw new NegocioException(UsuarioErrorsMessageConstants.DOCUMENTO_EXISTENTE);
     }
   }
 
@@ -164,14 +182,14 @@ public class UsuarioServiceImpl implements UsuarioService {
   }
 
   private void verificarWhatsappExistente(String numeroWhatsapp) {
-    if (usuarioRepository.findByWhatsapp(numeroWhatsapp).isPresent()) {
-      throw new NegocioException(ContatoValidationMessages.WHATSAPP_JA_CADASTRADO);
+    if (Objects.nonNull(numeroWhatsapp) && usuarioRepository.findByWhatsapp(numeroWhatsapp).isPresent()) {
+      throw new NegocioException(ContatoErrorsMessageConstants.WHATSAPP_JA_CADASTRADO);
     }
   }
 
   private void verificarEmailExistente(String email) {
-    if (usuarioRepository.findByEmail(email).isPresent()) {
-      throw new NegocioException(ContatoValidationMessages.EMAIL_JA_CADASTRADO);
+    if (Objects.nonNull(email) && usuarioRepository.findByEmail(email).isPresent()) {
+      throw new NegocioException(ContatoErrorsMessageConstants.EMAIL_JA_CADASTRADO);
     }
   }
 
@@ -208,10 +226,5 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   private boolean isCooperativaAssociacao(Usuario usuario) {
     return TipoPerfil.COOPERATIVA.equals(usuario.getTipoPerfil()) || TipoPerfil.ASSOCIACAO.equals(usuario.getTipoPerfil());
-  }
-
-  @Override
-  public UserDetails loadUserByUsername(String uid) throws UsernameNotFoundException {
-    return findByFirebaseUID(uid);
   }
 }

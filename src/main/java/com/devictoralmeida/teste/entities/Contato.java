@@ -1,8 +1,10 @@
 package com.devictoralmeida.teste.entities;
 
 import com.devictoralmeida.teste.dto.request.ContatoRequestDto;
+import com.devictoralmeida.teste.dto.request.ContatoUpdateRequestDto;
 import com.devictoralmeida.teste.enums.TipoContato;
 import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
+import com.devictoralmeida.teste.shared.utils.ValidateDadosUtils;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +14,7 @@ import org.hibernate.envers.Audited;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -56,5 +59,19 @@ public class Contato extends BaseAuditoria implements Serializable {
     email = request.getEmail();
     isWhatsapp = request.isWhatsapp();
     isNewsletter = request.isNewsletter();
+  }
+
+  public boolean validarMudancaUpdateCodigo(ContatoUpdateRequestDto request) {
+    if (TipoContato.EMAIL.equals(request.getPreferenciaContato())) {
+      return !Objects.equals(email, request.getEmail());
+    } else {
+      return !Objects.equals(numeroWhatsapp, request.getNumeroWhatsapp());
+    }
+  }
+
+  public void aplicarMudancaUpdateCodigo(ContatoUpdateRequestDto request) {
+    preferenciaContato = request.getPreferenciaContato();
+    numeroWhatsapp = ValidateDadosUtils.isNullOrStringVazia(request.getNumeroWhatsapp()) ? numeroWhatsapp : request.getNumeroWhatsapp();
+    email = ValidateDadosUtils.isNullOrStringVazia(request.getEmail()) ? email : request.getEmail();
   }
 }

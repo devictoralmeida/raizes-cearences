@@ -1,12 +1,11 @@
 package com.devictoralmeida.teste.config.filters;
 
-import com.devictoralmeida.teste.services.UsuarioService;
+import com.devictoralmeida.teste.services.AuthService;
 import com.google.firebase.auth.FirebaseToken;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,20 +21,27 @@ import java.io.IOException;
 public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
   @Autowired
   @Lazy
-  private final UsuarioService usuarioService;
+  private final AuthService authService;
 
-  public FirebaseAuthenticationFilter(@Lazy UsuarioService usuarioService) {
-    this.usuarioService = usuarioService;
+  public FirebaseAuthenticationFilter(@Lazy AuthService authService) {
+    this.authService = authService;
   }
 
-  @SneakyThrows
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     String idToken = recoverToken(request);
 
+//    if (idToken == null) {
+//      throw new SemAutorizacaoException(FirebaseErrorsMessageConstants.ERRO_AUTENTICACAO_TOKEN);
+//    }
+
+//    if (request.getRequestURI().contains("/auth/login")) {
+//
+//    } else {
+
     if (idToken != null) {
-      FirebaseToken token = usuarioService.verificarToken(idToken);
-      UserDetails user = usuarioService.loadUserByUsername(token.getUid());
+      FirebaseToken token = authService.verificarToken(idToken);
+      UserDetails user = authService.loadUserByUsername(token.getUid());
       Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
       SecurityContextHolder.getContext().setAuthentication(authentication);
     }

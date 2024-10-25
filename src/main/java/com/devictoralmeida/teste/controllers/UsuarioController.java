@@ -2,14 +2,15 @@ package com.devictoralmeida.teste.controllers;
 
 import com.devictoralmeida.teste.dto.request.AnexoRequestDto;
 import com.devictoralmeida.teste.dto.request.CodigoRequestDto;
+import com.devictoralmeida.teste.dto.request.ContatoUpdateRequestDto;
 import com.devictoralmeida.teste.dto.request.UsuarioRequestDto;
 import com.devictoralmeida.teste.dto.response.ResponseDto;
-import com.devictoralmeida.teste.enums.TipoContato;
 import com.devictoralmeida.teste.enums.TipoDocumento;
 import com.devictoralmeida.teste.services.UsuarioService;
 import com.devictoralmeida.teste.shared.constants.MessageCommonsConstants;
 import com.devictoralmeida.teste.shared.constants.validation.AnexoValidationMessages;
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -52,8 +53,8 @@ public class UsuarioController {
   }
 
   @PostMapping("/reenviar-codigo/{login}")
-  public ResponseEntity<?> reenvioCodigo(@PathVariable(name = "login") String login, TipoContato canalEnvio) {
-    service.reenviarCodigo(login, canalEnvio);
+  public ResponseEntity<?> reenvioCodigo(@PathVariable(name = "login") String login) {
+    service.reenviarCodigo(login);
     return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_CODIGO_ENVIADO_SUCESSO));
   }
 
@@ -61,6 +62,12 @@ public class UsuarioController {
   public ResponseEntity<?> validarCodigo(@PathVariable(name = "login") String login, @Valid @RequestBody CodigoRequestDto request) {
     service.validarCodigo(login, request.getCodigo());
     return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_CADASTRO_CONFIRMADO_SUCESSO));
+  }
+
+  @PatchMapping("/alterar-contato/{login}")
+  public ResponseEntity<?> alterarContato(@PathVariable(name = "login") String login, @Valid @RequestBody ContatoUpdateRequestDto request) throws JsonProcessingException {
+    service.alterarContato(login, request);
+    return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_CONTATO_ALTERADO_SUCESSO));
   }
 
   @DeleteMapping("/{id}")

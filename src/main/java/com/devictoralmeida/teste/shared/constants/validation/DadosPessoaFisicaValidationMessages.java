@@ -10,8 +10,6 @@ public class DadosPessoaFisicaValidationMessages {
   public static final String SOBRENOME_TAMANHO = "O sobrenome deve ter no máximo 100 caracteres";
   public static final String ORG_EXPEDIDOR_TAMANHO = "O órgão expedidor deve ter no máximo 15 caracteres";
   public static final String DATA_EXPEDICAO_PASSADO_PRESENTE = "A data de expedição deve ser no passado ou presente";
-  public static final String DATA_EXPEDICAO_TAMANHO = "A data de expedição deve ter 8 caracteres";
-  public static final String DATA_NASCIMENTO_TAMANHO = "A data de nascimento deve ter 8 caracteres";
   public static final String DATA_NASCIMENTO_OBRIGATORIA = "A data de nascimento é obrigatória!";
   public static final String DATA_NASCIMENTO_PASSADO = "A data de nascimento deve ser posterior a 01/01/1900";
   public static final String SEXO_OBRIGATORIO = "O sexo é obrigatório";

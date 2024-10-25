@@ -1,5 +1,6 @@
 package com.devictoralmeida.teste.entities;
 
+import com.devictoralmeida.teste.enums.TipoCodigoVerificacao;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,10 @@ public class CodigoVerificacao implements Serializable {
 
   @Column(name = "codigo", nullable = false)
   private String codigo;
+
+  @Column(name = "tipo_codigo", nullable = false)
+  @Enumerated(EnumType.STRING)
+  private TipoCodigoVerificacao tipoCodigo;
 
   @Column(name = "fl_validado")
   private boolean isValido = false;

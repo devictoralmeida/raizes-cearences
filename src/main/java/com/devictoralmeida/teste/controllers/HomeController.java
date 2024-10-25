@@ -1,5 +1,6 @@
 package com.devictoralmeida.teste.controllers;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -7,7 +8,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class HomeController {
 
   @GetMapping(value = "/home")
-  public String test() {
-    return "Hello World!";
+  public void test(Authentication authentication) {
+    System.out.println(authentication);
+    System.out.println(authentication.getName());
+    System.out.println(authentication.getClass());
+    System.out.println(authentication.getCredentials());
+    System.out.println(authentication.getPrincipal());
+    System.out.println(authentication.isAuthenticated());
+    System.out.println(authentication.getAuthorities());
   }
 }

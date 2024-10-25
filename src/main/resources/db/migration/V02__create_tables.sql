@@ -2,6 +2,7 @@ CREATE TABLE "codigo_verificacao"
 (
   "id"            UUID       NOT NULL,
   "codigo"        VARCHAR(5) NOT NULL,
+  "tipo_codigo" VARCHAR(10) NOT NULL,
   "fl_validado"   boolean,
   "dat_expiracao" TIMESTAMP  NOT NULL,
   CONSTRAINT "pk_codigoverificacao" PRIMARY KEY ("id")

@@ -2,7 +2,6 @@ package com.devictoralmeida.teste.shared.constants.validation;
 
 public class AnexoValidationMessages {
   public static final String TIPO_MIME_TAMANHO = "O tipo mime do anexo deve ter no máximo 5 caracteres";
-  public static final String TIPO_MIME_OBRIGATORIO = "O tipo mime do anexo é obrigatório";
   public static final String NOME_ANEXO_TAMANHO = "O nome do anexo deve ter no máximo 255 caracteres";
   public static final String TIPO_DOCUMENTO_OBRIGATORIO = "O tipo de documento do anexo é obrigatório";
   public static final String TIPO_INVALIDO = "O tipo de arquivo enviado não é permitido, o tipo permitido é: pdf";
