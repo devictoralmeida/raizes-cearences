@@ -1,9 +1,6 @@
 package com.devictoralmeida.teste.services.impl;
 
-import com.devictoralmeida.teste.dto.request.FirebaseLoginRequestDto;
-import com.devictoralmeida.teste.dto.request.LoginRequestDto;
-import com.devictoralmeida.teste.dto.request.RecuperarSenhaRequestDto;
-import com.devictoralmeida.teste.dto.request.RefreshTokenRequestDto;
+import com.devictoralmeida.teste.dto.request.*;
 import com.devictoralmeida.teste.dto.response.FirebaseLoginResponseDto;
 import com.devictoralmeida.teste.dto.response.RefreshTokenResponseDto;
 import com.devictoralmeida.teste.entities.Usuario;
@@ -82,9 +79,25 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public void recuperarSenha(RecuperarSenhaRequestDto request) {
+  public void enviarCodigoRecuperacaoSenha(RecuperarSenhaRequestDto request) {
     Usuario usuario = usuarioService.findByLogin(request.getLogin());
     usuarioService.enviarCodigoRecuperacaoSenha(usuario);
+  }
+
+  @Override
+  public void recuperarSenha(String login, SenhaRequestDto request) {
+    usuarioService.criarSenha(login, request);
+  }
+
+  @Override
+  public void alterarSenha(AlterarSenhaRequestDto request) {
+    request.validar();
+    Usuario usuario = usuarioService.findByLogin(request.getLogin());
+    verificarUsuarioValido(usuario);
+    UserRecord firebaseUser = firebaseService.findUserByUid(usuario.getFirebaseUID());
+    FirebaseLoginRequestDto firebaseLoginRequestDto = new FirebaseLoginRequestDto(firebaseUser.getEmail(), request.getSenhaAtual());
+    firebaseLogin(firebaseLoginRequestDto);
+    usuarioService.alterarSenha(usuario, request.getNovaSenha());
   }
 
   private FirebaseLoginResponseDto firebaseLogin(FirebaseLoginRequestDto request) {

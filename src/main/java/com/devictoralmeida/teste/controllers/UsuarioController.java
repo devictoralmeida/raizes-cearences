@@ -33,14 +33,8 @@ public class UsuarioController {
 
   @PatchMapping("/criar-senha/{login}")
   public ResponseEntity<?> criarSenha(@PathVariable(name = "login") String login, @Valid @RequestBody SenhaRequestDto request) {
-    service.alterarSenha(login, request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.fromData(null, HttpStatus.CREATED, MessageCommonsConstants.MENSAGEM_SENHA_CADASTRADA_SUCESSO));
-  }
-
-  @PatchMapping("/alterar-senha/{login}")
-  public ResponseEntity<?> alterarSenha(@PathVariable(name = "login") String login, @Valid @RequestBody SenhaRequestDto request) {
-    service.alterarSenha(login, request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.fromData(null, HttpStatus.CREATED, MessageCommonsConstants.MENSAGEM_SENHA_ALTERADA_SUCESSO));
+    service.criarSenha(login, request);
+    return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_SENHA_CADASTRADA_SUCESSO));
   }
 
   @PostMapping("/upload/{login}")
@@ -64,7 +58,7 @@ public class UsuarioController {
   @PostMapping("/reenviar-codigo/{login}")
   public ResponseEntity<?> reenvioCodigo(@PathVariable(name = "login") String login) {
     service.reenviarCodigo(login);
-    return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_CODIGO_ENVIADO_SUCESSO));
+    return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.fromData(null, HttpStatus.CREATED, MessageCommonsConstants.MENSAGEM_CODIGO_ENVIADO_SUCESSO));
   }
 
   @PatchMapping("/validacao-codigo/{login}")

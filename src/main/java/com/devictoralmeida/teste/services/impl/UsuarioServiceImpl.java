@@ -156,12 +156,17 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   @Transactional
   @Override
-  public void alterarSenha(String login, SenhaRequestDto request) {
+  public void criarSenha(String login, SenhaRequestDto request) {
     request.validar();
     Usuario usuario = findByLogin(login);
     verificarValidacaoCodigo(usuario);
-    usuario.setSenha(passwordEncoder.encode(request.getSenha()));
-    firebaseService.atualizarSenhaUsuarioFirebase(usuario.getFirebaseUID(), request.getSenha());
+    alterarSenha(usuario, request.getSenha());
+  }
+
+  @Override
+  public void alterarSenha(Usuario usuario, String senha) {
+    usuario.setSenha(passwordEncoder.encode(senha));
+    firebaseService.atualizarSenhaUsuarioFirebase(usuario.getFirebaseUID(), senha);
     usuarioRepository.save(usuario);
   }
 

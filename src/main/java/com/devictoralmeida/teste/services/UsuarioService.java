@@ -30,11 +30,13 @@ public interface UsuarioService {
 
   void alterarContato(String login, ContatoUpdateRequestDto request) throws JsonProcessingException;
 
-  void alterarSenha(String login, SenhaRequestDto request);
+  void criarSenha(String login, SenhaRequestDto request);
 
   void verificarValidacaoCodigo(Usuario usuario);
 
   void verificarAceiteTermos(Usuario usuario);
 
   void enviarCodigoRecuperacaoSenha(Usuario usuario);
+
+  void alterarSenha(Usuario usuario, String senha);
 }
