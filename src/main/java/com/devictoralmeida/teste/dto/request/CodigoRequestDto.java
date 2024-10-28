@@ -12,6 +12,7 @@ import java.io.Serializable;
 public class CodigoRequestDto implements Serializable {
   @Serial
   private static final long serialVersionUID = 7256937663879706028L;
+
   @NotEmpty(message = "O código é obrigatório")
   private String codigo;
 }

@@ -9,12 +9,15 @@ public class HomeController {
 
   @GetMapping(value = "/home")
   public void test(Authentication authentication) {
-    System.out.println(authentication);
-    System.out.println(authentication.getName());
-    System.out.println(authentication.getClass());
-    System.out.println(authentication.getCredentials());
-    System.out.println(authentication.getPrincipal());
-    System.out.println(authentication.isAuthenticated());
-    System.out.println(authentication.getAuthorities());
+    if (authentication != null) {
+      System.out.println(authentication);
+      System.out.println(authentication.getName());
+      System.out.println(authentication.getClass());
+      System.out.println(authentication.getCredentials());
+      System.out.println(authentication.getPrincipal());
+      System.out.println(authentication.isAuthenticated());
+      System.out.println(authentication.getAuthorities());
+    }
+
   }
 }

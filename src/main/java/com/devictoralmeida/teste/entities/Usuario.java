@@ -7,7 +7,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -68,16 +73,31 @@ public class Usuario extends BaseAuditoria implements UserDetails, Serializable 
   @OneToOne(cascade = CascadeType.ALL, mappedBy = "usuario")
   private PessoaPerfil pessoaPerfil;
 
+  @ManyToOne
+  @JoinColumn(name = "termo_id")
+  @NotAudited
+  @JsonIgnore
+  private TermoCondicao termo;
+
+  @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+  @JsonSerialize(using = LocalDateTimeSerializer.class)
+  @NotAudited
+  @Column(name = "dat_aceite_termo")
+  private LocalDateTime dataAceiteTermo;
+
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "usuario_perfil_acesso",
           joinColumns = @JoinColumn(name = "usuario_id"),
           inverseJoinColumns = @JoinColumn(name = "perfil_acesso_id"))
   private Set<PerfilAcesso> perfisAcessos = new HashSet<>();
 
-  public Usuario(UsuarioRequestDto request, String senha) {
+  public Usuario(UsuarioRequestDto request, String firebaseUID, TermoCondicao termoCondicao) {
     login = request.getLogin();
     tipoPerfil = request.getTipoPerfil();
-    this.senha = senha;
+    this.firebaseUID = firebaseUID;
+    termo = termoCondicao;
+    // Lembrar de apagar as linhas abaixo
+    dataAceiteTermo = LocalDateTime.now();
   }
 
   public String toStringMapper() throws JsonProcessingException {
@@ -91,8 +111,14 @@ public class Usuario extends BaseAuditoria implements UserDetails, Serializable 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return perfisAcessos.stream()
-            .map(perfil -> new SimpleGrantedAuthority(perfil.getNome()))
+            .flatMap(perfil -> perfil.getPermissoes().stream()
+                    .map(permissao -> new SimpleGrantedAuthority(permissao.getNome())))
             .collect(Collectors.toSet());
+
+//        return perfisAcessos.stream()
+//            .map(perfil -> perfil.getPermissoes().stream()
+//                    .map(permissao -> new SimpleGrantedAuthority(permissao.getNome()))
+//                    .collect(Collectors.toSet()));
   }
 
   @Override

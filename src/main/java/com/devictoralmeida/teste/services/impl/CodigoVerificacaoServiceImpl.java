@@ -21,23 +21,25 @@ public class CodigoVerificacaoServiceImpl implements CodigoVerificacaoService {
 
   @Transactional
   @Override
-  public CodigoVerificacao save(TipoCodigoVerificacao tipo) {
+  public CodigoVerificacao save(TipoCodigoVerificacao tipo, Usuario usuario) {
     if (TipoCodigoVerificacao.CONTATO.equals(tipo)) {
       LocalDateTime dataExpiracao = LocalDateTime.now().plusMinutes(15);
-      CodigoVerificacao codigoVerificacao = new CodigoVerificacao(gerarCodigoVerificacaoContato(), dataExpiracao);
+      CodigoVerificacao codigoVerificacao = new CodigoVerificacao(gerarCodigoVerificacaoContato(), dataExpiracao, tipo);
+      // Lembrar apagar linha abaixo
+//      codigoVerificacao.setValido(true);
       return repository.save(codigoVerificacao);
     } else {
-      return null;
+      LocalDateTime dataExpiracao = LocalDateTime.now().plusMinutes(15);
+      CodigoVerificacao codigoVerificacao = new CodigoVerificacao(gerarCodigoVerificacaoSenha(usuario.getDataCriacao()), dataExpiracao, tipo);
+      return repository.save(codigoVerificacao);
     }
   }
 
-  @Override
-  public String gerarCodigoVerificacaoContato() {
+  private String gerarCodigoVerificacaoContato() {
     return String.format("%05d", new Random().nextInt(100000));
   }
 
-  @Override
-  public String gerarCodigoVerificacaoSenha(LocalDateTime dataCadastroUsuario) {
+  private String gerarCodigoVerificacaoSenha(LocalDateTime dataCadastroUsuario) {
     String ano = String.valueOf(dataCadastroUsuario.getYear()).substring(2);
     String mes = String.format("%02d", dataCadastroUsuario.getMonthValue());
 

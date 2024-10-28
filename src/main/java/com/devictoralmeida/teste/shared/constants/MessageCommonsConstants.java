@@ -3,7 +3,9 @@ package com.devictoralmeida.teste.shared.constants;
 public class MessageCommonsConstants {
   public static final String MENSAGEM_SAVE_SUCESSO = "O registro foi salvo com sucesso!";
   public static final String MENSAGEM_CODIGO_ENVIADO_SUCESSO = "Código enviado com sucesso";
-  public static final String MENSAGEM_CADASTRO_CONFIRMADO_SUCESSO = "Cadastro confirmado com sucesso!";
+  public static final String MENSAGEM_SENHA_CADASTRADA_SUCESSO = "Senha cadastrada com sucesso!";
+  public static final String MENSAGEM_SENHA_ALTERADA_SUCESSO = "Senha redefinida com sucesso.";
+  public static final String MENSAGEM_CODIGO_CONFIRMADO_SUCESSO = "Código confirmado com sucesso!";
   public static final String MENSAGEM_UPLOAD_SUCESSO = "Os arquivos foram salvos com sucesso!";
   public static final String MENSAGEM_LOGIN_SUCESSO = "Login realizado com sucesso";
   public static final String MENSAGEM_TOKEN_ATUALIZADO_SUCESSO = "Token atualizado com sucesso!";

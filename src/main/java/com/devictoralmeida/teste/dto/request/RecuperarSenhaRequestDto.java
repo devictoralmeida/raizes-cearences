@@ -8,13 +8,10 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Getter
-public class LoginRequestDto implements Serializable {
+public class RecuperarSenhaRequestDto implements Serializable {
   @Serial
-  private static final long serialVersionUID = -721054336603288433L;
+  private static final long serialVersionUID = -5140952734522230653L;
 
   @NotBlank(message = UsuarioValidationMessages.LOGIN_OBRIGATORIO)
   private String login;
-
-  @NotBlank(message = UsuarioValidationMessages.SENHA_OBRIGATORIA)
-  private String senha;
 }

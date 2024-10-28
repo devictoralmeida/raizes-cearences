@@ -11,7 +11,8 @@ import org.hibernate.envers.Audited;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -33,11 +34,11 @@ public class PerfilAcesso extends BaseAuditoria implements Serializable {
   @Column(name = "nome")
   private String nome;
 
-  @ManyToMany
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(name = "perfil_permissao",
           joinColumns = @JoinColumn(name = "perfil_acesso_id"),
           inverseJoinColumns = @JoinColumn(name = "permissao_id"))
-  private List<Permissao> permissoes;
+  private Set<Permissao> permissoes = new HashSet<>();
 
   public String toStringMapper() throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();

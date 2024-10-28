@@ -6,11 +6,7 @@ public class FirebaseErrorsMessageConstants {
   public static final String ERRO_USUARIO_NAO_ENCONTRADO = "Usuário não encontrado no Firebase";
   public static final String ERRO_VERIFICACAO_EMAIL = "Erro ao verificar o email do usuário no Firebase";
   public static final String ERRO_DELETAR_USUARIO = "Erro ao deletar o usuário no Firebase";
-  public static final String ERRO_AUTENTICACAO_TOKEN = "Falha de autenticação: Token ausente, inválido ou expirado";
-  public static final String INVALID_CREDENTIALS_ERROR = "INVALID_CREDENTIALS";
-  public static final String INVALID_REFRESH_TOKEN_ERROR = "INVALID_REFRESH_TOKEN";
-  public static final String ERRO_REFRESH_TOKEN_INVALIDO = "Refresh token inválido!";
-  public static final String ERRO_CREDENCIAIS_INVALIDAS = "Login e/ou Senha incorretos. Verifique suas credenciais e tente novamente";
+  public static final String ERRO_ATUALIZAR_SENHA_USUARIO = "Erro ao atualizar a senha do usuário no Firebase";
 
   private FirebaseErrorsMessageConstants() {
   }

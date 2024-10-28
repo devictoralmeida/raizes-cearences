@@ -2,14 +2,16 @@ package com.devictoralmeida.teste.services.impl;
 
 import com.devictoralmeida.teste.dto.request.FirebaseLoginRequestDto;
 import com.devictoralmeida.teste.dto.request.LoginRequestDto;
+import com.devictoralmeida.teste.dto.request.RecuperarSenhaRequestDto;
 import com.devictoralmeida.teste.dto.request.RefreshTokenRequestDto;
 import com.devictoralmeida.teste.dto.response.FirebaseLoginResponseDto;
 import com.devictoralmeida.teste.dto.response.RefreshTokenResponseDto;
 import com.devictoralmeida.teste.entities.Usuario;
+import com.devictoralmeida.teste.enums.TipoCodigoVerificacao;
 import com.devictoralmeida.teste.services.AuthService;
 import com.devictoralmeida.teste.services.FirebaseService;
 import com.devictoralmeida.teste.services.UsuarioService;
-import com.devictoralmeida.teste.shared.constants.errors.FirebaseErrorsMessageConstants;
+import com.devictoralmeida.teste.shared.constants.errors.AuthErrorsMessageConstants;
 import com.devictoralmeida.teste.shared.constants.errors.UsuarioErrorsMessageConstants;
 import com.devictoralmeida.teste.shared.exceptions.RecursoNaoEncontradoException;
 import com.devictoralmeida.teste.shared.exceptions.SemAutorizacaoException;
@@ -44,6 +46,7 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public FirebaseLoginResponseDto login(LoginRequestDto request) {
     Usuario usuario = usuarioService.findByLogin(request.getLogin());
+    verificarUsuarioValido(usuario);
     UserRecord firebaseUser = firebaseService.findUserByUid(usuario.getFirebaseUID());
     FirebaseLoginRequestDto firebaseLoginRequestDto = new FirebaseLoginRequestDto(firebaseUser.getEmail(), request.getSenha());
     return firebaseLogin(firebaseLoginRequestDto);
@@ -69,6 +72,21 @@ public class AuthServiceImpl implements AuthService {
     return refreshTokenRequest(refreshTokenRequestDto);
   }
 
+  @Override
+  public void verificarUsuarioValido(Usuario usuario) {
+    if (TipoCodigoVerificacao.CONTATO.equals(usuario.getCodigoVerificacao().getTipoCodigo())) {
+      usuarioService.verificarValidacaoCodigo(usuario);
+    }
+
+    usuarioService.verificarAceiteTermos(usuario);
+  }
+
+  @Override
+  public void recuperarSenha(RecuperarSenhaRequestDto request) {
+    Usuario usuario = usuarioService.findByLogin(request.getLogin());
+    usuarioService.enviarCodigoRecuperacaoSenha(usuario);
+  }
+
   private FirebaseLoginResponseDto firebaseLogin(FirebaseLoginRequestDto request) {
     try {
       return RestClient.create(googleLoginUrl)
@@ -81,8 +99,8 @@ public class AuthServiceImpl implements AuthService {
               .retrieve()
               .body(FirebaseLoginResponseDto.class);
     } catch (HttpClientErrorException exception) {
-      if (exception.getResponseBodyAsString().contains(FirebaseErrorsMessageConstants.INVALID_CREDENTIALS_ERROR)) {
-        throw new SemAutorizacaoException(FirebaseErrorsMessageConstants.ERRO_CREDENCIAIS_INVALIDAS);
+      if (exception.getResponseBodyAsString().contains(AuthErrorsMessageConstants.INVALID_CREDENTIALS_ERROR)) {
+        throw new SemAutorizacaoException(AuthErrorsMessageConstants.ERRO_CREDENCIAIS_INVALIDAS);
       }
       throw exception;
     }
@@ -100,8 +118,8 @@ public class AuthServiceImpl implements AuthService {
               .retrieve()
               .body(RefreshTokenResponseDto.class);
     } catch (HttpClientErrorException exception) {
-      if (exception.getResponseBodyAsString().contains(FirebaseErrorsMessageConstants.INVALID_REFRESH_TOKEN_ERROR)) {
-        throw new SemAutorizacaoException(FirebaseErrorsMessageConstants.ERRO_REFRESH_TOKEN_INVALIDO);
+      if (exception.getResponseBodyAsString().contains(AuthErrorsMessageConstants.INVALID_REFRESH_TOKEN_ERROR)) {
+        throw new SemAutorizacaoException(AuthErrorsMessageConstants.ERRO_REFRESH_TOKEN_INVALIDO);
       }
       throw exception;
     }

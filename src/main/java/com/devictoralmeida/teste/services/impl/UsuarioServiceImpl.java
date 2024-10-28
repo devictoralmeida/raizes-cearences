@@ -1,14 +1,11 @@
 package com.devictoralmeida.teste.services.impl;
 
-import com.devictoralmeida.teste.dto.request.AnexoRequestDto;
-import com.devictoralmeida.teste.dto.request.ContatoRequestDto;
-import com.devictoralmeida.teste.dto.request.ContatoUpdateRequestDto;
-import com.devictoralmeida.teste.dto.request.UsuarioRequestDto;
+import com.devictoralmeida.teste.dto.request.*;
 import com.devictoralmeida.teste.entities.*;
 import com.devictoralmeida.teste.enums.TipoCodigoVerificacao;
 import com.devictoralmeida.teste.enums.TipoContato;
 import com.devictoralmeida.teste.enums.TipoPerfil;
-import com.devictoralmeida.teste.factories.DadosPessoaPerfilRepository;
+import com.devictoralmeida.teste.factories.DadosPessoaPerfilTermoRepository;
 import com.devictoralmeida.teste.repositories.UsuarioRepository;
 import com.devictoralmeida.teste.services.*;
 import com.devictoralmeida.teste.services.rules.RegraPessoaPerfilAnexo;
@@ -39,7 +36,7 @@ public class UsuarioServiceImpl implements UsuarioService {
   private final FirebaseService firebaseService;
   private final EmailService emailService;
   private final MensagemService mensagemService;
-  private final DadosPessoaPerfilRepository dadosPessoaPerfilRepository;
+  private final DadosPessoaPerfilTermoRepository dadosPessoaPerfilTermoRepository;
   private final PasswordEncoder passwordEncoder;
 
   @Transactional
@@ -50,12 +47,12 @@ public class UsuarioServiceImpl implements UsuarioService {
     validarContatoExistente(request.getPessoaPerfil().getContato());
 
     UserRecord usuarioFirebase = firebaseService.criarUsuarioFirebase(request);
-    Usuario usuario = new Usuario(request, passwordEncoder.encode(request.getSenha()));
+    TermoCondicao termoCondicao = dadosPessoaPerfilTermoRepository.getTermoCondicaoRepository().findLatest();
+    Usuario usuario = new Usuario(request, usuarioFirebase.getUid(), termoCondicao);
+    CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO, usuario);
+    usuario.setCodigoVerificacao(codigoVerificacao);
     PessoaPerfil pessoaPerfil = createPessoaPerfil(request, usuario);
     usuario.setPessoaPerfil(pessoaPerfil);
-    usuario.setFirebaseUID(usuarioFirebase.getUid());
-    CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO);
-    usuario.setCodigoVerificacao(codigoVerificacao);
     usuarioRepository.save(usuario);
 
 //    TipoContato preferenciaContato = usuario.getPessoaPerfil().getContato().getPreferenciaContato();
@@ -98,7 +95,7 @@ public class UsuarioServiceImpl implements UsuarioService {
   public void reenviarCodigo(String login) {
     Usuario usuario = findByLogin(login);
     TipoContato canalEnvio = usuario.getPessoaPerfil().getContato().getPreferenciaContato();
-    CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO);
+    CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO, usuario);
     usuario.setCodigoVerificacao(codigoVerificacao);
     usuarioRepository.save(usuario);
     enviarCodigo(usuario, codigoVerificacao, canalEnvio);
@@ -115,7 +112,7 @@ public class UsuarioServiceImpl implements UsuarioService {
       anexo.setNome(anexo.getArquivo().getOriginalFilename());
       PessoaPerfilAnexo pessoaPerfilAnexo = new PessoaPerfilAnexo(anexo, usuario);
       usuario.getPessoaPerfil().getAnexos().add(pessoaPerfilAnexo);
-      dadosPessoaPerfilRepository.getPessoaPerfilAnexoRepository().save(pessoaPerfilAnexo);
+      dadosPessoaPerfilTermoRepository.getPessoaPerfilAnexoRepository().save(pessoaPerfilAnexo);
     });
   }
 
@@ -137,11 +134,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     boolean houveMudanca = contato.validarMudancaUpdateCodigo(request);
 
     if (houveMudanca) {
-      if (!contato.getNumeroWhatsapp().equals(request.getNumeroWhatsapp())) {
+      if (Objects.nonNull(contato.getNumeroWhatsapp()) && !contato.getNumeroWhatsapp().equals(request.getNumeroWhatsapp())) {
         verificarWhatsappExistente(request.getNumeroWhatsapp());
       }
 
-      if (!contato.getEmail().equals(request.getEmail())) {
+      if (Objects.nonNull(contato.getEmail()) && !contato.getEmail().equals(request.getEmail())) {
         verificarEmailExistente(request.getEmail());
       }
 
@@ -149,12 +146,48 @@ public class UsuarioServiceImpl implements UsuarioService {
       contato.aplicarMudancaUpdateCodigo(request);
     }
 
-    CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO);
+    CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO, usuario);
     usuario.setCodigoVerificacao(codigoVerificacao);
     Usuario updatedUser = usuarioRepository.save(usuario);
     boolean usuarioPossuiEmail = Objects.nonNull(updatedUser.getPessoaPerfil().getContato().getEmail());
     firebaseService.atualizarContatoUsuarioFirebase(updatedUser.getFirebaseUID(), request, usuarioPossuiEmail);
     enviarCodigo(usuario, codigoVerificacao, updatedUser.getPessoaPerfil().getContato().getPreferenciaContato());
+  }
+
+  @Transactional
+  @Override
+  public void alterarSenha(String login, SenhaRequestDto request) {
+    request.validar();
+    Usuario usuario = findByLogin(login);
+    verificarValidacaoCodigo(usuario);
+    usuario.setSenha(passwordEncoder.encode(request.getSenha()));
+    firebaseService.atualizarSenhaUsuarioFirebase(usuario.getFirebaseUID(), request.getSenha());
+    usuarioRepository.save(usuario);
+  }
+
+  @Override
+  public void verificarValidacaoCodigo(Usuario usuario) {
+    if (TipoCodigoVerificacao.CONTATO.equals(usuario.getCodigoVerificacao().getTipoCodigo()) && !usuario.getCodigoVerificacao().isValido()) {
+      throw new NegocioException(UsuarioErrorsMessageConstants.CODIGO_VALIDACAO_CONTATO_NAO_REALIZADO);
+    } else if (TipoCodigoVerificacao.SENHA.equals(usuario.getCodigoVerificacao().getTipoCodigo()) && !usuario.getCodigoVerificacao().isValido()) {
+      throw new NegocioException(UsuarioErrorsMessageConstants.CODIGO_VALIDACAO_SENHA_NAO_REALIZADO);
+    }
+  }
+
+  @Override
+  public void verificarAceiteTermos(Usuario usuario) {
+//    if (usuario.getDataAceiteTermos() == null) {
+//      throw new NegocioException(UsuarioErrorsMessageConstants.ACEITE_TERMOS_NAO_REALIZADO);
+//    }
+  }
+
+  @Transactional
+  @Override
+  public void enviarCodigoRecuperacaoSenha(Usuario usuario) {
+    CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.SENHA, usuario);
+    usuario.setCodigoVerificacao(codigoVerificacao);
+    usuarioRepository.save(usuario);
+    enviarCodigo(usuario, codigoVerificacao, usuario.getPessoaPerfil().getContato().getPreferenciaContato());
   }
 
   private void enviarCodigo(Usuario usuario, CodigoVerificacao codigoVerificacao, TipoContato preferenciaContato) {
@@ -172,23 +205,23 @@ public class UsuarioServiceImpl implements UsuarioService {
   }
 
   private void validarContatoExistente(ContatoRequestDto contato) {
-    if (contato.getEmail() != null) {
+    if (Objects.nonNull(contato.getEmail())) {
       verificarEmailExistente(contato.getEmail());
     }
 
-    if (contato.getNumeroWhatsapp() != null) {
+    if (Objects.nonNull(contato.getNumeroWhatsapp())) {
       verificarWhatsappExistente(contato.getNumeroWhatsapp());
     }
   }
 
   private void verificarWhatsappExistente(String numeroWhatsapp) {
-    if (Objects.nonNull(numeroWhatsapp) && usuarioRepository.findByWhatsapp(numeroWhatsapp).isPresent()) {
+    if (usuarioRepository.findByWhatsapp(numeroWhatsapp).isPresent()) {
       throw new NegocioException(ContatoErrorsMessageConstants.WHATSAPP_JA_CADASTRADO);
     }
   }
 
   private void verificarEmailExistente(String email) {
-    if (Objects.nonNull(email) && usuarioRepository.findByEmail(email).isPresent()) {
+    if (usuarioRepository.findByEmail(email).isPresent()) {
       throw new NegocioException(ContatoErrorsMessageConstants.EMAIL_JA_CADASTRADO);
     }
   }
@@ -203,13 +236,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   private PessoaPerfil createPessoaPerfilFisica(UsuarioRequestDto request, Usuario usuario) {
     DadosPessoaFisica dadosPessoaFisica = new DadosPessoaFisica(request.getPessoaPerfil().getDadosPessoaFisica());
-    dadosPessoaPerfilRepository.getDadosPessoaFisicaRepository().save(dadosPessoaFisica);
+    dadosPessoaPerfilTermoRepository.getDadosPessoaFisicaRepository().save(dadosPessoaFisica);
     return new PessoaPerfil(request.getPessoaPerfil(), usuario, dadosPessoaFisica.getId());
   }
 
   private PessoaPerfil createPessoaPerfilJuridica(UsuarioRequestDto request, Usuario usuario) {
     DadosPessoaJuridica dadosPessoaJuridica = new DadosPessoaJuridica(request.getPessoaPerfil().getDadosPessoaJuridica());
-    dadosPessoaPerfilRepository.getDadosPessoaJuridicaRepository().save(dadosPessoaJuridica);
+    dadosPessoaPerfilTermoRepository.getDadosPessoaJuridicaRepository().save(dadosPessoaJuridica);
 
     if (isCooperativaAssociacao(usuario)) {
       return createPessoaPerfilComPresidente(request, usuario, dadosPessoaJuridica);
@@ -220,7 +253,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   private PessoaPerfil createPessoaPerfilComPresidente(UsuarioRequestDto request, Usuario usuario, DadosPessoaJuridica dadosPessoaJuridica) {
     DadosPessoaFisica dadosPresidente = new DadosPessoaFisica(request.getPessoaPerfil().getPresidente().getDadosPessoais());
-    dadosPessoaPerfilRepository.getDadosPessoaFisicaRepository().save(dadosPresidente);
+    dadosPessoaPerfilTermoRepository.getDadosPessoaFisicaRepository().save(dadosPresidente);
     return new PessoaPerfil(request.getPessoaPerfil(), usuario, dadosPessoaJuridica.getId(), dadosPresidente.getId());
   }
 

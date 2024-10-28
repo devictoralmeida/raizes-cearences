@@ -32,10 +32,7 @@ public class Modulo extends BaseAuditoria implements Serializable {
   @Column(name = "nome")
   private String nome;
 
-  @ManyToMany
-  @JoinTable(name = "modulo_permissao",
-          joinColumns = @JoinColumn(name = "modulo_id"),
-          inverseJoinColumns = @JoinColumn(name = "permissao_id"))
+  @OneToMany(mappedBy = "modulo")
   private List<Permissao> permissoes;
 
   public String toStringMapper() throws JsonProcessingException {

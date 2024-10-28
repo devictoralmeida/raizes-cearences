@@ -1,9 +1,6 @@
 package com.devictoralmeida.teste.controllers;
 
-import com.devictoralmeida.teste.dto.request.AnexoRequestDto;
-import com.devictoralmeida.teste.dto.request.CodigoRequestDto;
-import com.devictoralmeida.teste.dto.request.ContatoUpdateRequestDto;
-import com.devictoralmeida.teste.dto.request.UsuarioRequestDto;
+import com.devictoralmeida.teste.dto.request.*;
 import com.devictoralmeida.teste.dto.response.ResponseDto;
 import com.devictoralmeida.teste.enums.TipoDocumento;
 import com.devictoralmeida.teste.services.UsuarioService;
@@ -34,6 +31,18 @@ public class UsuarioController {
     return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.fromData(null, HttpStatus.CREATED, MessageCommonsConstants.MENSAGEM_SAVE_SUCESSO));
   }
 
+  @PatchMapping("/criar-senha/{login}")
+  public ResponseEntity<?> criarSenha(@PathVariable(name = "login") String login, @Valid @RequestBody SenhaRequestDto request) {
+    service.alterarSenha(login, request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.fromData(null, HttpStatus.CREATED, MessageCommonsConstants.MENSAGEM_SENHA_CADASTRADA_SUCESSO));
+  }
+
+  @PatchMapping("/alterar-senha/{login}")
+  public ResponseEntity<?> alterarSenha(@PathVariable(name = "login") String login, @Valid @RequestBody SenhaRequestDto request) {
+    service.alterarSenha(login, request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.fromData(null, HttpStatus.CREATED, MessageCommonsConstants.MENSAGEM_SENHA_ALTERADA_SUCESSO));
+  }
+
   @PostMapping("/upload/{login}")
   public ResponseEntity<?> upload(@PathVariable(name = "login") String login,
                                   @RequestParam("tipoDocumento") List<TipoDocumento> tipoDocumentos,
@@ -58,10 +67,10 @@ public class UsuarioController {
     return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_CODIGO_ENVIADO_SUCESSO));
   }
 
-  @PostMapping("/validacao-codigo/{login}")
+  @PatchMapping("/validacao-codigo/{login}")
   public ResponseEntity<?> validarCodigo(@PathVariable(name = "login") String login, @Valid @RequestBody CodigoRequestDto request) {
     service.validarCodigo(login, request.getCodigo());
-    return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_CADASTRO_CONFIRMADO_SUCESSO));
+    return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_CODIGO_CONFIRMADO_SUCESSO));
   }
 
   @PatchMapping("/alterar-contato/{login}")

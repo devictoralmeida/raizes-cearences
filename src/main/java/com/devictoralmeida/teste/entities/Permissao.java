@@ -1,6 +1,7 @@
 package com.devictoralmeida.teste.entities;
 
 import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
@@ -30,6 +31,11 @@ public class Permissao extends BaseAuditoria implements Serializable {
 
   @Column(name = "nome")
   private String nome;
+
+  @JsonIgnore
+  @ManyToOne
+  @JoinColumn(name = "modulo_id")
+  private Modulo modulo;
 
   public String toStringMapper() throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();

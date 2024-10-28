@@ -17,4 +17,6 @@ public interface FirebaseService {
   void atualizarContatoUsuarioFirebase(String uid, ContatoUpdateRequestDto requestDto, boolean usuarioPossuiEmail);
 
   FirebaseToken verificarToken(String idToken);
+
+  void atualizarSenhaUsuarioFirebase(String firebaseUID, String senha);
 }

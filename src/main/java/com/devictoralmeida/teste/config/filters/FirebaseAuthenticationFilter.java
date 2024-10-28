@@ -1,5 +1,6 @@
 package com.devictoralmeida.teste.config.filters;
 
+import com.devictoralmeida.teste.entities.Usuario;
 import com.devictoralmeida.teste.services.AuthService;
 import com.google.firebase.auth.FirebaseToken;
 import jakarta.servlet.FilterChain;
@@ -29,10 +30,13 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+//    String requestURI = request.getRequestURI();
     String idToken = recoverToken(request);
+//    boolean isRotaPermitida = Arrays.stream(RotasPermitidasConstants.ROTAS_PERMITIDAS)
+//            .anyMatch(requestURI::matches);
 
-//    if (idToken == null) {
-//      throw new SemAutorizacaoException(FirebaseErrorsMessageConstants.ERRO_AUTENTICACAO_TOKEN);
+//    if (idToken == null && !isRotaPermitida) {
+//      throw new SemAutorizacaoException(AuthErrorsMessageConstants.ERRO_AUTENTICACAO_TOKEN);
 //    }
 
 //    if (request.getRequestURI().contains("/auth/login")) {
@@ -42,6 +46,8 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
     if (idToken != null) {
       FirebaseToken token = authService.verificarToken(idToken);
       UserDetails user = authService.loadUserByUsername(token.getUid());
+      Usuario usuario = (Usuario) user;
+      authService.verificarUsuarioValido(usuario);
       Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
       SecurityContextHolder.getContext().setAuthentication(authentication);
     }
@@ -58,12 +64,4 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
 
     return authHeader.replace("Bearer ", "");
   }
-
-//  private List<GrantedAuthority> getAuthoritiesFromToken(FirebaseToken token) {
-//    List<String> permissoes = (List<String>) token.getClaims().getOrDefault(SharedConstants.PERMISSOES, List.of());
-//    Set<String> novasPermissoes = new HashSet<>(permissoes);
-//    novasPermissoes.addAll(permissoes);
-//    authService.criarPermissoes(token.getUid()).stream().map(GrantedAuthority::getAuthority).forEach(novasPermissoes::add);
-//    return AuthorityUtils.createAuthorityList(novasPermissoes);
-//  }
 }

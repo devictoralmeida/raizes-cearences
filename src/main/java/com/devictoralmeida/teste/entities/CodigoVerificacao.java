@@ -42,8 +42,9 @@ public class CodigoVerificacao implements Serializable {
   @JsonIgnore
   private LocalDateTime dataExpiracao;
 
-  public CodigoVerificacao(String codigo, LocalDateTime dataExpiracao) {
+  public CodigoVerificacao(String codigo, LocalDateTime dataExpiracao, TipoCodigoVerificacao tipo) {
     this.codigo = codigo;
     this.dataExpiracao = dataExpiracao;
+    tipoCodigo = tipo;
   }
 }

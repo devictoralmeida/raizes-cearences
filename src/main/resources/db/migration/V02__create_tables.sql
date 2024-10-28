@@ -3,9 +3,21 @@ CREATE TABLE "codigo_verificacao"
   "id"            UUID       NOT NULL,
   "codigo"        VARCHAR(5) NOT NULL,
   "tipo_codigo" VARCHAR(10) NOT NULL,
-  "fl_validado"   boolean,
+  "fl_validado" BOOLEAN DEFAULT FALSE,
   "dat_expiracao" TIMESTAMP  NOT NULL,
   CONSTRAINT "pk_codigoverificacao" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "termo_condicao"
+(
+  "id"                     UUID          NOT NULL,
+  "versao"                 VARCHAR(10)   NOT NULL,
+  "conteudo"               VARCHAR(7000) NOT NULL,
+  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,
+  "dat_criacao"            TIMESTAMP     NOT NULL DEFAULT (now()),
+  "dat_atualizacao"        TIMESTAMP     NOT NULL DEFAULT (now()),
+  CONSTRAINT "pk_tbtermocondicao" PRIMARY KEY ("id")
 );
 
 CREATE TABLE "usuario"
@@ -16,11 +28,14 @@ CREATE TABLE "usuario"
   "firebase_uid"           VARCHAR(28) NOT NULL,
   "senha" VARCHAR(255) NULL DEFAULT NULL,
   "codigo_verificacao"     UUID                 DEFAULT NULL,
+  "termo_id"         UUID NOT NULL,
+  "dat_aceite_termo" TIMESTAMP NULL DEFAULT NULL,
   "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
   "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,
   "dat_criacao"            TIMESTAMP   NOT NULL DEFAULT (now()),
   "dat_atualizacao"        TIMESTAMP   NOT NULL DEFAULT (now()),
-  CONSTRAINT "usuario_codigo_verificacao" FOREIGN KEY ("codigo_verificacao") REFERENCES "codigo_verificacao" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION
+  CONSTRAINT "usuario_codigo_verificacao" FOREIGN KEY ("codigo_verificacao") REFERENCES "codigo_verificacao" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT "fk_usuario_termo" FOREIGN KEY ("termo_id") REFERENCES "termo_condicao" ("id")
 );
 
 CREATE TABLE "usuario_aud"
@@ -28,7 +43,6 @@ CREATE TABLE "usuario_aud"
   "id"           UUID        NOT NULL,
   "login"        VARCHAR(14) NOT NULL,
   "tipo_perfil"  VARCHAR(13) NOT NULL,
-  "senha"        VARCHAR(255) NULL DEFAULT NULL,
   "cd_auditoria" BIGINT      NOT NULL,
   "tp_movimento" SMALLINT NULL DEFAULT NULL,
   CONSTRAINT "pk_tbusuarioaud" PRIMARY KEY ("id", "cd_auditoria"),
@@ -184,10 +198,10 @@ CREATE TABLE "contato"
   "id"                     UUID PRIMARY KEY,
   "preferencia_contato" VARCHAR(8),
   "numero_contato"         VARCHAR(11),
-  "fl_whatsapp"            boolean,
+  "fl_whatsapp"   BOOLEAN DEFAULT FALSE,
   "numero_whatsapp"        VARCHAR(11),
   "email"                  VARCHAR(320),
-  "fl_newsletter"          boolean,
+  "fl_newsletter" BOOLEAN DEFAULT FALSE,
   "dat_criacao"            TIMESTAMP  NOT NULL DEFAULT (now()),
   "dat_atualizacao"        TIMESTAMP  NOT NULL DEFAULT (now()),
   "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
@@ -199,10 +213,10 @@ CREATE TABLE "contato_aud"
   "id"                  UUID       NOT NULL,
   "preferencia_contato" VARCHAR(8),
   "numero_contato"      VARCHAR(11),
-  "fl_whatsapp"         boolean,
+  "fl_whatsapp"   BOOLEAN,
   "numero_whatsapp"     VARCHAR(11),
   "email"               VARCHAR(320),
-  "fl_newsletter"       boolean,
+  "fl_newsletter" BOOLEAN,
   "cd_auditoria"        BIGINT     NOT NULL,
   "tp_movimento"        SMALLINT NULL DEFAULT NULL,
   CONSTRAINT "pk_tbcontato_aud" PRIMARY KEY ("id", "cd_auditoria"),
@@ -248,9 +262,9 @@ CREATE TABLE "endereco_aud"
 CREATE TABLE "vinculo"
 (
   "id"                     UUID PRIMARY KEY,
-  "fl_cadastro_secaf"      boolean,
-  "fl_servicos_ater"       boolean,
-  "fl_oferta_ceasa"        boolean,
+  "fl_cadastro_secaf" BOOLEAN DEFAULT FALSE,
+  "fl_servicos_ater"  BOOLEAN DEFAULT FALSE,
+  "fl_oferta_ceasa"   BOOLEAN DEFAULT FALSE,
   "dat_criacao"            TIMESTAMP NOT NULL DEFAULT (now()),
   "dat_atualizacao"        TIMESTAMP NOT NULL DEFAULT (now()),
   "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
@@ -260,9 +274,9 @@ CREATE TABLE "vinculo"
 CREATE TABLE "vinculo_aud"
 (
   "id"                     UUID   NOT NULL,
-  "fl_cadastro_secaf"      boolean,
-  "fl_servicos_ater"       boolean,
-  "fl_oferta_ceasa"        boolean,
+  "fl_cadastro_secaf" BOOLEAN,
+  "fl_servicos_ater"  BOOLEAN,
+  "fl_oferta_ceasa"   BOOLEAN,
   "cd_auditoria"           BIGINT NOT NULL,
   "tp_movimento"           SMALLINT NULL DEFAULT NULL,
   CONSTRAINT "pk_tbvinculo_aud" PRIMARY KEY ("id", "cd_auditoria"),
@@ -343,16 +357,19 @@ CREATE TABLE "permissao"
 (
   "id"                     UUID PRIMARY KEY,
   "nome"                   VARCHAR   NOT NULL,
+  "modulo_id"       UUID      NOT NULL,
   "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
   "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,
   "dat_criacao"            TIMESTAMP NOT NULL DEFAULT (now()),
-  "dat_atualizacao"        TIMESTAMP NOT NULL DEFAULT (now())
+  "dat_atualizacao" TIMESTAMP NOT NULL DEFAULT (now()),
+  CONSTRAINT "fk_tbpermissao_tbmodulo" FOREIGN KEY ("modulo_id") REFERENCES "modulo" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 CREATE TABLE "permissao_aud"
 (
   "id"           UUID    NOT NULL,
   "nome"         VARCHAR NOT NULL,
+  "modulo_id" UUID NOT NULL,
   "cd_auditoria" BIGINT  NOT NULL,
   "tp_movimento" SMALLINT NULL DEFAULT NULL,
   CONSTRAINT "pk_tbpermissao_aud" PRIMARY KEY ("id", "cd_auditoria"),
@@ -375,24 +392,6 @@ CREATE TABLE "perfil_permissao_aud"
   "tp_movimento" SMALLINT NULL DEFAULT NULL,
   CONSTRAINT "pk_perfil_permissao_aud" PRIMARY KEY ("perfil_id", "permissao_id", "cd_auditoria"),
   CONSTRAINT "fk_perfil_permissao_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
-);
-
-CREATE TABLE "modulo_permissao"
-(
-  "modulo_id"    UUID NOT NULL,
-  "permissao_id" UUID NOT NULL,
-  CONSTRAINT "fk_modulo_permissao_modulo" FOREIGN KEY ("modulo_id") REFERENCES "modulo" ("id"),
-  CONSTRAINT "fk_modulo_permissao_permissao" FOREIGN KEY ("permissao_id") REFERENCES "permissao" ("id")
-);
-
-CREATE TABLE "modulo_permissao_aud"
-(
-  "modulo_id"    UUID   NOT NULL,
-  "permissao_id" UUID   NOT NULL,
-  "cd_auditoria" BIGINT NOT NULL,
-  "tp_movimento" SMALLINT NULL DEFAULT NULL,
-  CONSTRAINT "pk_modulo_permissao_aud" PRIMARY KEY ("modulo_id", "permissao_id", "cd_auditoria"),
-  CONSTRAINT "fk_modulo_permissao_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 CREATE TABLE "usuario_perfil_acesso"
@@ -439,3 +438,13 @@ ALTER TABLE "presidente"
 
 ALTER TABLE "presidente"
   ADD FOREIGN KEY ("dados_pessoa_id") REFERENCES "dados_pessoa_fisica" ("id");
+
+INSERT INTO "termo_condicao" (id, versao, conteudo, dat_criacao, dat_atualizacao, nm_usuario_cadastro,
+                              nm_usuario_atualizacao)
+VALUES ('eb1f62bf-9d16-45c1-be45-bd52f97dffb2',
+        '0.0.1',
+        'Este é um termo de condição genérico para a versão 0.0.1.',
+        now(),
+        now(),
+        'Assistente Virtual',
+        'Assistente Virtual');

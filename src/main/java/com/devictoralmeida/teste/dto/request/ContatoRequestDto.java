@@ -60,6 +60,10 @@ public class ContatoRequestDto implements Serializable {
   }
 
   private void validaWhatsApp() {
+    if (TipoContato.WHATSAPP.equals(preferenciaContato)) {
+      isWhatsapp = true;
+    }
+
     if (isWhatsapp && numeroContato != null) {
       numeroWhatsapp = numeroContato;
     }

@@ -5,6 +5,7 @@ import com.devictoralmeida.teste.dto.request.ContatoUpdateRequestDto;
 import com.devictoralmeida.teste.dto.request.UsuarioRequestDto;
 import com.devictoralmeida.teste.services.FirebaseService;
 import com.devictoralmeida.teste.shared.constants.SharedConstants;
+import com.devictoralmeida.teste.shared.constants.errors.AuthErrorsMessageConstants;
 import com.devictoralmeida.teste.shared.constants.errors.FirebaseErrorsMessageConstants;
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
 import com.devictoralmeida.teste.shared.exceptions.RecursoNaoEncontradoException;
@@ -57,7 +58,6 @@ public class FirebaseServiceImpl implements FirebaseService {
   private UserRecord.CreateRequest createFirebaseUserRequest(UsuarioRequestDto dto, String nome) {
     UserRecord.CreateRequest request = new UserRecord.CreateRequest()
             .setEmailVerified(false)
-            .setPassword(dto.getSenha())
             .setDisplayName(nome)
             .setDisabled(false);
 
@@ -123,7 +123,17 @@ public class FirebaseServiceImpl implements FirebaseService {
     try {
       return firebaseAuth.verifyIdToken(idToken, true);
     } catch (FirebaseAuthException e) {
-      throw new SemAutorizacaoException(FirebaseErrorsMessageConstants.ERRO_AUTENTICACAO_TOKEN);
+      throw new SemAutorizacaoException(AuthErrorsMessageConstants.ERRO_AUTENTICACAO_TOKEN);
+    }
+  }
+
+  @Override
+  public void atualizarSenhaUsuarioFirebase(String firebaseUID, String senha) {
+    try {
+      UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(firebaseUID).setPassword(senha);
+      firebaseAuth.updateUser(request);
+    } catch (FirebaseAuthException e) {
+      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_ATUALIZAR_SENHA_USUARIO);
     }
   }
 }

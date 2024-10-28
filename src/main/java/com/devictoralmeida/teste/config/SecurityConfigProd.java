@@ -19,13 +19,13 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 @Configuration
 @EnableWebSecurity
-@Profile("!prod")
-public class SecurityConfig {
+@Profile("prod")
+public class SecurityConfigProd {
   @Autowired
   @Lazy
   private final FirebaseAuthenticationFilter filter;
 
-  public SecurityConfig(@Lazy FirebaseAuthenticationFilter filter) {
+  public SecurityConfigProd(@Lazy FirebaseAuthenticationFilter filter) {
     this.filter = filter;
   }
 
@@ -33,6 +33,7 @@ public class SecurityConfig {
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
             .cors(AbstractHttpConfigurer::disable)
+            .requiresChannel(channel -> channel.anyRequest().requiresSecure())
             .sessionManagement(session -> session
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .invalidSessionUrl("/auth/login")

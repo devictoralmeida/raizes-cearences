@@ -2,6 +2,7 @@ package com.devictoralmeida.teste.services;
 
 import com.devictoralmeida.teste.dto.request.AnexoRequestDto;
 import com.devictoralmeida.teste.dto.request.ContatoUpdateRequestDto;
+import com.devictoralmeida.teste.dto.request.SenhaRequestDto;
 import com.devictoralmeida.teste.dto.request.UsuarioRequestDto;
 import com.devictoralmeida.teste.entities.Usuario;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,4 +29,12 @@ public interface UsuarioService {
   void delete(UUID id);
 
   void alterarContato(String login, ContatoUpdateRequestDto request) throws JsonProcessingException;
+
+  void alterarSenha(String login, SenhaRequestDto request);
+
+  void verificarValidacaoCodigo(Usuario usuario);
+
+  void verificarAceiteTermos(Usuario usuario);
+
+  void enviarCodigoRecuperacaoSenha(Usuario usuario);
 }
