@@ -29,14 +29,14 @@ public class Vinculo extends BaseAuditoria implements Serializable {
   @Column(name = "id")
   private UUID id;
 
-  @Column(name = "fl_cadastro_secaf")
-  private boolean isCadastroSecaf;
+  @Column(name = "fl_cadastro_secaf", nullable = false)
+  private boolean isCadastroSecaf = false;
 
-  @Column(name = "fl_servicos_ater")
-  private boolean isServicosAter;
+  @Column(name = "fl_servicos_ater", nullable = false)
+  private boolean isServicosAter = false;
 
-  @Column(name = "fl_oferta_ceasa")
-  private boolean isOfertaCeasa;
+  @Column(name = "fl_oferta_ceasa", nullable = false)
+  private boolean isOfertaCeasa = false;
 
   public Vinculo(VinculoRequestDto request) {
     isCadastroSecaf = request.isCadastroSecaf();

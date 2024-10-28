@@ -26,7 +26,7 @@ public class CodigoVerificacaoServiceImpl implements CodigoVerificacaoService {
       LocalDateTime dataExpiracao = LocalDateTime.now().plusMinutes(15);
       CodigoVerificacao codigoVerificacao = new CodigoVerificacao(gerarCodigoVerificacaoContato(), dataExpiracao, tipo);
       // Lembrar apagar linha abaixo
-//      codigoVerificacao.setValido(true);
+      codigoVerificacao.setValido(true);
       return repository.save(codigoVerificacao);
     } else {
       LocalDateTime dataExpiracao = LocalDateTime.now().plusMinutes(15);

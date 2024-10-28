@@ -40,6 +40,7 @@ public class AuthServiceImpl implements AuthService {
   @Value("${firebase.api.key}")
   private String apiKey;
 
+  @Transactional(readOnly = true)
   @Override
   public FirebaseLoginResponseDto login(LoginRequestDto request) {
     Usuario usuario = usuarioService.findByLogin(request.getLogin());
@@ -89,6 +90,7 @@ public class AuthServiceImpl implements AuthService {
     usuarioService.criarSenha(login, request);
   }
 
+  @Transactional
   @Override
   public void alterarSenha(AlterarSenhaRequestDto request) {
     request.validar();

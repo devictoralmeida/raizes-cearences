@@ -3,6 +3,7 @@ package com.devictoralmeida.teste.entities;
 import com.devictoralmeida.teste.dto.request.UsuarioRequestDto;
 import com.devictoralmeida.teste.enums.TipoPerfil;
 import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
+import com.devictoralmeida.teste.shared.utils.FormatarDadosUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -91,11 +92,12 @@ public class Usuario extends BaseAuditoria implements UserDetails, Serializable 
           inverseJoinColumns = @JoinColumn(name = "perfil_acesso_id"))
   private Set<PerfilAcesso> perfisAcessos = new HashSet<>();
 
-  public Usuario(UsuarioRequestDto request, String firebaseUID, TermoCondicao termoCondicao) {
+  public Usuario(UsuarioRequestDto request, TermoCondicao termoCondicao) {
     login = request.getLogin();
     tipoPerfil = request.getTipoPerfil();
-    this.firebaseUID = firebaseUID;
+
     termo = termoCondicao;
+    FormatarDadosUtils.aplicarTrim(this);
     // Lembrar de apagar as linhas abaixo
     dataAceiteTermo = LocalDateTime.now();
   }

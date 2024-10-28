@@ -24,18 +24,17 @@ public class EnderecoRequestDto implements Serializable {
   private String cep;
 
   @NotBlank(message = EnderecoValidationMessages.MUNICIPIO_OBRIGATORIO)
-  @Size(max = 100, message = EnderecoValidationMessages.MUNICIPIO_TAMANHO)
+  @Pattern(regexp = SharedConstants.REGEX_APENAS_LETRAS, message = EnderecoValidationMessages.MUNICIPIO_APENAS_LETRAS)
+  @Size(max = SharedConstants.TAMANHO_PADRAO_NOME_RAZAO_SOCIAL, message = EnderecoValidationMessages.MUNICIPIO_TAMANHO)
   private String municipio;
 
-  //  @NotBlank(message = EnderecoValidationMessages.LOCALIDADE_OBRIGATORIA)
-  @Size(max = 100, message = EnderecoValidationMessages.LOCALIDADE_TAMANHO)
+  @Pattern(regexp = SharedConstants.REGEX_APENAS_LETRAS, message = EnderecoValidationMessages.LOCALIDADE_APENAS_LETRAS)
+  @Size(max = SharedConstants.TAMANHO_PADRAO_NOME_RAZAO_SOCIAL, message = EnderecoValidationMessages.LOCALIDADE_TAMANHO)
   private String localidade;
 
-  //  @NotBlank(message = EnderecoValidationMessages.LOGRADOURO_OBRIGATORIO)
-  @Size(max = 100, message = EnderecoValidationMessages.LOGRADOURO_TAMANHO)
+  @Size(max = SharedConstants.TAMANHO_PADRAO_NOME_RAZAO_SOCIAL, message = EnderecoValidationMessages.LOGRADOURO_TAMANHO)
   private String logradouro;
 
-  //  @NotBlank(message = EnderecoValidationMessages.NUMERO_OBRIGATORIO)
   @Pattern(regexp = SharedConstants.REGEX_ALFANUMERICO, message = EnderecoValidationMessages.NUMERO_ALFANUMERICO)
   @Size(max = 10, message = EnderecoValidationMessages.NUMERO_TAMANHO)
   private String numero;

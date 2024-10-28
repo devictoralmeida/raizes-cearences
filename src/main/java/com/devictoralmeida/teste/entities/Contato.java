@@ -1,10 +1,10 @@
 package com.devictoralmeida.teste.entities;
 
 import com.devictoralmeida.teste.dto.request.ContatoRequestDto;
-import com.devictoralmeida.teste.dto.request.ContatoUpdateRequestDto;
+import com.devictoralmeida.teste.dto.request.update.ContatoUpdateRequestDto;
 import com.devictoralmeida.teste.enums.TipoContato;
 import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
-import com.devictoralmeida.teste.shared.utils.ValidateDadosUtils;
+import com.devictoralmeida.teste.shared.utils.ValidarDadosUtils;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -71,7 +71,7 @@ public class Contato extends BaseAuditoria implements Serializable {
 
   public void aplicarMudancaUpdateCodigo(ContatoUpdateRequestDto request) {
     preferenciaContato = request.getPreferenciaContato();
-    numeroWhatsapp = ValidateDadosUtils.isNullOrStringVazia(request.getNumeroWhatsapp()) ? numeroWhatsapp : request.getNumeroWhatsapp();
-    email = ValidateDadosUtils.isNullOrStringVazia(request.getEmail()) ? email : request.getEmail();
+    numeroWhatsapp = ValidarDadosUtils.isNullOrStringVazia(request.getNumeroWhatsapp()) ? numeroWhatsapp : request.getNumeroWhatsapp();
+    email = ValidarDadosUtils.isNullOrStringVazia(request.getEmail()) ? email : request.getEmail();
   }
 }

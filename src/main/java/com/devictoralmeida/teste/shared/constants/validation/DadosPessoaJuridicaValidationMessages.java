@@ -18,6 +18,7 @@ public class DadosPessoaJuridicaValidationMessages {
   public static final String RAZAO_SOCIAL_ALFANUMERICO = "A razão social deve conter apenas letras e números";
   public static final String CAF_TAMANHO = "O CAF deve ter no máximo 11 caracteres";
   public static final String DATA_VALIDADE_CAF_PASSADO = "A data de validade do CAF deve ser posterior a 01/01/1900";
+  public static final String DATA_FUNDACAO_PASSADO_PRESENTE = "A data de fundação deve ser anterior ou igual à data atual";
 
   private DadosPessoaJuridicaValidationMessages() {
   }

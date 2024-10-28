@@ -3,6 +3,7 @@ package com.devictoralmeida.teste.entities;
 import com.devictoralmeida.teste.dto.request.PessoaPerfilRequestDto;
 import com.devictoralmeida.teste.enums.TipoUsuario;
 import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
+import com.devictoralmeida.teste.shared.utils.FormatarDadosUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -78,6 +79,7 @@ public class PessoaPerfil extends BaseAuditoria implements Serializable {
     vinculo = new Vinculo(request.getVinculo());
     contato = new Contato(request.getContato());
     endereco = new Endereco(request.getEndereco());
+    FormatarDadosUtils.aplicarTrim(this);
 
     if (idDadosPessoaisPresidente != null) {
       presidente = new Presidente(request.getPresidente(), this, idDadosPessoaisPresidente);

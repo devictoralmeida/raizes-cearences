@@ -3,8 +3,9 @@ package com.devictoralmeida.teste.dto.request;
 import com.devictoralmeida.teste.shared.constants.SharedConstants;
 import com.devictoralmeida.teste.shared.constants.validation.DadosPessoaJuridicaValidationMessages;
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
-import com.devictoralmeida.teste.shared.utils.ValidateDadosUtils;
+import com.devictoralmeida.teste.shared.utils.ValidarDadosUtils;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -39,6 +40,7 @@ public class DadosPessoaJuridicaRequestDto implements Serializable {
   @Size(max = 12, message = DadosPessoaJuridicaValidationMessages.INSCRICAO_ESTADUAL_TAMANHO)
   private String inscricaoEstadual;
 
+  @PastOrPresent(message = DadosPessoaJuridicaValidationMessages.DATA_FUNDACAO_PASSADO_PRESENTE)
   private LocalDate dataFundacao;
 
   @Size(max = 11, message = DadosPessoaJuridicaValidationMessages.CAF_TAMANHO)
@@ -47,8 +49,8 @@ public class DadosPessoaJuridicaRequestDto implements Serializable {
   private LocalDate dataValidadeCaf;
 
   public void validar() {
-    validarTamanhoCampo(razaoSocial, 100, DadosPessoaJuridicaValidationMessages.RAZAO_SOCIAL_TAMANHO_PADRAO);
-    validarTamanhoCampo(nomeFantasia, 100, DadosPessoaJuridicaValidationMessages.NOME_FANTASIA_TAMANHO_PADRAO);
+    validarTamanhoCampo(razaoSocial, SharedConstants.TAMANHO_PADRAO_NOME_RAZAO_SOCIAL, DadosPessoaJuridicaValidationMessages.RAZAO_SOCIAL_TAMANHO_PADRAO);
+    validarTamanhoCampo(nomeFantasia, SharedConstants.TAMANHO_PADRAO_NOME_RAZAO_SOCIAL, DadosPessoaJuridicaValidationMessages.NOME_FANTASIA_TAMANHO_PADRAO);
     resetarCamposNaoPermitidos();
   }
 
@@ -75,7 +77,7 @@ public class DadosPessoaJuridicaRequestDto implements Serializable {
   }
 
   private void validarCampoObrigatorio(String campo, String mensagemErro) {
-    if (ValidateDadosUtils.isNullOrStringVazia(campo)) {
+    if (ValidarDadosUtils.isNullOrStringVazia(campo)) {
       throw new NegocioException(mensagemErro);
     }
   }

@@ -34,21 +34,26 @@ public class PresidenteRequestDto implements Serializable {
   private LocalDate dataInicioMandato;
 
   @NotNull(message = PresidenteValidationMessages.DATA_FINAL_MANDATO_OBRIGATORIA)
+  @FutureOrPresent(message = PresidenteValidationMessages.DATA_FINAL_MANDATO_FUTURO_OU_PRESENTE)
   private LocalDate dataFinalMandato;
 
   public void validar() {
-    validarDatasMandato();
+    validarDatas();
     dadosPessoais.validar();
     contato.validacoesPresidente();
   }
 
-  private void validarDatasMandato() {
-    if (dataInicioMandato.isBefore(SharedConstants.DATA_MINIMA)) {
-      throw new NegocioException(PresidenteValidationMessages.DATA_INICIO_MANDATO_PASSADO);
-    }
+  private void validarDatas() {
+    validarDataAnterior(dataInicioMandato, SharedConstants.DATA_MINIMA, PresidenteValidationMessages.DATA_INICIO_MANDATO_PASSADO);
+    validarDataAnterior(dataFinalMandato, SharedConstants.DATA_MINIMA, PresidenteValidationMessages.DATA_FINAL_MANDATO_PASSADO);
+    validarDataAnterior(dataFinalMandato, dataInicioMandato, PresidenteValidationMessages.DATA_FINAL_MANDATO_ANTERIOR_INICIAL);
+    validarDataAnterior(dataFinalMandato, dadosPessoais.getDataNascimento(), PresidenteValidationMessages.DATA_FINAL_MANDATO_ANTERIOR_NASCIMENTO);
+    validarDataAnterior(dataInicioMandato, dadosPessoais.getDataNascimento(), PresidenteValidationMessages.DATA_INICIO_MANDATO_ANTERIOR_NASCIMENTO);
+  }
 
-    if (dataFinalMandato.isBefore(SharedConstants.DATA_MINIMA)) {
-      throw new NegocioException(PresidenteValidationMessages.DATA_FINAL_MANDATO_PASSADO);
+  private void validarDataAnterior(LocalDate data, LocalDate referencia, String mensagemErro) {
+    if (data.isBefore(referencia) || data.isEqual(referencia)) {
+      throw new NegocioException(mensagemErro);
     }
   }
 }

@@ -13,6 +13,7 @@ public class AnexoValidationMessages {
   public static final String ARQUIVO_OBRIGATORIO = "O arquivo do anexo é obrigatório";
   public static final String ARQUIVO_TAMANHO_MAXIMO = "O arquivo devem ter no máximo 10MB";
   public static final String QUANTIDADE_TIPO_DOCUMENTO_ARQUIVO_DIFERENTE = "A quantidade de tipos de documento e arquivos enviados é diferente";
+  public static final String ATA_ASSEMBLEIA_GERAL_NAO_PERMITIDA = "Conforme o tipo de perfil do usuário, não é permitido enviar o anexo de Ata da Assembléia Geral.";
 
   private AnexoValidationMessages() {
   }

@@ -3,6 +3,8 @@ package com.devictoralmeida.teste.shared.constants;
 public class RotasPermitidasConstants {
   public static final String[] ROTAS_PERMITIDAS = {
           "/auth/**",
+          "/usuario/",
+          "/usuario",
           "/usuario/criar-senha/**",
           "/usuario/upload/**",
           "/usuario/reenviar-codigo/**",

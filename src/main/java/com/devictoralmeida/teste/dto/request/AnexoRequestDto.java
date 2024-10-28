@@ -1,6 +1,7 @@
 package com.devictoralmeida.teste.dto.request;
 
 import com.devictoralmeida.teste.enums.TipoDocumento;
+import com.devictoralmeida.teste.shared.constants.SharedConstants;
 import com.devictoralmeida.teste.shared.constants.validation.AnexoValidationMessages;
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
 import jakarta.validation.constraints.Size;
@@ -40,7 +41,7 @@ public class AnexoRequestDto implements Serializable {
   }
 
   private void verificaTamanhoNome() {
-    if (arquivo.getOriginalFilename() != null && arquivo.getOriginalFilename().length() > 255) {
+    if (arquivo.getOriginalFilename() != null && arquivo.getOriginalFilename().length() > SharedConstants.TAMANHO_MAXIMO_DOMINIO_EMAIL) {
       throw new NegocioException(AnexoValidationMessages.NOME_ANEXO_TAMANHO);
     }
   }

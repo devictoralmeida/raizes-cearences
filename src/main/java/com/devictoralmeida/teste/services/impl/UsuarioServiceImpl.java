@@ -1,6 +1,10 @@
 package com.devictoralmeida.teste.services.impl;
 
-import com.devictoralmeida.teste.dto.request.*;
+import com.devictoralmeida.teste.dto.request.AnexoRequestDto;
+import com.devictoralmeida.teste.dto.request.ContatoRequestDto;
+import com.devictoralmeida.teste.dto.request.SenhaRequestDto;
+import com.devictoralmeida.teste.dto.request.UsuarioRequestDto;
+import com.devictoralmeida.teste.dto.request.update.ContatoUpdateRequestDto;
 import com.devictoralmeida.teste.entities.*;
 import com.devictoralmeida.teste.enums.TipoCodigoVerificacao;
 import com.devictoralmeida.teste.enums.TipoContato;
@@ -11,10 +15,13 @@ import com.devictoralmeida.teste.services.*;
 import com.devictoralmeida.teste.services.rules.RegraPessoaPerfilAnexo;
 import com.devictoralmeida.teste.shared.auditoria.CustomRevisionListener;
 import com.devictoralmeida.teste.shared.constants.errors.ContatoErrorsMessageConstants;
+import com.devictoralmeida.teste.shared.constants.errors.FirebaseErrorsMessageConstants;
 import com.devictoralmeida.teste.shared.constants.errors.UsuarioErrorsMessageConstants;
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
 import com.devictoralmeida.teste.shared.exceptions.RecursoNaoEncontradoException;
+import com.devictoralmeida.teste.shared.utils.FileUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -46,32 +53,34 @@ public class UsuarioServiceImpl implements UsuarioService {
     validarDocumentoExistente(request);
     validarContatoExistente(request.getPessoaPerfil().getContato());
 
-    UserRecord usuarioFirebase = firebaseService.criarUsuarioFirebase(request);
     TermoCondicao termoCondicao = dadosPessoaPerfilTermoRepository.getTermoCondicaoRepository().findLatest();
-    Usuario usuario = new Usuario(request, usuarioFirebase.getUid(), termoCondicao);
-    CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO, usuario);
-    usuario.setCodigoVerificacao(codigoVerificacao);
+    Usuario usuario = new Usuario(request, termoCondicao);
     PessoaPerfil pessoaPerfil = createPessoaPerfil(request, usuario);
+    CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO, usuario);
     usuario.setPessoaPerfil(pessoaPerfil);
-    usuarioRepository.save(usuario);
+    usuario.setCodigoVerificacao(codigoVerificacao);
 
-//    TipoContato preferenciaContato = usuario.getPessoaPerfil().getContato().getPreferenciaContato();
-//    enviarCodigo(usuario, codigoVerificacao, preferenciaContato);
+    try {
+      UserRecord usuarioFirebase = firebaseService.criarUsuarioFirebase(request);
+      usuario.setFirebaseUID(usuarioFirebase.getUid());
+      firebaseService.adicionarPermissoesTokenFirebase(usuarioFirebase.getUid(), usuario.getAuthorities());
+      enviarCodigo(usuario, codigoVerificacao, usuario.getPessoaPerfil().getContato().getPreferenciaContato());
+      usuarioRepository.save(usuario);
+    } catch (FirebaseAuthException e) {
+      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_CRIAR_USUARIO);
+    }
   }
 
-  @Transactional(readOnly = true)
   @Override
   public Usuario findById(UUID id) {
     return usuarioRepository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException(UsuarioErrorsMessageConstants.USUARIO_NAO_ENCONTRADO));
   }
 
-  @Transactional(readOnly = true)
   @Override
   public Usuario findByLogin(String login) {
     return usuarioRepository.findByLogin(login).orElseThrow(() -> new RecursoNaoEncontradoException(UsuarioErrorsMessageConstants.USUARIO_NAO_ENCONTRADO));
   }
 
-  @Transactional(readOnly = true)
   @Override
   public Usuario findByFirebaseUID(String uid) {
     return usuarioRepository.findByFirebaseUID(uid).orElseThrow(() -> new RecursoNaoEncontradoException(UsuarioErrorsMessageConstants.USUARIO_NAO_ENCONTRADO));
@@ -109,19 +118,11 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     anexos.forEach(anexo -> {
       fileService.upload(anexo.getArquivo());
-      anexo.setNome(anexo.getArquivo().getOriginalFilename());
+      anexo.setNome(FileUtils.removerExtensao(anexo.getArquivo().getOriginalFilename()));
       PessoaPerfilAnexo pessoaPerfilAnexo = new PessoaPerfilAnexo(anexo, usuario);
       usuario.getPessoaPerfil().getAnexos().add(pessoaPerfilAnexo);
       dadosPessoaPerfilTermoRepository.getPessoaPerfilAnexoRepository().save(pessoaPerfilAnexo);
     });
-  }
-
-  @Transactional(propagation = Propagation.SUPPORTS)
-  @Override
-  public void delete(UUID id) {
-    Usuario usuario = findById(id);
-    firebaseService.deletarUsuarioFirebase(usuario.getFirebaseUID());
-    usuarioRepository.delete(usuario);
   }
 
   @Transactional
@@ -148,10 +149,15 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO, usuario);
     usuario.setCodigoVerificacao(codigoVerificacao);
-    Usuario updatedUser = usuarioRepository.save(usuario);
-    boolean usuarioPossuiEmail = Objects.nonNull(updatedUser.getPessoaPerfil().getContato().getEmail());
-    firebaseService.atualizarContatoUsuarioFirebase(updatedUser.getFirebaseUID(), request, usuarioPossuiEmail);
-    enviarCodigo(usuario, codigoVerificacao, updatedUser.getPessoaPerfil().getContato().getPreferenciaContato());
+
+    try {
+      Usuario updatedUser = usuarioRepository.save(usuario);
+      boolean usuarioPossuiEmail = Objects.nonNull(updatedUser.getPessoaPerfil().getContato().getEmail());
+      firebaseService.atualizarContatoUsuarioFirebase(updatedUser.getFirebaseUID(), request, usuarioPossuiEmail);
+      enviarCodigo(usuario, codigoVerificacao, updatedUser.getPessoaPerfil().getContato().getPreferenciaContato());
+    } catch (FirebaseAuthException e) {
+      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_ATUALIZAR_CONTATO_USUARIO);
+    }
   }
 
   @Transactional
@@ -165,9 +171,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   @Override
   public void alterarSenha(Usuario usuario, String senha) {
-    usuario.setSenha(passwordEncoder.encode(senha));
-    firebaseService.atualizarSenhaUsuarioFirebase(usuario.getFirebaseUID(), senha);
-    usuarioRepository.save(usuario);
+    try {
+      usuario.setSenha(passwordEncoder.encode(senha));
+      firebaseService.atualizarSenhaUsuarioFirebase(usuario.getFirebaseUID(), senha);
+      usuarioRepository.save(usuario);
+    } catch (FirebaseAuthException e) {
+      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_ATUALIZAR_SENHA_USUARIO);
+    }
   }
 
   @Override
@@ -193,6 +203,19 @@ public class UsuarioServiceImpl implements UsuarioService {
     usuario.setCodigoVerificacao(codigoVerificacao);
     usuarioRepository.save(usuario);
     enviarCodigo(usuario, codigoVerificacao, usuario.getPessoaPerfil().getContato().getPreferenciaContato());
+  }
+
+  @Transactional(propagation = Propagation.SUPPORTS)
+  @Override
+  public void delete(UUID id) {
+    Usuario usuario = findById(id);
+
+    try {
+      firebaseService.deletarUsuarioFirebase(usuario.getFirebaseUID());
+      usuarioRepository.delete(usuario);
+    } catch (FirebaseAuthException e) {
+      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_DELETAR_USUARIO);
+    }
   }
 
   private void enviarCodigo(Usuario usuario, CodigoVerificacao codigoVerificacao, TipoContato preferenciaContato) {

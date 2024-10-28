@@ -1,9 +1,9 @@
 package com.devictoralmeida.teste.services;
 
 import com.devictoralmeida.teste.dto.request.AnexoRequestDto;
-import com.devictoralmeida.teste.dto.request.ContatoUpdateRequestDto;
 import com.devictoralmeida.teste.dto.request.SenhaRequestDto;
 import com.devictoralmeida.teste.dto.request.UsuarioRequestDto;
+import com.devictoralmeida.teste.dto.request.update.ContatoUpdateRequestDto;
 import com.devictoralmeida.teste.entities.Usuario;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;

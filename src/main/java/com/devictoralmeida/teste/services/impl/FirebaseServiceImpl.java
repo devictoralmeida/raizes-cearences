@@ -1,8 +1,8 @@
 package com.devictoralmeida.teste.services.impl;
 
 import com.devictoralmeida.teste.dto.request.ContatoRequestDto;
-import com.devictoralmeida.teste.dto.request.ContatoUpdateRequestDto;
 import com.devictoralmeida.teste.dto.request.UsuarioRequestDto;
+import com.devictoralmeida.teste.dto.request.update.ContatoUpdateRequestDto;
 import com.devictoralmeida.teste.services.FirebaseService;
 import com.devictoralmeida.teste.shared.constants.SharedConstants;
 import com.devictoralmeida.teste.shared.constants.errors.AuthErrorsMessageConstants;
@@ -15,7 +15,11 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
+import java.util.HashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -23,27 +27,14 @@ public class FirebaseServiceImpl implements FirebaseService {
   private final FirebaseAuth firebaseAuth;
 
   @Override
-  public UserRecord criarUsuarioFirebase(UsuarioRequestDto dto) {
+  public UserRecord criarUsuarioFirebase(UsuarioRequestDto dto) throws FirebaseAuthException {
     String nome = dto.getPessoaPerfil().getDadosPessoaFisica() != null
             ? dto.getPessoaPerfil().getDadosPessoaFisica().getNome() + " " + dto.getPessoaPerfil().getDadosPessoaFisica().getSobrenome()
             : dto.getPessoaPerfil().getDadosPessoaJuridica().getRazaoSocial();
 
-    try {
-      UserRecord.CreateRequest request = createFirebaseUserRequest(dto, nome);
-      UserRecord firebaseUser = firebaseAuth.createUser(request);
 
-
-//      Set<String> permissoes = new HashSet<>();
-//      permissoes.add("AGRICULTOR");
-//
-//      HashMap<String, Object> claims = new HashMap<>();
-//      claims.put(SharedConstants.PERMISSOES, permissoes);
-//      String customToken = firebaseAuth.createCustomToken(firebaseUser.getUid());
-//      firebaseAuth.setCustomUserClaims(firebaseUser.getUid(), claims);
-      return firebaseUser;
-    } catch (FirebaseAuthException e) {
-      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_CRIAR_USUARIO);
-    }
+    UserRecord.CreateRequest request = createFirebaseUserRequest(dto, nome);
+    return firebaseAuth.createUser(request);
   }
 
   @Override
@@ -87,35 +78,27 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
-  public void deletarUsuarioFirebase(String uid) {
-    try {
-      firebaseAuth.deleteUser(uid);
-    } catch (FirebaseAuthException e) {
-      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_DELETAR_USUARIO);
-    }
+  public void deletarUsuarioFirebase(String uid) throws FirebaseAuthException {
+    firebaseAuth.deleteUser(uid);
   }
 
   @Override
-  public void atualizarContatoUsuarioFirebase(String uid, ContatoUpdateRequestDto requestDto, boolean usuarioPossuiEmail) {
-    try {
-      UserRecord.UpdateRequest updateRequestFirebase = new UserRecord.UpdateRequest(uid);
+  public void atualizarContatoUsuarioFirebase(String uid, ContatoUpdateRequestDto requestDto, boolean usuarioPossuiEmail) throws FirebaseAuthException {
+    UserRecord.UpdateRequest updateRequestFirebase = new UserRecord.UpdateRequest(uid);
 
-      if (requestDto.getEmail() != null) {
-        updateRequestFirebase.setEmail(requestDto.getEmail());
-      }
-
-      if (requestDto.getNumeroWhatsapp() != null) {
-        updateRequestFirebase.setPhoneNumber(SharedConstants.PREFIX_TELEFONE_BR + requestDto.getNumeroWhatsapp());
-
-        if (!usuarioPossuiEmail) {
-          updateRequestFirebase.setEmail(requestDto.getNumeroWhatsapp() + SharedConstants.EMAIL_DOMINIO_RAIZES);
-        }
-      }
-
-      firebaseAuth.updateUser(updateRequestFirebase);
-    } catch (FirebaseAuthException e) {
-      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_ATUALIZAR_CONTATO_USUARIO);
+    if (requestDto.getEmail() != null) {
+      updateRequestFirebase.setEmail(requestDto.getEmail());
     }
+
+    if (requestDto.getNumeroWhatsapp() != null) {
+      updateRequestFirebase.setPhoneNumber(SharedConstants.PREFIX_TELEFONE_BR + requestDto.getNumeroWhatsapp());
+
+      if (!usuarioPossuiEmail) {
+        updateRequestFirebase.setEmail(requestDto.getNumeroWhatsapp() + SharedConstants.EMAIL_DOMINIO_RAIZES);
+      }
+    }
+
+    firebaseAuth.updateUser(updateRequestFirebase);
   }
 
   @Override
@@ -128,12 +111,19 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
-  public void atualizarSenhaUsuarioFirebase(String firebaseUID, String senha) {
+  public void atualizarSenhaUsuarioFirebase(String firebaseUID, String senha) throws FirebaseAuthException {
+    UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(firebaseUID).setPassword(senha);
+    firebaseAuth.updateUser(request);
+  }
+
+  @Override
+  public void adicionarPermissoesTokenFirebase(String uid, Collection<? extends GrantedAuthority> permissoes) {
     try {
-      UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(firebaseUID).setPassword(senha);
-      firebaseAuth.updateUser(request);
+      HashMap<String, Object> claims = new HashMap<>();
+      claims.put(SharedConstants.PERMISSOES, permissoes);
+      firebaseAuth.setCustomUserClaims(uid, claims);
     } catch (FirebaseAuthException e) {
-      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_ATUALIZAR_SENHA_USUARIO);
+      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_ADICIONAR_PERMISSOES_TOKEN);
     }
   }
 }

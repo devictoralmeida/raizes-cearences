@@ -2,6 +2,7 @@ package com.devictoralmeida.teste.entities;
 
 import com.devictoralmeida.teste.dto.request.AnexoRequestDto;
 import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
+import com.devictoralmeida.teste.shared.utils.FormatarDadosUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -45,7 +46,8 @@ public class Anexo extends BaseAuditoria implements Serializable {
   private List<PessoaPerfilAnexo> pessoaPerfilAnexos = new ArrayList<>();
 
   public Anexo(AnexoRequestDto request) {
-    nome = request.getNome();
+    nome = request.getNome().trim();
     tipo = request.getTipo();
+    FormatarDadosUtils.aplicarTrim(this);
   }
 }

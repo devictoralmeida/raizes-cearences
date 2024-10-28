@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-public class ValidateDadosUtils {
+public class ValidarDadosUtils {
 
-  private ValidateDadosUtils() {
+  private ValidarDadosUtils() {
   }
 
   public static boolean contemApenasLetras(String texto) {

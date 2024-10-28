@@ -1,4 +1,4 @@
-package com.devictoralmeida.teste.dto.request;
+package com.devictoralmeida.teste.dto.request.update;
 
 import com.devictoralmeida.teste.enums.TipoContato;
 import com.devictoralmeida.teste.shared.constants.SharedConstants;
@@ -12,6 +12,7 @@ import lombok.Getter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Getter
 public class ContatoUpdateRequestDto implements Serializable {
@@ -26,12 +27,12 @@ public class ContatoUpdateRequestDto implements Serializable {
   private String numeroWhatsapp;
 
   @Email(message = ContatoValidationMessages.EMAIL_INVALIDO)
-  @Size(max = 320, message = ContatoValidationMessages.EMAIL_TAMANHO)
   private String email;
 
   public void validar() {
     validaExistenciaContato();
     validaPreferenciaContato();
+    validaTamanhoEmail();
   }
 
   private void validaExistenciaContato() {
@@ -49,6 +50,18 @@ public class ContatoUpdateRequestDto implements Serializable {
 
     if (TipoContato.WHATSAPP.equals(preferenciaContato) && numeroWhatsapp == null) {
       throw new NegocioException(ContatoValidationMessages.CONTATO_PREFERENCIA_CONTATO_DIVERGENTE);
+    }
+  }
+
+  private void validaTamanhoEmail() {
+    if (Objects.nonNull(email)) {
+      String[] partesEmail = email.split("@");
+      String parteLocal = partesEmail[0];
+      String parteDominio = partesEmail[1];
+
+      if (parteLocal.length() > SharedConstants.TAMANHO_MAXIMO_LOCAL_EMAIL || parteDominio.length() > SharedConstants.TAMANHO_MAXIMO_DOMINIO_EMAIL) {
+        throw new NegocioException(ContatoValidationMessages.EMAIL_TAMANHO);
+      }
     }
   }
 }

@@ -23,11 +23,11 @@ public class DadosPessoaFisicaRequestDto implements Serializable {
   private UUID id;
 
   @NotBlank(message = DadosPessoaFisicaValidationMessages.NOME_OBRIGATORIO)
-  @Size(max = 100, message = DadosPessoaFisicaValidationMessages.NOME_TAMANHO)
+  @Size(max = SharedConstants.TAMANHO_PADRAO_NOME_RAZAO_SOCIAL, message = DadosPessoaFisicaValidationMessages.NOME_TAMANHO)
   private String nome;
 
   @NotBlank(message = DadosPessoaFisicaValidationMessages.SOBRENOME_OBRIGATORIO)
-  @Size(max = 100, message = DadosPessoaFisicaValidationMessages.SOBRENOME_TAMANHO)
+  @Size(max = SharedConstants.TAMANHO_PADRAO_NOME_RAZAO_SOCIAL, message = DadosPessoaFisicaValidationMessages.SOBRENOME_TAMANHO)
   private String sobrenome;
 
   @NotBlank(message = DadosPessoaFisicaValidationMessages.RG_OBRIGATORIO)

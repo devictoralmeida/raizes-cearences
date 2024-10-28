@@ -7,39 +7,50 @@ import com.devictoralmeida.teste.shared.constants.validation.AnexoValidationMess
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class RegraPessoaPerfilAnexo {
+  private static final Map<TipoPerfil, Set<TipoDocumento>> PERFIL_DOCUMENTOS_OBRIGATORIOS = Map.of(
+          TipoPerfil.COOPERATIVA, Set.of(
+                  TipoDocumento.ATA_ASSEMBLEIA_GERAL,
+                  TipoDocumento.ATA_FUNDACAO,
+                  TipoDocumento.ATA_ULTIMA_ELEICAO,
+                  TipoDocumento.ESTATUTO
+          ),
+          TipoPerfil.ASSOCIACAO, Set.of(
+                  TipoDocumento.ATA_FUNDACAO,
+                  TipoDocumento.ATA_ULTIMA_ELEICAO,
+                  TipoDocumento.ESTATUTO
+          )
+  );
+
   private RegraPessoaPerfilAnexo() {
   }
 
   public static void validar(List<AnexoRequestDto> anexos, TipoPerfil tipoPerfil) {
     anexos.forEach(AnexoRequestDto::validar);
 
-    switch (tipoPerfil) {
-      case COOPERATIVA -> validarAnexosCooperativa(anexos);
-      case ASSOCIACAO -> validarAnexosAssociacao(anexos);
-      default -> throw new NegocioException(AnexoValidationMessages.TIPO_PERFIL_INVALIDO);
+    if (!PERFIL_DOCUMENTOS_OBRIGATORIOS.containsKey(tipoPerfil)) {
+      throw new NegocioException(AnexoValidationMessages.TIPO_PERFIL_INVALIDO);
+    }
+
+    if (tipoPerfil == TipoPerfil.ASSOCIACAO) {
+      validarAnexosAssociacao(anexos);
+    }
+
+    validarDocumentosObrigatorios(anexos, PERFIL_DOCUMENTOS_OBRIGATORIOS.get(tipoPerfil));
+  }
+
+  private static void validarAnexosAssociacao(List<AnexoRequestDto> anexos) {
+    List<TipoDocumento> tiposDocumentoEnviados = anexos.stream().map(AnexoRequestDto::getTipoDocumento).toList();
+
+    if (tiposDocumentoEnviados.contains(TipoDocumento.ATA_ASSEMBLEIA_GERAL)) {
+      throw new NegocioException(AnexoValidationMessages.ATA_ASSEMBLEIA_GERAL_NAO_PERMITIDA);
     }
   }
 
-  public static void validarAnexosCooperativa(List<AnexoRequestDto> anexos) {
-    validarDocumentosObrigatorios(anexos, List.of(
-            TipoDocumento.ATA_ASSEMBLEIA_GERAL,
-            TipoDocumento.ATA_FUNDACAO,
-            TipoDocumento.ATA_ULTIMA_ELEICAO,
-            TipoDocumento.ESTATUTO
-    ));
-  }
-
-  public static void validarAnexosAssociacao(List<AnexoRequestDto> anexos) {
-    validarDocumentosObrigatorios(anexos, List.of(
-            TipoDocumento.ATA_FUNDACAO,
-            TipoDocumento.ATA_ULTIMA_ELEICAO,
-            TipoDocumento.ESTATUTO
-    ));
-  }
-
-  private static void validarDocumentosObrigatorios(List<AnexoRequestDto> anexos, List<TipoDocumento> documentosObrigatorios) {
+  private static void validarDocumentosObrigatorios(List<AnexoRequestDto> anexos, Set<TipoDocumento> documentosObrigatorios) {
     List<TipoDocumento> tiposDocumentoEnviados = anexos.stream().map(AnexoRequestDto::getTipoDocumento).toList();
 
     for (TipoDocumento documento : documentosObrigatorios) {

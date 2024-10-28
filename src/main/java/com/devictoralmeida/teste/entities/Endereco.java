@@ -2,6 +2,7 @@ package com.devictoralmeida.teste.entities;
 
 import com.devictoralmeida.teste.dto.request.EnderecoRequestDto;
 import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
+import com.devictoralmeida.teste.shared.utils.FormatarDadosUtils;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -66,5 +67,7 @@ public class Endereco extends BaseAuditoria implements Serializable {
     bairro = request.getBairro();
     uf = request.getUf();
     pontoReferencia = request.getPontoReferencia();
+
+    FormatarDadosUtils.aplicarTrim(this);
   }
 }

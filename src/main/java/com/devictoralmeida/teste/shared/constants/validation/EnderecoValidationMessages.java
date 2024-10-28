@@ -15,6 +15,8 @@ public class EnderecoValidationMessages {
   public static final String UF_TAMANHO = "A UF deve ter 2 caracteres";
   public static final String UF_OBRIGATORIA = "A UF é obrigatória!";
   public static final String PONTO_REFERENCIA_TAMANHO = "O ponto de referência deve ter no máximo 50 caracteres";
+  public static final String LOCALIDADE_APENAS_LETRAS = "A localidade deve conter apenas letras";
+  public static final String MUNICIPIO_APENAS_LETRAS = "O município deve conter apenas letras";
 
   private EnderecoValidationMessages() {
   }

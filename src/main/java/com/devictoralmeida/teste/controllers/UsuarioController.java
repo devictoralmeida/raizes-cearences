@@ -1,6 +1,10 @@
 package com.devictoralmeida.teste.controllers;
 
-import com.devictoralmeida.teste.dto.request.*;
+import com.devictoralmeida.teste.dto.request.AnexoRequestDto;
+import com.devictoralmeida.teste.dto.request.CodigoRequestDto;
+import com.devictoralmeida.teste.dto.request.SenhaRequestDto;
+import com.devictoralmeida.teste.dto.request.UsuarioRequestDto;
+import com.devictoralmeida.teste.dto.request.update.ContatoUpdateRequestDto;
 import com.devictoralmeida.teste.dto.response.ResponseDto;
 import com.devictoralmeida.teste.enums.TipoDocumento;
 import com.devictoralmeida.teste.services.UsuarioService;

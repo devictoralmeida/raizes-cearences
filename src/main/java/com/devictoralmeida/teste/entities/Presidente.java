@@ -2,6 +2,7 @@ package com.devictoralmeida.teste.entities;
 
 import com.devictoralmeida.teste.dto.request.PresidenteRequestDto;
 import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
+import com.devictoralmeida.teste.shared.utils.FormatarDadosUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -67,6 +68,7 @@ public class Presidente extends BaseAuditoria implements Serializable {
     dadosPessoaId = idDadosPessoaisPresidente;
     this.pessoaPerfil = pessoaPerfil;
     contato = new Contato(request.getContato());
+    FormatarDadosUtils.aplicarTrim(this);
   }
 
 }

@@ -13,6 +13,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -31,7 +32,6 @@ public class ContatoRequestDto implements Serializable {
   private String numeroWhatsapp;
 
   @Email(message = ContatoValidationMessages.EMAIL_INVALIDO)
-  @Size(max = 320, message = ContatoValidationMessages.EMAIL_TAMANHO)
   private String email;
 
   @JsonProperty("isWhatsapp")
@@ -44,11 +44,13 @@ public class ContatoRequestDto implements Serializable {
     validaWhatsApp();
     validaExistenciaContato();
     validaPreferenciaContato();
+    validaTamanhoEmail();
   }
 
   public void validacoesPresidente() {
     validarCampoObrigatorio(email, ContatoValidationMessages.EMAIL_OBRIGATORIO);
     validarCampoObrigatorio(numeroContato, ContatoValidationMessages.NUMERO_CONTATO_OBRIGATORIO);
+    validaTamanhoEmail();
     resetarCamposNaoPermitidosPresidente();
   }
 
@@ -96,6 +98,18 @@ public class ContatoRequestDto implements Serializable {
   private void validarCampoObrigatorio(String campo, String mensagemErro) {
     if (campo == null) {
       throw new NegocioException(mensagemErro);
+    }
+  }
+
+  private void validaTamanhoEmail() {
+    if (Objects.nonNull(email)) {
+      String[] partesEmail = email.split("@");
+      String parteLocal = partesEmail[0];
+      String parteDominio = partesEmail[1];
+
+      if (parteLocal.length() > SharedConstants.TAMANHO_MAXIMO_LOCAL_EMAIL || parteDominio.length() > SharedConstants.TAMANHO_MAXIMO_DOMINIO_EMAIL) {
+        throw new NegocioException(ContatoValidationMessages.EMAIL_TAMANHO);
+      }
     }
   }
 }

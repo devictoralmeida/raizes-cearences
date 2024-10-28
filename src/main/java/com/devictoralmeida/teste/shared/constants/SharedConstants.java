@@ -9,6 +9,10 @@ public class SharedConstants {
   public static final String PREFIX_TELEFONE_BR = "+55";
   public static final String EMAIL_DOMINIO_RAIZES = "@raizes-cearences.com.br";
 
+  public static final int TAMANHO_PADRAO_NOME_RAZAO_SOCIAL = 100;
+  public static final int TAMANHO_MAXIMO_DOMINIO_EMAIL = 255;
+  public static final int TAMANHO_MAXIMO_LOCAL_EMAIL = 64;
+
   public static final int TAMANHO_CONTATO_NUMERICO = 11;
   public static final int TAMANHO_CPF = 11;
   public static final int TAMANHO_MAXIMO_RG = 20;

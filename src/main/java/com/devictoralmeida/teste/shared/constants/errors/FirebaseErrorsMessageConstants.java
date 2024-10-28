@@ -7,6 +7,7 @@ public class FirebaseErrorsMessageConstants {
   public static final String ERRO_VERIFICACAO_EMAIL = "Erro ao verificar o email do usuário no Firebase";
   public static final String ERRO_DELETAR_USUARIO = "Erro ao deletar o usuário no Firebase";
   public static final String ERRO_ATUALIZAR_SENHA_USUARIO = "Erro ao atualizar a senha do usuário no Firebase";
+  public static final String ERRO_ADICIONAR_PERMISSOES_TOKEN = "Erro ao adicionar permissões ao token do usuário no Firebase";
 
   private FirebaseErrorsMessageConstants() {
   }
