@@ -1,6 +1,10 @@
 package com.devictoralmeida.teste.controllers;
 
-import com.devictoralmeida.teste.dto.request.*;
+import com.devictoralmeida.teste.dto.request.LoginRequestDto;
+import com.devictoralmeida.teste.dto.request.RecuperarSenhaRequestDto;
+import com.devictoralmeida.teste.dto.request.RefreshTokenRequestDto;
+import com.devictoralmeida.teste.dto.request.SenhaRequestDto;
+import com.devictoralmeida.teste.dto.request.update.SenhaUpdateRequestDto;
 import com.devictoralmeida.teste.dto.response.FirebaseLoginResponseDto;
 import com.devictoralmeida.teste.dto.response.RefreshTokenResponseDto;
 import com.devictoralmeida.teste.dto.response.ResponseDto;
@@ -41,7 +45,7 @@ public class AuthController {
   }
 
   @PatchMapping("/alterar-senha")
-  public ResponseEntity<?> alterarSenha(@Valid @RequestBody AlterarSenhaRequestDto request) {
+  public ResponseEntity<?> alterarSenha(@Valid @RequestBody SenhaUpdateRequestDto request) {
     authService.alterarSenha(request);
     return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_SENHA_ALTERADA_SUCESSO));
   }

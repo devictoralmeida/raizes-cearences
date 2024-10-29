@@ -1,6 +1,10 @@
 package com.devictoralmeida.teste.services;
 
-import com.devictoralmeida.teste.dto.request.*;
+import com.devictoralmeida.teste.dto.request.LoginRequestDto;
+import com.devictoralmeida.teste.dto.request.RecuperarSenhaRequestDto;
+import com.devictoralmeida.teste.dto.request.RefreshTokenRequestDto;
+import com.devictoralmeida.teste.dto.request.SenhaRequestDto;
+import com.devictoralmeida.teste.dto.request.update.SenhaUpdateRequestDto;
 import com.devictoralmeida.teste.dto.response.FirebaseLoginResponseDto;
 import com.devictoralmeida.teste.dto.response.RefreshTokenResponseDto;
 import com.devictoralmeida.teste.entities.Usuario;
@@ -20,5 +24,5 @@ public interface AuthService extends UserDetailsService {
 
   void recuperarSenha(String login, SenhaRequestDto request);
 
-  void alterarSenha(AlterarSenhaRequestDto request);
+  void alterarSenha(SenhaUpdateRequestDto request);
 }

@@ -15,15 +15,12 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.UUID;
 
 @Getter
 @Setter
 public class PessoaPerfilRequestDto implements Serializable {
   @Serial
   private static final long serialVersionUID = 5973184765774917436L;
-
-  private UUID id;
 
   @NotNull(message = PessoaPerfilValidationMessages.TIPO_USUARIO_OBRIGATORIO)
   private TipoUsuario tipoUsuario;

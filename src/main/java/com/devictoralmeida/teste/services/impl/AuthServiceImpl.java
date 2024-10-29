@@ -1,6 +1,7 @@
 package com.devictoralmeida.teste.services.impl;
 
 import com.devictoralmeida.teste.dto.request.*;
+import com.devictoralmeida.teste.dto.request.update.SenhaUpdateRequestDto;
 import com.devictoralmeida.teste.dto.response.FirebaseLoginResponseDto;
 import com.devictoralmeida.teste.dto.response.RefreshTokenResponseDto;
 import com.devictoralmeida.teste.entities.Usuario;
@@ -92,7 +93,7 @@ public class AuthServiceImpl implements AuthService {
 
   @Transactional
   @Override
-  public void alterarSenha(AlterarSenhaRequestDto request) {
+  public void alterarSenha(SenhaUpdateRequestDto request) {
     request.validar();
     Usuario usuario = usuarioService.findByLogin(request.getLogin());
     verificarUsuarioValido(usuario);

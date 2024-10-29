@@ -1,4 +1,4 @@
-package com.devictoralmeida.teste.dto.request;
+package com.devictoralmeida.teste.dto.request.update;
 
 import com.devictoralmeida.teste.shared.constants.SharedConstants;
 import com.devictoralmeida.teste.shared.constants.validation.UsuarioValidationMessages;
@@ -12,7 +12,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Getter
-public class AlterarSenhaRequestDto implements Serializable {
+public class SenhaUpdateRequestDto implements Serializable {
   @Serial
   private static final long serialVersionUID = -721054336603288433L;
 

@@ -131,7 +131,6 @@ public class UsuarioServiceImpl implements UsuarioService {
     request.validar();
     Usuario usuario = findByLogin(login);
     Contato contato = usuario.getPessoaPerfil().getContato();
-
     boolean houveMudanca = contato.validarMudancaUpdateCodigo(request);
 
     if (houveMudanca) {
@@ -142,15 +141,17 @@ public class UsuarioServiceImpl implements UsuarioService {
       if (Objects.nonNull(contato.getEmail()) && !contato.getEmail().equals(request.getEmail())) {
         verificarEmailExistente(request.getEmail());
       }
-
-      CustomRevisionListener.setDadosAntigos(usuario.toStringMapper());
-      contato.aplicarMudancaUpdateCodigo(request);
     }
 
     CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO, usuario);
     usuario.setCodigoVerificacao(codigoVerificacao);
 
     try {
+      if (houveMudanca) {
+        CustomRevisionListener.setDadosAntigos(usuario.toStringMapper());
+        contato.aplicarMudancaUpdateCodigo(request);
+      }
+
       Usuario updatedUser = usuarioRepository.save(usuario);
       boolean usuarioPossuiEmail = Objects.nonNull(updatedUser.getPessoaPerfil().getContato().getEmail());
       firebaseService.atualizarContatoUsuarioFirebase(updatedUser.getFirebaseUID(), request, usuarioPossuiEmail);
@@ -191,9 +192,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   @Override
   public void verificarAceiteTermos(Usuario usuario) {
-//    if (usuario.getDataAceiteTermos() == null) {
-//      throw new NegocioException(UsuarioErrorsMessageConstants.ACEITE_TERMOS_NAO_REALIZADO);
-//    }
+    if (usuario.getDataAceiteTermo() == null) {
+      throw new NegocioException(UsuarioErrorsMessageConstants.ACEITE_TERMO_NAO_REALIZADO);
+    }
   }
 
   @Transactional

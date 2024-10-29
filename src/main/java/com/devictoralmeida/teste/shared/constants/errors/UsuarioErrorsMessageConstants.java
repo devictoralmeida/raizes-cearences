@@ -6,6 +6,7 @@ public class UsuarioErrorsMessageConstants {
   public static final String CODIGO_INVALIDO_EXPIRADO = "O código informado é inválido ou expirado! Solicite um novo código";
   public static final String CODIGO_VALIDACAO_CONTATO_NAO_REALIZADO = "O código de validação do contato do usuário não foi validado";
   public static final String CODIGO_VALIDACAO_SENHA_NAO_REALIZADO = "O código de validação da senha do usuário não foi validado";
+  public static final String ACEITE_TERMO_NAO_REALIZADO = "O usuário não realizou o aceite dos termos de uso";
 
   private UsuarioErrorsMessageConstants() {
   }

@@ -15,6 +15,7 @@ public class DadosPessoaFisicaValidationMessages {
   public static final String SEXO_OBRIGATORIO = "O sexo é obrigatório";
   public static final String ORG_EXPEDIDOR_APENAS_LETRAS = "O órgão expedidor deve conter apenas letras";
   public static final String DATA_EXPEDICAO_PASSADO = "A data de expedição deve ser posterior a 01/01/1900";
+  public static final String DATA_EXPEDICAO_ANTERIOR_NASCIMENTO = "A data de expedição deve ser posterior à data de nascimento";
 
   private DadosPessoaFisicaValidationMessages() {
   }
