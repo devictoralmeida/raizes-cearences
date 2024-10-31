@@ -10,7 +10,6 @@ public class FirebaseLoginResponseDto implements Serializable {
   @Serial
   private static final long serialVersionUID = -1857780050295696126L;
 
-  private String localId;
   private String email;
   private String displayName;
   private String idToken;

@@ -22,9 +22,4 @@ public class UsuarioRequestDto implements Serializable {
 
   @NotNull(message = UsuarioValidationMessages.PESSOA_PERFIL_OBRIGATORIA)
   private @Valid PessoaPerfilRequestDto pessoaPerfil;
-
-  public void validar() {
-    pessoaPerfil.validar(tipoPerfil);
-    login = pessoaPerfil.getDocumento();
-  }
 }

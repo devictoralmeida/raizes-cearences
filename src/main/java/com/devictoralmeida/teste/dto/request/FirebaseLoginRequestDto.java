@@ -9,10 +9,9 @@ import java.io.Serializable;
 public class FirebaseLoginRequestDto implements Serializable {
   @Serial
   private static final long serialVersionUID = 8382098202468358460L;
-
+  private final boolean returnSecureToken = true;
   private final String email;
   private final String password;
-  private final boolean returnSecureToken = true;
 
   public FirebaseLoginRequestDto(String email, String password) {
     this.email = email;

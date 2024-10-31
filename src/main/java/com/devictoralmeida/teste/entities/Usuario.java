@@ -3,7 +3,7 @@ package com.devictoralmeida.teste.entities;
 import com.devictoralmeida.teste.dto.request.UsuarioRequestDto;
 import com.devictoralmeida.teste.enums.TipoPerfil;
 import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
-import com.devictoralmeida.teste.shared.utils.FormatarDadosUtils;
+import com.devictoralmeida.teste.shared.utils.PermissoesUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +21,6 @@ import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
@@ -31,7 +30,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -86,7 +84,7 @@ public class Usuario extends BaseAuditoria implements UserDetails, Serializable 
   @Column(name = "dat_aceite_termo")
   private LocalDateTime dataAceiteTermo;
 
-  @ManyToMany(fetch = FetchType.EAGER)
+  @ManyToMany
   @JoinTable(name = "usuario_perfil_acesso",
           joinColumns = @JoinColumn(name = "usuario_id"),
           inverseJoinColumns = @JoinColumn(name = "perfil_acesso_id"))
@@ -95,32 +93,23 @@ public class Usuario extends BaseAuditoria implements UserDetails, Serializable 
   public Usuario(UsuarioRequestDto request, TermoCondicao termoCondicao) {
     login = request.getLogin();
     tipoPerfil = request.getTipoPerfil();
-
     termo = termoCondicao;
-    FormatarDadosUtils.aplicarTrim(this);
+
     // Lembrar de apagar as linhas abaixo
     dataAceiteTermo = LocalDateTime.now();
   }
 
-  public String toStringMapper() throws JsonProcessingException {
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.registerModule(new JavaTimeModule())
-            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+  public boolean possuiPermissao(String permissao) {
+    return this.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals(permissao));
+  }
 
-    return objectMapper.writeValueAsString(this);
+  public boolean isAdmin() {
+    return TipoPerfil.ADMINISTRADOR.equals(tipoPerfil);
   }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return perfisAcessos.stream()
-            .flatMap(perfil -> perfil.getPermissoes().stream()
-                    .map(permissao -> new SimpleGrantedAuthority(permissao.getNome())))
-            .collect(Collectors.toSet());
-
-//        return perfisAcessos.stream()
-//            .map(perfil -> perfil.getPermissoes().stream()
-//                    .map(permissao -> new SimpleGrantedAuthority(permissao.getNome()))
-//                    .collect(Collectors.toSet()));
+    return PermissoesUtils.getPermissoes(perfisAcessos);
   }
 
   @Override
@@ -151,5 +140,13 @@ public class Usuario extends BaseAuditoria implements UserDetails, Serializable 
   @Override
   public boolean isEnabled() {
     return true;
+  }
+
+  public String toStringMapper() throws JsonProcessingException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    return objectMapper.writeValueAsString(this);
   }
 }

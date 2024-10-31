@@ -378,19 +378,19 @@ CREATE TABLE "permissao_aud"
 
 CREATE TABLE "perfil_permissao"
 (
-  "perfil_id"    UUID,
+  "perfil_acesso_id" UUID,
   "permissao_id" UUID,
-  CONSTRAINT "fk_perfil_permissao_perfil" FOREIGN KEY ("perfil_id") REFERENCES "perfil_acesso" ("id"),
+  CONSTRAINT "fk_perfil_permissao_perfil" FOREIGN KEY ("perfil_acesso_id") REFERENCES "perfil_acesso" ("id"),
   CONSTRAINT "fk_perfil_permissao_permissao" FOREIGN KEY ("permissao_id") REFERENCES "permissao" ("id")
 );
 
 CREATE TABLE "perfil_permissao_aud"
 (
-  "perfil_id"    UUID   NOT NULL,
+  "perfil_acesso_id" UUID NOT NULL,
   "permissao_id" UUID   NOT NULL,
   "cd_auditoria" BIGINT NOT NULL,
   "tp_movimento" SMALLINT NULL DEFAULT NULL,
-  CONSTRAINT "pk_perfil_permissao_aud" PRIMARY KEY ("perfil_id", "permissao_id", "cd_auditoria"),
+  CONSTRAINT "pk_perfil_permissao_aud" PRIMARY KEY ("perfil_acesso_id", "permissao_id", "cd_auditoria"),
   CONSTRAINT "fk_perfil_permissao_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
@@ -438,13 +438,3 @@ ALTER TABLE "presidente"
 
 ALTER TABLE "presidente"
   ADD FOREIGN KEY ("dados_pessoa_id") REFERENCES "dados_pessoa_fisica" ("id");
-
-INSERT INTO "termo_condicao" (id, versao, conteudo, dat_criacao, dat_atualizacao, nm_usuario_cadastro,
-                              nm_usuario_atualizacao)
-VALUES ('eb1f62bf-9d16-45c1-be45-bd52f97dffb2',
-        '0.0.1',
-        'Este é um termo de condição genérico para a versão 0.0.1.',
-        now(),
-        now(),
-        'Assistente Virtual',
-        'Assistente Virtual');

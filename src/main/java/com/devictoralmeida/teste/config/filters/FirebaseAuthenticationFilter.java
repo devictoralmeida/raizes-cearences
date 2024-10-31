@@ -2,6 +2,7 @@ package com.devictoralmeida.teste.config.filters;
 
 import com.devictoralmeida.teste.entities.Usuario;
 import com.devictoralmeida.teste.services.AuthService;
+import com.devictoralmeida.teste.shared.utils.PermissoesUtils;
 import com.google.firebase.auth.FirebaseToken;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -39,16 +40,12 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
 //      throw new SemAutorizacaoException(AuthErrorsMessageConstants.ERRO_AUTENTICACAO_TOKEN);
 //    }
 
-//    if (request.getRequestURI().contains("/auth/login")) {
-//
-//    } else {
-
     if (idToken != null) {
       FirebaseToken token = authService.verificarToken(idToken);
       UserDetails user = authService.loadUserByUsername(token.getUid());
       Usuario usuario = (Usuario) user;
       authService.verificarUsuarioValido(usuario);
-      Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+      Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, PermissoesUtils.getPermissoesFromToken(token));
       SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 

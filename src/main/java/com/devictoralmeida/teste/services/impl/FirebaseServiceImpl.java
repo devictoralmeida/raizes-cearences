@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -120,7 +122,8 @@ public class FirebaseServiceImpl implements FirebaseService {
   public void adicionarPermissoesTokenFirebase(String uid, Collection<? extends GrantedAuthority> permissoes) {
     try {
       HashMap<String, Object> claims = new HashMap<>();
-      claims.put(SharedConstants.PERMISSOES, permissoes);
+      List<String> permissoesList = permissoes.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
+      claims.put(SharedConstants.PERMISSOES, permissoesList);
       firebaseAuth.setCustomUserClaims(uid, claims);
     } catch (FirebaseAuthException e) {
       throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_ADICIONAR_PERMISSOES_TOKEN);

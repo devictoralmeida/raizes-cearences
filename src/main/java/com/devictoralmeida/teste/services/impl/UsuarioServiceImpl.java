@@ -10,9 +10,11 @@ import com.devictoralmeida.teste.enums.TipoCodigoVerificacao;
 import com.devictoralmeida.teste.enums.TipoContato;
 import com.devictoralmeida.teste.enums.TipoPerfil;
 import com.devictoralmeida.teste.factories.DadosPessoaPerfilTermoRepository;
+import com.devictoralmeida.teste.helpers.AnexoRequestHelper;
+import com.devictoralmeida.teste.helpers.ContatoRequestHelper;
+import com.devictoralmeida.teste.helpers.UsuarioRequestHelper;
 import com.devictoralmeida.teste.repositories.UsuarioRepository;
 import com.devictoralmeida.teste.services.*;
-import com.devictoralmeida.teste.services.rules.RegraPessoaPerfilAnexo;
 import com.devictoralmeida.teste.shared.auditoria.CustomRevisionListener;
 import com.devictoralmeida.teste.shared.constants.errors.ContatoErrorsMessageConstants;
 import com.devictoralmeida.teste.shared.constants.errors.FirebaseErrorsMessageConstants;
@@ -49,7 +51,7 @@ public class UsuarioServiceImpl implements UsuarioService {
   @Transactional
   @Override
   public void save(UsuarioRequestDto request) {
-    request.validar();
+    UsuarioRequestHelper.validar(request);
     validarDocumentoExistente(request);
     validarContatoExistente(request.getPessoaPerfil().getContato());
 
@@ -59,6 +61,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO, usuario);
     usuario.setPessoaPerfil(pessoaPerfil);
     usuario.setCodigoVerificacao(codigoVerificacao);
+
+    if (!TipoPerfil.CONSUMIDOR.equals(usuario.getTipoPerfil())) {
+      List<PerfilAcesso> perfilAcessos = dadosPessoaPerfilTermoRepository.getPerfilAcessoRepository().getPerfilAcessoOfertasPlanos();
+      usuario.getPerfisAcessos().addAll(perfilAcessos);
+    }
 
     try {
       UserRecord usuarioFirebase = firebaseService.criarUsuarioFirebase(request);
@@ -114,7 +121,7 @@ public class UsuarioServiceImpl implements UsuarioService {
   @Override
   public void uploadAnexos(String login, @Valid List<AnexoRequestDto> anexos) {
     Usuario usuario = findByLogin(login);
-    RegraPessoaPerfilAnexo.validar(anexos, usuario.getTipoPerfil());
+    AnexoRequestHelper.validarLista(anexos, usuario.getTipoPerfil());
 
     anexos.forEach(anexo -> {
       fileService.upload(anexo.getArquivo());
@@ -128,17 +135,17 @@ public class UsuarioServiceImpl implements UsuarioService {
   @Transactional
   @Override
   public void alterarContato(String login, ContatoUpdateRequestDto request) throws JsonProcessingException {
-    request.validar();
+    ContatoRequestHelper.validar(request);
     Usuario usuario = findByLogin(login);
     Contato contato = usuario.getPessoaPerfil().getContato();
     boolean houveMudanca = contato.validarMudancaUpdateCodigo(request);
 
     if (houveMudanca) {
-      if (Objects.nonNull(contato.getNumeroWhatsapp()) && !contato.getNumeroWhatsapp().equals(request.getNumeroWhatsapp())) {
+      if (contato.getNumeroWhatsapp() != null && !contato.getNumeroWhatsapp().equals(request.getNumeroWhatsapp())) {
         verificarWhatsappExistente(request.getNumeroWhatsapp());
       }
 
-      if (Objects.nonNull(contato.getEmail()) && !contato.getEmail().equals(request.getEmail())) {
+      if (contato.getEmail() != null && !contato.getEmail().equals(request.getEmail())) {
         verificarEmailExistente(request.getEmail());
       }
     }
@@ -221,7 +228,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   private void enviarCodigo(Usuario usuario, CodigoVerificacao codigoVerificacao, TipoContato preferenciaContato) {
     if (TipoContato.EMAIL.equals(preferenciaContato)) {
-//      emailService.enviarEmail(usuario.getPessoaPerfil().getContato().getEmail(), codigoVerificacao.getCodigo());
+      emailService.enviarEmail(usuario.getPessoaPerfil().getContato().getEmail(), codigoVerificacao.getCodigo());
     } else if (TipoContato.WHATSAPP.equals(preferenciaContato)) {
       mensagemService.enviarWhatsapp(usuario.getPessoaPerfil().getContato().getNumeroWhatsapp(), codigoVerificacao.getCodigo());
     }
@@ -234,11 +241,11 @@ public class UsuarioServiceImpl implements UsuarioService {
   }
 
   private void validarContatoExistente(ContatoRequestDto contato) {
-    if (Objects.nonNull(contato.getEmail())) {
+    if (contato.getEmail() != null) {
       verificarEmailExistente(contato.getEmail());
     }
 
-    if (Objects.nonNull(contato.getNumeroWhatsapp())) {
+    if (contato.getNumeroWhatsapp() != null) {
       verificarWhatsappExistente(contato.getNumeroWhatsapp());
     }
   }

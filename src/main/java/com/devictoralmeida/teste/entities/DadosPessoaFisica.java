@@ -4,7 +4,6 @@ import com.devictoralmeida.teste.dto.request.DadosPessoaFisicaRequestDto;
 import com.devictoralmeida.teste.enums.GrauInstrucao;
 import com.devictoralmeida.teste.enums.Sexo;
 import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
-import com.devictoralmeida.teste.shared.utils.FormatarDadosUtils;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -76,6 +75,5 @@ public class DadosPessoaFisica extends BaseAuditoria implements Serializable {
     dataNascimento = request.getDataNascimento();
     sexo = request.getSexo();
     grauInstrucao = request.getGrauInstrucao();
-    FormatarDadosUtils.aplicarTrim(this);
   }
 }

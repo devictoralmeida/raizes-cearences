@@ -22,17 +22,14 @@ public class CodigoVerificacaoServiceImpl implements CodigoVerificacaoService {
   @Transactional
   @Override
   public CodigoVerificacao save(TipoCodigoVerificacao tipo, Usuario usuario) {
+    LocalDateTime dataExpiracao = LocalDateTime.now().plusMinutes(15);
+    CodigoVerificacao codigoVerificacao;
     if (TipoCodigoVerificacao.CONTATO.equals(tipo)) {
-      LocalDateTime dataExpiracao = LocalDateTime.now().plusMinutes(15);
-      CodigoVerificacao codigoVerificacao = new CodigoVerificacao(gerarCodigoVerificacaoContato(), dataExpiracao, tipo);
-      // Lembrar apagar linha abaixo
-      codigoVerificacao.setValido(true);
-      return repository.save(codigoVerificacao);
+      codigoVerificacao = new CodigoVerificacao(gerarCodigoVerificacaoContato(), dataExpiracao, tipo);
     } else {
-      LocalDateTime dataExpiracao = LocalDateTime.now().plusMinutes(15);
-      CodigoVerificacao codigoVerificacao = new CodigoVerificacao(gerarCodigoVerificacaoSenha(usuario.getDataCriacao()), dataExpiracao, tipo);
-      return repository.save(codigoVerificacao);
+      codigoVerificacao = new CodigoVerificacao(gerarCodigoVerificacaoSenha(usuario.getDataCriacao()), dataExpiracao, tipo);
     }
+    return repository.save(codigoVerificacao);
   }
 
   private String gerarCodigoVerificacaoContato() {

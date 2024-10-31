@@ -185,6 +185,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     return handleExceptionInternal(ex, obj, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
   }
 
+  @ExceptionHandler({SemAutenticacaoException.class})
+  public ResponseEntity<?> handleSemAutenticacaoExceptionException(SemAutenticacaoException ex, WebRequest request) {
+    LOGGER.error(" =============== SemAutenticacaoException ==========================");
+
+    String field = ex.getMessage();
+    String error = ex.getMessage();
+
+    Object obj = ResponseDto.fromData(null, HttpStatus.UNAUTHORIZED, error, Arrays.asList(field));
+    return handleExceptionInternal(ex, obj, new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
+  }
+
   @ExceptionHandler({SemAutorizacaoException.class})
   public ResponseEntity<?> handleSemAutorizacaoExceptionException(SemAutorizacaoException ex, WebRequest request) {
     LOGGER.error(" =============== SemAutorizacaoException ==========================");
@@ -192,7 +203,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     String field = ex.getMessage();
     String error = ex.getMessage();
 
-    Object obj = ResponseDto.fromData(null, HttpStatus.UNAUTHORIZED, error, Arrays.asList(field));
-    return handleExceptionInternal(ex, obj, new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
+    Object obj = ResponseDto.fromData(null, HttpStatus.FORBIDDEN, error, Arrays.asList(field));
+    return handleExceptionInternal(ex, obj, new HttpHeaders(), HttpStatus.FORBIDDEN, request);
   }
 }

@@ -16,7 +16,6 @@ public class FirebaseAuthRequestDto implements Serializable {
 
   @Serial
   private static final long serialVersionUID = -6458806298345818807L;
-
+  private final boolean returnSecureToken = true;
   private String token;
-  private boolean returnSecureToken = true;
 }

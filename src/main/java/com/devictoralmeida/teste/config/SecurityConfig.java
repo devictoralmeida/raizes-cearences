@@ -33,17 +33,10 @@ public class SecurityConfig {
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
             .cors(AbstractHttpConfigurer::disable)
-            .sessionManagement(session -> session
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                    .invalidSessionUrl("/auth/login")
-                    .maximumSessions(1)
-                    .maxSessionsPreventsLogin(true)
-                    .expiredUrl("/auth/login"))
-            .authorizeHttpRequests(auth -> {
-              auth.requestMatchers(HttpMethod.POST, "/usuario").permitAll()
-                      .requestMatchers(RotasPermitidasConstants.ROTAS_PERMITIDAS).permitAll()
-                      .anyRequest().authenticated();
-            })
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.POST, "/usuario").permitAll()
+                    .requestMatchers(RotasPermitidasConstants.ROTAS_PERMITIDAS).permitAll()
+                    .anyRequest().authenticated())
 //            .formLogin((withDefaults()));
 //            .addFilterAfter(new FirebaseAuthenticationFilter(authService), BasicAuthenticationFilter.class);
             .addFilterAfter(filter, BasicAuthenticationFilter.class);

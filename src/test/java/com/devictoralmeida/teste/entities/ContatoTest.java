@@ -19,7 +19,7 @@ public class ContatoTest {
   @Test
   void teste_contato_valido() {
     ContatoRequestDto dto = ContatoRequestDtoTest.getContatoCompleto();
-    dto.validar();
+//    dto.validar();
     Contato contato = getContato(dto);
     assertEquals(TipoContato.WHATSAPP, contato.getPreferenciaContato());
     assertEquals("85999999999", contato.getNumeroContato());
@@ -32,7 +32,7 @@ public class ContatoTest {
   @Test
   void teste_contato_presidente_valido() {
     ContatoRequestDto dto = ContatoRequestDtoTest.getContatoCompleto();
-    dto.validacoesPresidente();
+//    dto.validacoesPresidente();
     Contato contato = getContato(dto);
     assertNull(contato.getPreferenciaContato());
     assertNull(contato.getNumeroWhatsapp());

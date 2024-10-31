@@ -2,7 +2,6 @@ package com.devictoralmeida.teste.entities;
 
 import com.devictoralmeida.teste.dto.request.DadosPessoaJuridicaRequestDto;
 import com.devictoralmeida.teste.shared.auditoria.BaseAuditoria;
-import com.devictoralmeida.teste.shared.utils.FormatarDadosUtils;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -68,6 +67,5 @@ public class DadosPessoaJuridica extends BaseAuditoria implements Serializable {
     dataFundacao = request.getDataFundacao();
     caf = request.getCaf();
     dataValidadeCaf = request.getDataValidadeCaf();
-    FormatarDadosUtils.aplicarTrim(this);
   }
 }
