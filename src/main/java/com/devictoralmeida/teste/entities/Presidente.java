@@ -56,7 +56,7 @@ public class Presidente extends BaseAuditoria implements Serializable {
   private LocalDate dataFinalMandato;
 
   @JsonIgnore
-  @OneToOne(cascade = CascadeType.ALL)
+  @OneToOne
   @JoinColumn(name = "pessoa_perfil_id", referencedColumnName = "id", nullable = false)
   private PessoaPerfil pessoaPerfil;
 

@@ -27,14 +27,11 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +43,6 @@ public class UsuarioServiceImpl implements UsuarioService {
   private final EmailService emailService;
   private final MensagemService mensagemService;
   private final DadosPessoaPerfilTermoRepository dadosPessoaPerfilTermoRepository;
-  private final PasswordEncoder passwordEncoder;
 
   @Transactional
   @Override
@@ -63,15 +59,15 @@ public class UsuarioServiceImpl implements UsuarioService {
     usuario.setCodigoVerificacao(codigoVerificacao);
 
     if (!TipoPerfil.CONSUMIDOR.equals(usuario.getTipoPerfil())) {
-      List<PerfilAcesso> perfilAcessos = dadosPessoaPerfilTermoRepository.getPerfilAcessoRepository().getPerfilAcessoOfertasPlanos();
-      usuario.getPerfisAcessos().addAll(perfilAcessos);
+      Set<PerfilAcesso> perfilAcessos = new HashSet<>(dadosPessoaPerfilTermoRepository.getPerfilAcessoRepository().getPerfilAcessoOfertasPlanos());
+      usuario.setPerfisAcessos(perfilAcessos);
     }
 
     try {
       UserRecord usuarioFirebase = firebaseService.criarUsuarioFirebase(request);
       usuario.setFirebaseUID(usuarioFirebase.getUid());
       firebaseService.adicionarPermissoesTokenFirebase(usuarioFirebase.getUid(), usuario.getAuthorities());
-      enviarCodigo(usuario, codigoVerificacao, usuario.getPessoaPerfil().getContato().getPreferenciaContato());
+//      enviarCodigo(usuario, codigoVerificacao, usuario.getPessoaPerfil().getContato().getPreferenciaContato());
       usuarioRepository.save(usuario);
     } catch (FirebaseAuthException e) {
       throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_CRIAR_USUARIO);
@@ -180,7 +176,6 @@ public class UsuarioServiceImpl implements UsuarioService {
   @Override
   public void alterarSenha(Usuario usuario, String senha) {
     try {
-      usuario.setSenha(passwordEncoder.encode(senha));
       firebaseService.atualizarSenhaUsuarioFirebase(usuario.getFirebaseUID(), senha);
       usuarioRepository.save(usuario);
     } catch (FirebaseAuthException e) {
@@ -218,6 +213,7 @@ public class UsuarioServiceImpl implements UsuarioService {
   public void delete(UUID id) {
     Usuario usuario = findById(id);
 
+    // Falta deletar os anexos no bucket
     try {
       firebaseService.deletarUsuarioFirebase(usuario.getFirebaseUID());
       usuarioRepository.delete(usuario);

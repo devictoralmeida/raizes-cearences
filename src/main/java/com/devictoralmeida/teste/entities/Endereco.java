@@ -50,7 +50,7 @@ public class Endereco extends BaseAuditoria implements Serializable {
   @Column(name = "bairro")
   private String bairro;
 
-  @Column(name = "uf", nullable = false)
+  @Column(name = "uf", nullable = false, length = 2)
   private String uf;
 
   @Column(name = "ponto_referencia")

@@ -11,7 +11,6 @@ import org.hibernate.envers.Audited;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -29,11 +28,11 @@ public class Modulo extends BaseAuditoria implements Serializable {
   @Column(name = "id")
   private UUID id;
 
-  @Column(name = "nome")
+  @Column(name = "nome", nullable = false)
   private String nome;
 
-  @OneToMany(mappedBy = "modulo")
-  private List<Permissao> permissoes;
+//  @OneToMany(cascade = CascadeType.ALL, mappedBy = "modulo")
+//  private List<Permissao> permissoes;
 
   public String toStringMapper() throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();

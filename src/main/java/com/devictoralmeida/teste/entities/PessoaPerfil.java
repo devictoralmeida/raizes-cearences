@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Table(name = "pessoa_perfil")
 @Getter
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "pessoa_perfil")
 @Audited
 @AuditTable("pessoa_perfil_aud")
 public class PessoaPerfil extends BaseAuditoria implements Serializable {
@@ -37,27 +37,27 @@ public class PessoaPerfil extends BaseAuditoria implements Serializable {
   @Enumerated(EnumType.STRING)
   private TipoUsuario tipoUsuario;
 
-  @Column(name = "documento", nullable = false)
+  @Column(name = "documento", nullable = false, unique = true)
   private String documento;
 
   @Column(name = "dados_pessoa_id", nullable = false)
   private UUID dadosPessoaId;
 
   @JsonIgnore
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "user_id", referencedColumnName = "id")
+  @OneToOne
+  @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
   private Usuario usuario;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "vinculo_id", referencedColumnName = "id")
+  @JoinColumn(name = "vinculo_id", referencedColumnName = "id", nullable = false)
   private Vinculo vinculo;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "contato_id", referencedColumnName = "id")
+  @JoinColumn(name = "contato_id", referencedColumnName = "id", nullable = false)
   private Contato contato;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "endereco_id", referencedColumnName = "id")
+  @JoinColumn(name = "endereco_id", referencedColumnName = "id", nullable = false)
   private Endereco endereco;
 
   @OneToOne(cascade = CascadeType.ALL, mappedBy = "pessoaPerfil")

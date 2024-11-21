@@ -29,4 +29,6 @@ public interface AuthService extends UserDetailsService {
   void recuperarSenha(String login, SenhaRequestDto request);
 
   void alterarSenha(SenhaUpdateRequestDto request);
+
+  Usuario getUsuarioLogado();
 }

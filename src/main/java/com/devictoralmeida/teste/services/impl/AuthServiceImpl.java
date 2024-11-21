@@ -89,10 +89,17 @@ public class AuthServiceImpl implements AuthService {
     }
   }
 
-  protected Usuario getUsuarioLogado() {
+  // Esse método deve ser protected (nome será autenticado)
+  @Override
+  public Usuario getUsuarioLogado() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     return usuarioService.findByLogin(authentication.getName());
   }
+
+//  public Usuario teste() {
+//    Usuario usuario = this.getUsuarioLogado();
+//    return new UsuarioResponseDTO(usuario);
+//  }
 
   @Override
   public void verificarUsuarioValido(Usuario usuario) {

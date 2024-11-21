@@ -16,9 +16,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
   @Query("SELECT u FROM Usuario u JOIN u.pessoaPerfil pp JOIN pp.contato c WHERE c.numeroWhatsapp = :whatsapp")
   Optional<Usuario> findByWhatsapp(String whatsapp);
 
-  @Query(value = "select * from usuario u where u.login = :login", nativeQuery = true)
+  @Query("SELECT obj FROM Usuario obj JOIN FETCH obj.perfisAcessos pa JOIN FETCH obj.pessoaPerfil pp LEFT JOIN FETCH pp.anexos WHERE obj.login = :login")
   Optional<Usuario> findByLogin(String login);
 
-  @Query(value = "select * from usuario u where u.firebase_uid = :uid", nativeQuery = true)
+  @Query("SELECT obj FROM Usuario obj JOIN FETCH  obj.perfisAcessos WHERE obj.firebaseUID = :uid")
   Optional<Usuario> findByFirebaseUID(String uid);
 }

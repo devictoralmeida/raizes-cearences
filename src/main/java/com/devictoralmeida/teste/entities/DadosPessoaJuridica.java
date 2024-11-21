@@ -34,16 +34,16 @@ public class DadosPessoaJuridica extends BaseAuditoria implements Serializable {
   @Column(name = "id")
   private UUID id;
 
-  @Column(name = "razao_social", nullable = false)
+  @Column(name = "razao_social", nullable = false, unique = true)
   private String razaoSocial;
 
   @Column(name = "nome_fantasia")
   private String nomeFantasia;
 
-  @Column(name = "inscricao_junta_comercial")
+  @Column(name = "inscricao_junta_comercial", unique = true)
   private String inscricaoJuntaComercial;
 
-  @Column(name = "inscricao_estadual")
+  @Column(name = "inscricao_estadual", unique = true)
   private String inscricaoEstadual;
 
   @JsonDeserialize(using = LocalDateDeserializer.class)

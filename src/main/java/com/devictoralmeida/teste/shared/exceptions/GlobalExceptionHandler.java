@@ -44,8 +44,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
       errorMsg = "Violação de integridade: " + getMessage(ex.getMessage());
     }
 
-    ResponseDto<?> obj = ResponseDto.fromData(errorMsg, HttpStatus.BAD_REQUEST, errorMsg, Arrays.asList(ex.getMessage()));
-    return handleExceptionInternal(ex, obj, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    ResponseDto<?> obj = ResponseDto.fromData(errorMsg, HttpStatus.CONFLICT, errorMsg, Arrays.asList(ex.getMessage()));
+    return handleExceptionInternal(ex, obj, new HttpHeaders(), HttpStatus.CONFLICT, request);
   }
 
   public String getMessage(String message) {

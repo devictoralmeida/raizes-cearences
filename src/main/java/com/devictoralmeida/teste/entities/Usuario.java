@@ -47,7 +47,7 @@ public class Usuario extends BaseAuditoria implements UserDetails, Serializable 
   @Column(name = "id")
   private UUID id;
 
-  @Column(name = "login", nullable = false)
+  @Column(name = "login", nullable = false, unique = true)
   private String login;
 
   @Column(name = "tipo_perfil", nullable = false)
@@ -55,13 +55,8 @@ public class Usuario extends BaseAuditoria implements UserDetails, Serializable 
   private TipoPerfil tipoPerfil;
 
   @NotAudited
-  @Column(name = "firebase_uid", nullable = false)
+  @Column(name = "firebase_uid", nullable = false, unique = true)
   private String firebaseUID;
-
-  @JsonIgnore
-  @NotAudited
-  @Column(name = "senha")
-  private String senha;
 
   @JsonIgnore
   @OneToOne
@@ -69,21 +64,22 @@ public class Usuario extends BaseAuditoria implements UserDetails, Serializable 
   @JoinColumn(name = "codigo_verificacao")
   private CodigoVerificacao codigoVerificacao;
 
-  @OneToOne(cascade = CascadeType.ALL, mappedBy = "usuario")
-  private PessoaPerfil pessoaPerfil;
-
-  @ManyToOne
-  @JoinColumn(name = "termo_id")
   @NotAudited
-  @JsonIgnore
-  private TermoCondicao termo;
-
   @JsonDeserialize(using = LocalDateTimeDeserializer.class)
   @JsonSerialize(using = LocalDateTimeSerializer.class)
-  @NotAudited
   @Column(name = "dat_aceite_termo")
   private LocalDateTime dataAceiteTermo;
 
+  @OneToOne(cascade = CascadeType.ALL, mappedBy = "usuario")
+  private PessoaPerfil pessoaPerfil;
+
+  @NotAudited
+  @JsonIgnore
+  @ManyToOne
+  @JoinColumn(name = "termo_id", referencedColumnName = "id")
+  private TermoCondicao termo;
+
+  @JsonIgnore
   @ManyToMany
   @JoinTable(name = "usuario_perfil_acesso",
           joinColumns = @JoinColumn(name = "usuario_id"),
@@ -100,43 +96,51 @@ public class Usuario extends BaseAuditoria implements UserDetails, Serializable 
   }
 
   public boolean possuiPermissao(String permissao) {
-    return this.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals(permissao));
+    return getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals(permissao));
   }
 
+  @JsonIgnore
   public boolean isAdmin() {
     return TipoPerfil.ADMINISTRADOR.equals(tipoPerfil);
   }
 
+  @JsonIgnore
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return PermissoesUtils.getPermissoes(perfisAcessos);
   }
 
+  @JsonIgnore
   @Override
   public String getPassword() {
     return null;
   }
 
+  @JsonIgnore
   @Override
   public String getUsername() {
     return login;
   }
 
+  @JsonIgnore
   @Override
   public boolean isAccountNonExpired() {
     return true;
   }
 
+  @JsonIgnore
   @Override
   public boolean isAccountNonLocked() {
     return true;
   }
 
+  @JsonIgnore
   @Override
   public boolean isCredentialsNonExpired() {
     return true;
   }
 
+  @JsonIgnore
   @Override
   public boolean isEnabled() {
     return true;

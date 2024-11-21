@@ -31,7 +31,7 @@ public class PerfilAcesso extends BaseAuditoria implements Serializable {
   @Column(name = "id")
   private UUID id;
 
-  @Column(name = "nome")
+  @Column(name = "nome", nullable = false)
   private String nome;
 
   @ManyToMany(fetch = FetchType.EAGER)

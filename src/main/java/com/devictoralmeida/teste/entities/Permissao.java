@@ -29,12 +29,12 @@ public class Permissao extends BaseAuditoria implements Serializable {
   @Column(name = "id")
   private UUID id;
 
-  @Column(name = "nome")
+  @Column(name = "nome", nullable = false)
   private String nome;
 
   @JsonIgnore
   @ManyToOne
-  @JoinColumn(name = "modulo_id")
+  @JoinColumn(name = "modulo_id", referencedColumnName = "id", nullable = false)
   private Modulo modulo;
 
   public String toStringMapper() throws JsonProcessingException {

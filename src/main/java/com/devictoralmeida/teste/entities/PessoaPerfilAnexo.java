@@ -31,11 +31,11 @@ public class PessoaPerfilAnexo extends BaseAuditoria implements Serializable {
   private UUID id;
 
   @ManyToOne
-  @JoinColumn(name = "id_pessoa_perfil", nullable = false)
+  @JoinColumn(name = "id_pessoa_perfil", referencedColumnName = "id", nullable = false)
   private PessoaPerfil pessoaPerfil;
 
-  @ManyToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "id_anexo", nullable = false)
+  @ManyToOne
+  @JoinColumn(name = "id_anexo", referencedColumnName = "id", nullable = false)
   private Anexo anexo;
 
   @Column(name = "tipo_documento", nullable = false)

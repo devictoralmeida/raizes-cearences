@@ -5,6 +5,7 @@ import java.util.List;
 
 public class SharedConstants {
   public static final String PERMISSOES = "permissoes";
+  public static final String LOGIN = "login";
   public static final String REGEX_APENAS_NUMEROS = "^\\d+$";
   public static final String REGEX_ALFANUMERICO = "^(?! )[a-zA-Z0-9 ]*(?<! )$";
   public static final String PREFIX_TELEFONE_BR = "+55";

@@ -23,10 +23,9 @@ CREATE TABLE "termo_condicao"
 CREATE TABLE "usuario"
 (
   "id"                     UUID PRIMARY KEY,
-  "login"                  VARCHAR(14) NOT NULL,
+  "login"        VARCHAR(14) NOT NULL UNIQUE,
   "tipo_perfil"            VARCHAR(13) NOT NULL,
-  "firebase_uid"           VARCHAR(28) NOT NULL,
-  "senha" VARCHAR(255) NULL DEFAULT NULL,
+  "firebase_uid" VARCHAR(28) NOT NULL UNIQUE,
   "codigo_verificacao"     UUID                 DEFAULT NULL,
   "termo_id"         UUID NOT NULL,
   "dat_aceite_termo" TIMESTAMP NULL DEFAULT NULL,
@@ -53,7 +52,7 @@ CREATE TABLE "pessoa_perfil"
 (
   "id"                     UUID PRIMARY KEY,
   "tipo_usuario"           VARCHAR(15) NOT NULL,
-  "documento"              VARCHAR(14) NOT NULL,
+  "documento" VARCHAR(14) NOT NULL UNIQUE,
   "user_id"                UUID        NOT NULL,
   "contato_id"             UUID        NOT NULL,
   "endereco_id"            UUID        NOT NULL,
@@ -84,7 +83,7 @@ CREATE TABLE "pessoa_perfil_aud"
 CREATE TABLE "dados_pessoa_fisica"
 (
   "id"                     UUID PRIMARY KEY,
-  "rg"                     VARCHAR(20)  NOT NULL,
+  "rg" VARCHAR(20) NOT NULL UNIQUE,
   "orgao_expeditor"        VARCHAR(15),
   "dat_expedicao"          DATE,
   "nome"                   VARCHAR(100) NOT NULL,
@@ -118,10 +117,10 @@ CREATE TABLE "dados_pessoa_fisica_aud"
 CREATE TABLE "dados_pessoa_juridica"
 (
   "id"                        UUID PRIMARY KEY,
-  "razao_social"     VARCHAR(150) NOT NULL,
+  "razao_social"              VARCHAR(150) NOT NULL UNIQUE,
   "nome_fantasia"             VARCHAR(150),
-  "inscricao_junta_comercial" VARCHAR(50),
-  "inscricao_estadual"        VARCHAR(12),
+  "inscricao_junta_comercial" VARCHAR(50) UNIQUE,
+  "inscricao_estadual"        VARCHAR(12) UNIQUE,
   "dat_fundacao"              DATE,
   "caf"              VARCHAR(11),
   "dat_validade_caf" DATE,
@@ -200,7 +199,7 @@ CREATE TABLE "contato"
   "numero_contato"         VARCHAR(11),
   "fl_whatsapp"   BOOLEAN DEFAULT FALSE,
   "numero_whatsapp"        VARCHAR(11),
-  "email"                  VARCHAR(320),
+  "email" VARCHAR(320) UNIQUE,
   "fl_newsletter" BOOLEAN DEFAULT FALSE,
   "dat_criacao"            TIMESTAMP  NOT NULL DEFAULT (now()),
   "dat_atualizacao"        TIMESTAMP  NOT NULL DEFAULT (now()),

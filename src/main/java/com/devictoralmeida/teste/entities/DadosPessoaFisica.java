@@ -36,7 +36,7 @@ public class DadosPessoaFisica extends BaseAuditoria implements Serializable {
   @Column(name = "id")
   private UUID id;
 
-  @Column(name = "rg", nullable = false)
+  @Column(name = "rg", nullable = false, unique = true)
   private String rg;
 
   @Column(name = "orgao_expeditor")
