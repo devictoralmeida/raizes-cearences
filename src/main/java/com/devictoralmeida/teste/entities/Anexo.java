@@ -13,8 +13,6 @@ import org.hibernate.envers.NotAudited;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -41,8 +39,8 @@ public class Anexo extends BaseAuditoria implements Serializable {
 
   @JsonIgnore
   @NotAudited
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "anexo")
-  private List<PessoaPerfilAnexo> pessoaPerfilAnexos = new ArrayList<>();
+  @OneToOne(cascade = CascadeType.ALL, mappedBy = "anexo")
+  private PessoaPerfilAnexo pessoaPerfilAnexo;
 
   public Anexo(AnexoRequestDto request) {
     nome = request.getNome().trim();

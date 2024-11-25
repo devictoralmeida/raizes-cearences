@@ -21,14 +21,14 @@ public class AnexoRequestDto implements Serializable {
 
   private TipoDocumento tipoDocumento;
 
-  private transient MultipartFile arquivo;
+  private transient MultipartFile anexo;
 
   @Size(max = 5, message = AnexoValidationMessages.TIPO_MIME_TAMANHO)
   private String tipo;
 
-  public AnexoRequestDto(TipoDocumento tipoDocumento, MultipartFile arquivo) {
+  public AnexoRequestDto(TipoDocumento tipoDocumento, MultipartFile anexo) {
     this.tipoDocumento = tipoDocumento;
-    this.arquivo = arquivo;
-    tipo = FilenameUtils.getExtension(arquivo.getOriginalFilename());
+    this.anexo = anexo;
+    tipo = FilenameUtils.getExtension(anexo.getOriginalFilename());
   }
 }

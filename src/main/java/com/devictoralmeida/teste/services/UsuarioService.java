@@ -20,6 +20,8 @@ public interface UsuarioService {
 
   Usuario findByLogin(String login);
 
+  Usuario getUsuarioLogadoByLogin(String login);
+
   Usuario findByFirebaseUID(String uid);
 
   void validarCodigo(String login, String codigo);

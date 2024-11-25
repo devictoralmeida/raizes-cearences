@@ -17,8 +17,6 @@ public class MessageCommonsConstants {
   public static final String MENSAGEM_CONSULTA_HISTORICO_ENCONTRADO = "Histórico dos Registros encontrados";
   public static final String MENSAGEM_CONSULTA_HISTORICO_VAZIA = "Registro selecionado não possui histórico de edições";
   public static final String MENSAGEM_DELETE_SUCESSO = "Registro excluído com sucesso!";
-  public static final String MENSAGEM_VERIFICAR_CAMPOS = "Favor verifique todos os campos com validação";
-  public static final String MENSAGEM_VALOR_INVALIDO = "Valor inválido para o tipo %s: %s. Valores aceitos são: %s";
   public static final String MENSAGEM_CONTATO_ALTERADO_SUCESSO = "Contato principal alterado com sucesso! Um código foi enviado para seu novo contato.";
 
   private MessageCommonsConstants() {

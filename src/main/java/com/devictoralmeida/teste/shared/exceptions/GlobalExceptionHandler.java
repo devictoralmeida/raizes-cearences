@@ -1,7 +1,7 @@
 package com.devictoralmeida.teste.shared.exceptions;
 
 import com.devictoralmeida.teste.dto.response.ResponseDto;
-import com.devictoralmeida.teste.shared.constants.MessageCommonsConstants;
+import com.devictoralmeida.teste.shared.constants.GlobalExceptionConstants;
 import com.devictoralmeida.teste.shared.constants.validation.AnexoValidationMessages;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.slf4j.Logger;
@@ -35,33 +35,37 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   public ResponseEntity<?> handlePSQLException(DataIntegrityViolationException ex, WebRequest request) {
     LOGGER.error(" =============== DataIntegrityViolationException ==========================");
 
-    String fieldName = ex.getMessage();
+    String message = ex.getCause().getMessage();
+    String fieldName = extractFieldName(ex.getMessage());
     String errorMsg;
 
     if (fieldName != null) {
       errorMsg = fieldName;
     } else {
-      errorMsg = "Violação de integridade: " + getMessage(ex.getMessage());
+      errorMsg = "Violação de integridade: " + message;
     }
 
     ResponseDto<?> obj = ResponseDto.fromData(errorMsg, HttpStatus.CONFLICT, errorMsg, Arrays.asList(ex.getMessage()));
     return handleExceptionInternal(ex, obj, new HttpHeaders(), HttpStatus.CONFLICT, request);
   }
 
-  public String getMessage(String message) {
-    return getTable(message) + " : " + getField(message);
-  }
-
-  public String getField(String errorMessage) {
-    int indexOfConstraint = errorMessage.indexOf("constraint [");
-    int indexOfEndOfField = errorMessage.indexOf("\" of relation", indexOfConstraint);
-    return errorMessage.substring(indexOfConstraint + "constraint [".length(), indexOfEndOfField);
-  }
-
-  public String getTable(String errorMessage) {
-    int indexOfRelation = errorMessage.indexOf("\" of relation");
-    int indexOfEndOfTable = errorMessage.indexOf("];", indexOfRelation);
-    return errorMessage.substring(indexOfRelation + "\" of relation \"".length(), indexOfEndOfTable);
+  private String extractFieldName(String message) {
+    if (message != null && (message.contains(GlobalExceptionConstants.DOCUMENTO))) {
+      return GlobalExceptionConstants.MENSAGEM_DOCUMENTO_DUPLICADO;
+    } else if (message != null && message.contains(GlobalExceptionConstants.EMAIL)) {
+      return GlobalExceptionConstants.MENSAGEM_EMAIL_DUPLICADO;
+    } else if (message != null && message.contains(GlobalExceptionConstants.LOGIN)) {
+      return GlobalExceptionConstants.MENSAGEM_LOGIN_DUPLICADO;
+    } else if (message != null && message.contains(GlobalExceptionConstants.RAZAO_SOCIAL)) {
+      return GlobalExceptionConstants.MENSAGEM_RAZAO_SOCIAL_DUPLICADA;
+    } else if (message != null && message.contains(GlobalExceptionConstants.RG)) {
+      return GlobalExceptionConstants.MENSAGEM_RG_DUPLICADO;
+    } else if (message != null && message.contains(GlobalExceptionConstants.INSCRICAO_JUNTA_COMERCIAL)) {
+      return GlobalExceptionConstants.MENSAGEM_INSCRICAO_JUNTA_COMERCIAL_DUPLICADO;
+    } else if (message != null && message.contains(GlobalExceptionConstants.INSCRICAO_ESTADUAL)) {
+      return GlobalExceptionConstants.MENSAGEM_INSCRICAO_ESTADUAL_DUPLICADO;
+    }
+    return null;
   }
 
   @Override
@@ -74,7 +78,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             .toList();
 
     ResponseDto<?> res = ResponseDto.fromData(null, HttpStatus.BAD_REQUEST,
-            MessageCommonsConstants.MENSAGEM_VERIFICAR_CAMPOS, erros);
+            GlobalExceptionConstants.MENSAGEM_VERIFICAR_CAMPOS, erros);
 
     return handleExceptionInternal(ex, res, headers, HttpStatus.BAD_REQUEST, request);
   }
@@ -95,7 +99,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
               .collect(Collectors.toList());
 
       String errorMessage = String.format(
-              MessageCommonsConstants.MENSAGEM_VALOR_INVALIDO,
+              GlobalExceptionConstants.MENSAGEM_VALOR_INVALIDO,
               enumType, invalidValue, enumValues);
 
       ResponseDto<?> res = ResponseDto.fromData(null, HttpStatus.BAD_REQUEST, errorMessage);
@@ -105,12 +109,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
       DateTimeParseException dateTimeParseException = (DateTimeParseException) rootCause;
       String invalidValue = dateTimeParseException.getParsedString();
-      String errorMessage = "Formato de data inválido: " + invalidValue + ". ";
+      String errorMessage = GlobalExceptionConstants.MENSAGEM_FORMATO_DATA_INVALIDO + invalidValue + ". ";
 
       if (ex.getLocalizedMessage().contains("LocalDate")) {
-        errorMessage += "O formato esperado é YYYY-MM-DD";
+        errorMessage += GlobalExceptionConstants.MENSAGEM_FORMATO_ESPERADO_DATA;
       } else {
-        errorMessage += "Use os formatos apropriados para data e hora.";
+        errorMessage += GlobalExceptionConstants.MENSAGEM_USAR_FORMATOS_APROPRIADOS;
       }
 
       ResponseDto<?> res = ResponseDto.fromData(null, HttpStatus.BAD_REQUEST, errorMessage);
@@ -128,12 +132,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     String field;
     String error;
 
-    if ("tipoDocumento".equals(ex.getParameterName())) {
-      field = "tipoDocumento";
+    if (GlobalExceptionConstants.TIPO_DOCUMENTO.equals(ex.getParameterName())) {
+      field = GlobalExceptionConstants.TIPO_DOCUMENTO;
       error = AnexoValidationMessages.TIPO_DOCUMENTO_OBRIGATORIO;
     } else {
       field = ex.getParameterName();
-      error = "Parâmetro obrigatório não está presente: " + ex.getParameterName();
+      error = GlobalExceptionConstants.MENSAGEM_PARAMETRO_OBRIGATORIO_NAO_INFORMADO + ex.getParameterName();
     }
 
     ResponseDto<?> res = ResponseDto.fromData(null, HttpStatus.BAD_REQUEST, error, Arrays.asList(field));
@@ -145,7 +149,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
           MissingServletRequestPartException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
     LOGGER.error(" =============== MissingServletRequestPartException ==========================");
 
-    String field = "arquivo";
+    String field = GlobalExceptionConstants.ARQUIVO;
     String error = AnexoValidationMessages.ARQUIVO_OBRIGATORIO;
 
     ResponseDto<?> res = ResponseDto.fromData(null, HttpStatus.BAD_REQUEST, error, Arrays.asList(field));
@@ -156,7 +160,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   protected ResponseEntity<Object> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
     LOGGER.error(" =============== MaxUploadSizeExceededException ==========================");
 
-    String field = "anexo";
+    String field = GlobalExceptionConstants.ANEXO;
     String error = AnexoValidationMessages.ARQUIVO_TAMANHO_MAXIMO;
 
     ResponseDto<?> res = ResponseDto.fromData(null, HttpStatus.BAD_REQUEST, error, Arrays.asList(field));

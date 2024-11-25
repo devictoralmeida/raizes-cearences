@@ -43,7 +43,7 @@ public class Contato extends BaseAuditoria implements Serializable {
   @Column(name = "numero_whatsapp")
   private String numeroWhatsapp;
 
-  @Column(name = "email", columnDefinition = "TEXT", unique = true)
+  @Column(name = "email", columnDefinition = "TEXT")
   private String email;
 
   @Column(name = "fl_whatsapp")

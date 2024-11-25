@@ -46,7 +46,7 @@ public class AnexoRequestHelper {
 
   private static void validar(AnexoRequestDto dto) {
     verificaTipoArquivo(dto.getTipo());
-    verificaTamanhoNome(dto.getArquivo());
+    verificaTamanhoNome(dto.getAnexo());
   }
 
   private static void verificaTamanhoNome(MultipartFile arquivo) {

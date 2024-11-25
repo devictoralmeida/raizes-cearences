@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class DadosPessoaPerfilTermoRepository {
   private final DadosPessoaFisicaRepository dadosPessoaFisicaRepository;
   private final DadosPessoaJuridicaRepository dadosPessoaJuridicaRepository;
-  private final PessoaPerfilAnexoRepository pessoaPerfilAnexoRepository;
   private final PerfilAcessoRepository perfilAcessoRepository;
   private final TermoCondicaoRepository termoCondicaoRepository;
+  private final AnexoRepository anexoRepository;
 }

@@ -37,16 +37,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.POST, "/usuario").permitAll()
                     .requestMatchers(RotasPermitidasConstants.ROTAS_PERMITIDAS).permitAll()
                     .anyRequest().authenticated())
-//            .formLogin((withDefaults()));
-//            .addFilterAfter(new FirebaseAuthenticationFilter(authService), BasicAuthenticationFilter.class);
             .addFilterAfter(filter, BasicAuthenticationFilter.class);
     return http.build();
   }
-
-//  @Bean
-//  AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-//    return authenticationConfiguration.getAuthenticationManager();
-//  }
 
   @Bean
   PasswordEncoder passwordEncoder() {

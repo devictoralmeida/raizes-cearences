@@ -15,28 +15,53 @@ services:
       - docker-network
     restart: always
 
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "victoremmanuelmn@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "123456"
+      TZ: "America/Sao_Paulo"
+    ports:
+      - "16543:80"
+    depends_on:
+      - postgres-db
+    networks:
+      - docker-network
+    restart: always
+
   minio:
     image: minio/minio:latest
     container_name: minio
-    restart: unless-stopped
     volumes:
-      - "./minio/data:/data"
-      - "./minio/minio:/minio"
-      - "./minio/config:/root/.minio"
+      - ./storage:/data
     environment:
-      TZ: America/Sao_Paulo
-      LANG: pt_BR.UTF-8
-      MINIO_PROMETHEUS_AUTH_TYPE: "public"
-      MINIO_ACCESS_KEY: "victor"
-      MINIO_SECRET_KEY: "12345678"
+      - "MINIO_ROOT_USER=victor"
+      - "MINIO_ROOT_PASSWORD=12345678"
     command: server /data  --console-address ":9001"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
     ports:
-      - "9000:9000" # file upload&preview port
+      - "9000:9000"
       - "9001:9001"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - docker-network
+
+  mc-service:
+    image: minio/mc
+    depends_on:
+      minio:
+        condition: service_healthy
+    restart: on-failure
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 victor 12345678;
+      /usr/bin/mc mb myminio/raizes;
+      /usr/bin/mc policy set public myminio/raizes;
+      "
     networks:
       - docker-network
 

@@ -5,11 +5,9 @@ import io.minio.http.Method;
 import io.minio.messages.Bucket;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -19,13 +17,8 @@ import java.net.URLDecoder;
 import java.util.*;
 
 @Slf4j
-@Component
-@RequiredArgsConstructor
 public class MinioUtils {
-  private final MinioClient minioClient;
-
-
-  /******************************  Operate Bucket Start  ******************************/
+  private MinioClient minioClient;
 
   public static InputStream base64ToInputStream(String base64) {
     ByteArrayInputStream stream = null;
@@ -36,19 +29,6 @@ public class MinioUtils {
       e.printStackTrace();
     }
     return stream;
-  }
-
-  /**
-   * init Bucket  when start SpringBoot container
-   * create bucket if the bucket is not exists
-   *
-   * @param bucketName
-   */
-  @SneakyThrows(Exception.class)
-  private void createBucket(String bucketName) {
-    if (!bucketExists(bucketName)) {
-      minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-    }
   }
 
   /**
@@ -95,22 +75,6 @@ public class MinioUtils {
   @SneakyThrows(Exception.class)
   public Optional<Bucket> getBucket(String bucketName) {
     return getAllBuckets().stream().filter(b -> b.name().equals(bucketName)).findFirst();
-  }
-
-  /******************************  Operate Bucket End  ******************************/
-
-
-  /******************************  Operate Files Start  ******************************/
-
-  /**
-   * Delete Bucket based on bucketName, true: deletion successful; false: deletion failed, file may no longer exist
-   *
-   * @param bucketName
-   * @throws Exception
-   */
-  @SneakyThrows(Exception.class)
-  public void removeBucket(String bucketName) {
-    minioClient.removeBucket(RemoveBucketArgs.builder().bucket(bucketName).build());
   }
 
   /**
@@ -240,12 +204,11 @@ public class MinioUtils {
    * @param file
    * @param objectName
    * @param contentType
-   * @return
    */
   @SneakyThrows(Exception.class)
-  public ObjectWriteResponse uploadFile(String bucketName, MultipartFile file, String objectName, String contentType) {
+  public void uploadFile(String bucketName, MultipartFile file, String objectName, String contentType) {
     InputStream inputStream = file.getInputStream();
-    return minioClient.putObject(
+    minioClient.putObject(
             PutObjectArgs.builder()
                     .bucket(bucketName)
                     .object(objectName)
@@ -283,12 +246,13 @@ public class MinioUtils {
    * @return
    */
   @SneakyThrows(Exception.class)
-  public ObjectWriteResponse uploadFile(String bucketName, String objectName, String fileName) {
+  public ObjectWriteResponse uploadFile(String bucketName, String objectName, String contentType) {
     return minioClient.uploadObject(
             UploadObjectArgs.builder()
                     .bucket(bucketName)
                     .object(objectName)
-                    .filename(fileName)
+                    .filename("/" + objectName)
+                    .contentType(contentType)
                     .build());
   }
 

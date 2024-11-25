@@ -9,6 +9,7 @@ import com.devictoralmeida.teste.entities.*;
 import com.devictoralmeida.teste.enums.TipoCodigoVerificacao;
 import com.devictoralmeida.teste.enums.TipoContato;
 import com.devictoralmeida.teste.enums.TipoPerfil;
+import com.devictoralmeida.teste.enums.TipoUsuario;
 import com.devictoralmeida.teste.factories.DadosPessoaPerfilTermoRepository;
 import com.devictoralmeida.teste.helpers.AnexoRequestHelper;
 import com.devictoralmeida.teste.helpers.ContatoRequestHelper;
@@ -21,14 +22,12 @@ import com.devictoralmeida.teste.shared.constants.errors.FirebaseErrorsMessageCo
 import com.devictoralmeida.teste.shared.constants.errors.UsuarioErrorsMessageConstants;
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
 import com.devictoralmeida.teste.shared.exceptions.RecursoNaoEncontradoException;
-import com.devictoralmeida.teste.shared.utils.FileUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -37,7 +36,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UsuarioServiceImpl implements UsuarioService {
   private final UsuarioRepository usuarioRepository;
-  private final FileService fileService;
+  private final BucketService bucketService;
   private final CodigoVerificacaoService codigoVerificacaoService;
   private final FirebaseService firebaseService;
   private final EmailService emailService;
@@ -55,6 +54,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     Usuario usuario = new Usuario(request, termoCondicao);
     PessoaPerfil pessoaPerfil = createPessoaPerfil(request, usuario);
     CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO, usuario);
+    codigoVerificacao.setValido(true);
     usuario.setPessoaPerfil(pessoaPerfil);
     usuario.setCodigoVerificacao(codigoVerificacao);
 
@@ -83,6 +83,12 @@ public class UsuarioServiceImpl implements UsuarioService {
   public Usuario findByLogin(String login) {
     return usuarioRepository.findByLogin(login).orElseThrow(() -> new RecursoNaoEncontradoException(UsuarioErrorsMessageConstants.USUARIO_NAO_ENCONTRADO));
   }
+
+  @Override
+  public Usuario getUsuarioLogadoByLogin(String login) {
+    return usuarioRepository.getUsuarioLogadoByLogin(login);
+  }
+
 
   @Override
   public Usuario findByFirebaseUID(String uid) {
@@ -119,13 +125,17 @@ public class UsuarioServiceImpl implements UsuarioService {
     Usuario usuario = findByLogin(login);
     AnexoRequestHelper.validarLista(anexos, usuario.getTipoPerfil());
 
-    anexos.forEach(anexo -> {
-      fileService.upload(anexo.getArquivo());
-      anexo.setNome(FileUtils.removerExtensao(anexo.getArquivo().getOriginalFilename()));
-      PessoaPerfilAnexo pessoaPerfilAnexo = new PessoaPerfilAnexo(anexo, usuario);
-      usuario.getPessoaPerfil().getAnexos().add(pessoaPerfilAnexo);
-      dadosPessoaPerfilTermoRepository.getPessoaPerfilAnexoRepository().save(pessoaPerfilAnexo);
+    anexos.forEach(anexoRequest -> {
+      anexoRequest.setNome(anexoRequest.getAnexo().getOriginalFilename());
+      Anexo anexoEntity = new Anexo(anexoRequest);
+      dadosPessoaPerfilTermoRepository.getAnexoRepository().save(anexoEntity);
+      bucketService.upload(anexoRequest, anexoEntity.getId());
+
+      PessoaPerfilAnexo pessoaPerfilAnexo = new PessoaPerfilAnexo(anexoRequest, usuario);
+      pessoaPerfilAnexo.setAnexo(anexoEntity);
+      usuario.getPessoaPerfil().getPessoaPerfilAnexo().add(pessoaPerfilAnexo);
     });
+    usuarioRepository.save(usuario);
   }
 
   @Transactional
@@ -208,15 +218,27 @@ public class UsuarioServiceImpl implements UsuarioService {
     enviarCodigo(usuario, codigoVerificacao, usuario.getPessoaPerfil().getContato().getPreferenciaContato());
   }
 
-  @Transactional(propagation = Propagation.SUPPORTS)
+  @Transactional
   @Override
   public void delete(UUID id) {
-    Usuario usuario = findById(id);
+    Usuario usuario = usuarioRepository.getByIdComAnexos(id);
 
-    // Falta deletar os anexos no bucket
+    if (usuario == null) {
+      throw new RecursoNaoEncontradoException(UsuarioErrorsMessageConstants.USUARIO_NAO_ENCONTRADO);
+    }
+
     try {
+      List<PessoaPerfilAnexo> anexosPerfil = usuario.getPessoaPerfil().getPessoaPerfilAnexo();
+
+      if (!anexosPerfil.isEmpty()) {
+        List<Anexo> anexos = anexosPerfil.stream().map(PessoaPerfilAnexo::getAnexo).toList();
+        bucketService.deletarArquivos(anexos);
+        dadosPessoaPerfilTermoRepository.getAnexoRepository().deleteAll(anexos);
+      }
+
       firebaseService.deletarUsuarioFirebase(usuario.getFirebaseUID());
       usuarioRepository.delete(usuario);
+      deletarDadosPessoa(usuario);
     } catch (FirebaseAuthException e) {
       throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_DELETAR_USUARIO);
     }
@@ -291,5 +313,20 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   private boolean isCooperativaAssociacao(Usuario usuario) {
     return TipoPerfil.COOPERATIVA.equals(usuario.getTipoPerfil()) || TipoPerfil.ASSOCIACAO.equals(usuario.getTipoPerfil());
+  }
+
+  private void deletarDadosPessoa(Usuario usuario) {
+    PessoaPerfil perfil = usuario.getPessoaPerfil();
+    UUID dadosPessoaId = perfil.getDadosPessoaId();
+
+    if (TipoUsuario.PESSOA_FISICA.equals(perfil.getTipoUsuario())) {
+      dadosPessoaPerfilTermoRepository.getDadosPessoaFisicaRepository().deleteById(dadosPessoaId);
+    } else {
+      dadosPessoaPerfilTermoRepository.getDadosPessoaJuridicaRepository().deleteById(dadosPessoaId);
+
+      if (isCooperativaAssociacao(usuario)) {
+        dadosPessoaPerfilTermoRepository.getDadosPessoaFisicaRepository().deleteById(perfil.getPresidente().getDadosPessoaId());
+      }
+    }
   }
 }

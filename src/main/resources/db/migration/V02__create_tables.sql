@@ -1,10 +1,10 @@
 CREATE TABLE "codigo_verificacao"
 (
-  "id"            UUID       NOT NULL,
-  "codigo"        VARCHAR(5) NOT NULL,
-  "tipo_codigo" VARCHAR(10) NOT NULL,
-  "fl_validado" BOOLEAN DEFAULT FALSE,
-  "dat_expiracao" TIMESTAMP  NOT NULL,
+  "id"            UUID        NOT NULL,
+  "codigo"        VARCHAR(5)  NOT NULL,
+  "tipo_codigo"   VARCHAR(10) NOT NULL,
+  "fl_validado"   BOOLEAN DEFAULT FALSE,
+  "dat_expiracao" TIMESTAMP   NOT NULL,
   CONSTRAINT "pk_codigoverificacao" PRIMARY KEY ("id")
 );
 
@@ -13,8 +13,8 @@ CREATE TABLE "termo_condicao"
   "id"                     UUID          NOT NULL,
   "versao"                 VARCHAR(10)   NOT NULL,
   "conteudo"               VARCHAR(7000) NOT NULL,
-  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
-  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,
+  "nm_usuario_atualizacao" VARCHAR(255)  NULL     DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255)  NULL     DEFAULT NULL,
   "dat_criacao"            TIMESTAMP     NOT NULL DEFAULT (now()),
   "dat_atualizacao"        TIMESTAMP     NOT NULL DEFAULT (now()),
   CONSTRAINT "pk_tbtermocondicao" PRIMARY KEY ("id")
@@ -23,16 +23,16 @@ CREATE TABLE "termo_condicao"
 CREATE TABLE "usuario"
 (
   "id"                     UUID PRIMARY KEY,
-  "login"        VARCHAR(14) NOT NULL UNIQUE,
-  "tipo_perfil"            VARCHAR(13) NOT NULL,
-  "firebase_uid" VARCHAR(28) NOT NULL UNIQUE,
-  "codigo_verificacao"     UUID                 DEFAULT NULL,
-  "termo_id"         UUID NOT NULL,
-  "dat_aceite_termo" TIMESTAMP NULL DEFAULT NULL,
-  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
-  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,
-  "dat_criacao"            TIMESTAMP   NOT NULL DEFAULT (now()),
-  "dat_atualizacao"        TIMESTAMP   NOT NULL DEFAULT (now()),
+  "login"                  VARCHAR(14)  NOT NULL UNIQUE,
+  "tipo_perfil"            VARCHAR(13)  NOT NULL,
+  "firebase_uid"           VARCHAR(28)  NOT NULL UNIQUE,
+  "codigo_verificacao"     UUID                  DEFAULT NULL,
+  "termo_id"               UUID         NOT NULL,
+  "dat_aceite_termo"       TIMESTAMP    NULL     DEFAULT NULL,
+  "nm_usuario_atualizacao" VARCHAR(255) NULL     DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255) NULL     DEFAULT NULL,
+  "dat_criacao"            TIMESTAMP    NOT NULL DEFAULT (now()),
+  "dat_atualizacao"        TIMESTAMP    NOT NULL DEFAULT (now()),
   CONSTRAINT "usuario_codigo_verificacao" FOREIGN KEY ("codigo_verificacao") REFERENCES "codigo_verificacao" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT "fk_usuario_termo" FOREIGN KEY ("termo_id") REFERENCES "termo_condicao" ("id")
 );
@@ -43,7 +43,7 @@ CREATE TABLE "usuario_aud"
   "login"        VARCHAR(14) NOT NULL,
   "tipo_perfil"  VARCHAR(13) NOT NULL,
   "cd_auditoria" BIGINT      NOT NULL,
-  "tp_movimento" SMALLINT NULL DEFAULT NULL,
+  "tp_movimento" SMALLINT    NULL DEFAULT NULL,
   CONSTRAINT "pk_tbusuarioaud" PRIMARY KEY ("id", "cd_auditoria"),
   CONSTRAINT "fk_tbusuarioaud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
@@ -51,17 +51,17 @@ CREATE TABLE "usuario_aud"
 CREATE TABLE "pessoa_perfil"
 (
   "id"                     UUID PRIMARY KEY,
-  "tipo_usuario"           VARCHAR(15) NOT NULL,
-  "documento" VARCHAR(14) NOT NULL UNIQUE,
-  "user_id"                UUID        NOT NULL,
-  "contato_id"             UUID        NOT NULL,
-  "endereco_id"            UUID        NOT NULL,
-  "vinculo_id"             UUID        NOT NULL,
-  "dados_pessoa_id"        UUID        NOT NULL,
-  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
-  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,
-  "dat_criacao"            TIMESTAMP   NOT NULL DEFAULT (now()),
-  "dat_atualizacao"        TIMESTAMP   NOT NULL DEFAULT (now())
+  "tipo_usuario"           VARCHAR(15)  NOT NULL,
+  "documento"              VARCHAR(14)  NOT NULL UNIQUE,
+  "user_id"                UUID         NOT NULL,
+  "contato_id"             UUID         NOT NULL,
+  "endereco_id"            UUID         NOT NULL,
+  "vinculo_id"             UUID         NOT NULL,
+  "dados_pessoa_id"        UUID         NOT NULL,
+  "nm_usuario_atualizacao" VARCHAR(255) NULL     DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255) NULL     DEFAULT NULL,
+  "dat_criacao"            TIMESTAMP    NOT NULL DEFAULT (now()),
+  "dat_atualizacao"        TIMESTAMP    NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "pessoa_perfil_aud"
@@ -75,7 +75,7 @@ CREATE TABLE "pessoa_perfil_aud"
   "vinculo_id"      UUID        NOT NULL,
   "dados_pessoa_id" UUID        NOT NULL,
   "cd_auditoria"    BIGINT      NOT NULL,
-  "tp_movimento"    SMALLINT NULL DEFAULT NULL,
+  "tp_movimento"    SMALLINT    NULL DEFAULT NULL,
   CONSTRAINT "pk_tbpessoa_perfilaud" PRIMARY KEY ("id", "cd_auditoria"),
   CONSTRAINT "fk_tbpessoa_perfilaud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
@@ -83,7 +83,7 @@ CREATE TABLE "pessoa_perfil_aud"
 CREATE TABLE "dados_pessoa_fisica"
 (
   "id"                     UUID PRIMARY KEY,
-  "rg" VARCHAR(20) NOT NULL UNIQUE,
+  "rg"                     VARCHAR(20)  NOT NULL UNIQUE,
   "orgao_expeditor"        VARCHAR(15),
   "dat_expedicao"          DATE,
   "nome"                   VARCHAR(100) NOT NULL,
@@ -91,8 +91,8 @@ CREATE TABLE "dados_pessoa_fisica"
   "dat_nascimento"         DATE         NOT NULL,
   "sexo"                   VARCHAR(9)   NOT NULL,
   "grau_instrucao"         VARCHAR(18),
-  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
-  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,
+  "nm_usuario_atualizacao" VARCHAR(255) NULL     DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255) NULL     DEFAULT NULL,
   "dat_criacao"            TIMESTAMP    NOT NULL DEFAULT (now()),
   "dat_atualizacao"        TIMESTAMP    NOT NULL DEFAULT (now())
 );
@@ -109,7 +109,7 @@ CREATE TABLE "dados_pessoa_fisica_aud"
   "sexo"            VARCHAR(9)   NOT NULL,
   "grau_instrucao"  VARCHAR(18),
   "cd_auditoria"    BIGINT       NOT NULL,
-  "tp_movimento"    SMALLINT NULL DEFAULT NULL,
+  "tp_movimento"    SMALLINT     NULL DEFAULT NULL,
   CONSTRAINT "pk_tbdados_pessoa_fisica_aud" PRIMARY KEY ("id", "cd_auditoria"),
   CONSTRAINT "fk_tbdados_pessoa_fisica_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
@@ -122,10 +122,10 @@ CREATE TABLE "dados_pessoa_juridica"
   "inscricao_junta_comercial" VARCHAR(50) UNIQUE,
   "inscricao_estadual"        VARCHAR(12) UNIQUE,
   "dat_fundacao"              DATE,
-  "caf"              VARCHAR(11),
-  "dat_validade_caf" DATE,
-  "nm_usuario_atualizacao"    VARCHAR(255) NULL DEFAULT NULL,
-  "nm_usuario_cadastro"       VARCHAR(255) NULL DEFAULT NULL,
+  "caf"                       VARCHAR(11),
+  "dat_validade_caf"          DATE,
+  "nm_usuario_atualizacao"    VARCHAR(255) NULL     DEFAULT NULL,
+  "nm_usuario_cadastro"       VARCHAR(255) NULL     DEFAULT NULL,
   "dat_criacao"               TIMESTAMP    NOT NULL DEFAULT (now()),
   "dat_atualizacao"           TIMESTAMP    NOT NULL DEFAULT (now())
 );
@@ -133,15 +133,15 @@ CREATE TABLE "dados_pessoa_juridica"
 CREATE TABLE "dados_pessoa_juridica_aud"
 (
   "id"                        UUID         NOT NULL,
-  "razao_social"     VARCHAR(150) NOT NULL,
+  "razao_social"              VARCHAR(150) NOT NULL,
   "nome_fantasia"             VARCHAR(150),
   "inscricao_junta_comercial" VARCHAR(50),
   "inscricao_estadual"        VARCHAR(12),
   "dat_fundacao"              DATE,
-  "caf"              VARCHAR(11),
-  "dat_validade_caf" DATE,
+  "caf"                       VARCHAR(11),
+  "dat_validade_caf"          DATE,
   "cd_auditoria"              BIGINT       NOT NULL,
-  "tp_movimento"              SMALLINT NULL DEFAULT NULL,
+  "tp_movimento"              SMALLINT     NULL DEFAULT NULL,
   CONSTRAINT "pk_tbdados_pessoa_juridica_aud" PRIMARY KEY ("id", "cd_auditoria"),
   CONSTRAINT "fk_tbdados_pessoa_juridica_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
@@ -151,8 +151,8 @@ CREATE TABLE "anexo"
   "id"                     UUID PRIMARY KEY,
   "nome_anexo"             VARCHAR(255) NOT NULL,
   "tipo_mime"              VARCHAR(5)   NOT NULL,
-  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
-  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,
+  "nm_usuario_atualizacao" VARCHAR(255) NULL     DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255) NULL     DEFAULT NULL,
   "dat_criacao"            TIMESTAMP    NOT NULL DEFAULT (now()),
   "dat_atualizacao"        TIMESTAMP    NOT NULL DEFAULT (now())
 );
@@ -163,7 +163,7 @@ CREATE TABLE "anexo_aud"
   "nome_anexo"   VARCHAR(255) NOT NULL,
   "tipo_mime"    VARCHAR(5)   NOT NULL,
   "cd_auditoria" BIGINT       NOT NULL,
-  "tp_movimento" SMALLINT NULL DEFAULT NULL,
+  "tp_movimento" SMALLINT     NULL DEFAULT NULL,
   CONSTRAINT "pk_tbanexo_aud" PRIMARY KEY ("id", "cd_auditoria"),
   CONSTRAINT "fk_tbanexo_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
@@ -171,22 +171,22 @@ CREATE TABLE "anexo_aud"
 CREATE TABLE "pessoa_perfil_anexo"
 (
   "id"                     UUID PRIMARY KEY,
-  "tipo_documento"         VARCHAR   NOT NULL,
-  "id_pessoa_perfil"       UUID      NOT NULL,
-  "id_anexo"               UUID      NOT NULL,
-  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
-  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,
-  "dat_criacao"            TIMESTAMP NOT NULL DEFAULT (now()),
-  "dat_atualizacao"        TIMESTAMP NOT NULL DEFAULT (now())
+  "tipo_documento"         VARCHAR      NOT NULL,
+  "id_pessoa_perfil"       UUID         NOT NULL,
+  "id_anexo"               UUID         NOT NULL,
+  "nm_usuario_atualizacao" VARCHAR(255) NULL     DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255) NULL     DEFAULT NULL,
+  "dat_criacao"            TIMESTAMP    NOT NULL DEFAULT (now()),
+  "dat_atualizacao"        TIMESTAMP    NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "pessoa_perfil_anexo_aud"
 (
-  "id"               UUID    NOT NULL,
-  "tipo_documento"   VARCHAR NOT NULL,
-  "id_pessoa_perfil" UUID    NOT NULL,
-  "id_anexo"         UUID    NOT NULL,
-  "cd_auditoria"     BIGINT  NOT NULL,
+  "id"               UUID     NOT NULL,
+  "tipo_documento"   VARCHAR  NOT NULL,
+  "id_pessoa_perfil" UUID     NOT NULL,
+  "id_anexo"         UUID     NOT NULL,
+  "cd_auditoria"     BIGINT   NOT NULL,
   "tp_movimento"     SMALLINT NULL DEFAULT NULL,
   CONSTRAINT "pk_tbpessoa_perfil_anexo_aud" PRIMARY KEY ("id", "cd_auditoria"),
   CONSTRAINT "fk_tbpessoa_perfil_anexo_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
@@ -195,28 +195,28 @@ CREATE TABLE "pessoa_perfil_anexo_aud"
 CREATE TABLE "contato"
 (
   "id"                     UUID PRIMARY KEY,
-  "preferencia_contato" VARCHAR(8),
+  "preferencia_contato"    VARCHAR(8),
   "numero_contato"         VARCHAR(11),
-  "fl_whatsapp"   BOOLEAN DEFAULT FALSE,
+  "fl_whatsapp"            BOOLEAN               DEFAULT FALSE,
   "numero_whatsapp"        VARCHAR(11),
-  "email" VARCHAR(320) UNIQUE,
-  "fl_newsletter" BOOLEAN DEFAULT FALSE,
-  "dat_criacao"            TIMESTAMP  NOT NULL DEFAULT (now()),
-  "dat_atualizacao"        TIMESTAMP  NOT NULL DEFAULT (now()),
-  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
-  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL
+  "email"                  VARCHAR(320),
+  "fl_newsletter"          BOOLEAN               DEFAULT FALSE,
+  "dat_criacao"            TIMESTAMP    NOT NULL DEFAULT (now()),
+  "dat_atualizacao"        TIMESTAMP    NOT NULL DEFAULT (now()),
+  "nm_usuario_atualizacao" VARCHAR(255) NULL     DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255) NULL     DEFAULT NULL
 );
 
 CREATE TABLE "contato_aud"
 (
-  "id"                  UUID       NOT NULL,
+  "id"                  UUID     NOT NULL,
   "preferencia_contato" VARCHAR(8),
   "numero_contato"      VARCHAR(11),
-  "fl_whatsapp"   BOOLEAN,
+  "fl_whatsapp"         BOOLEAN,
   "numero_whatsapp"     VARCHAR(11),
   "email"               VARCHAR(320),
-  "fl_newsletter" BOOLEAN,
-  "cd_auditoria"        BIGINT     NOT NULL,
+  "fl_newsletter"       BOOLEAN,
+  "cd_auditoria"        BIGINT   NOT NULL,
   "tp_movimento"        SMALLINT NULL DEFAULT NULL,
   CONSTRAINT "pk_tbcontato_aud" PRIMARY KEY ("id", "cd_auditoria"),
   CONSTRAINT "fk_tbcontato_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
@@ -227,17 +227,17 @@ CREATE TABLE "endereco"
   "id"                     UUID PRIMARY KEY,
   "cep"                    VARCHAR(8)   NOT NULL,
   "municipio"              VARCHAR(100) NOT NULL,
-  "localidade" VARCHAR(100),
-  "logradouro" VARCHAR(100),
-  "numero"     VARCHAR(10),
+  "localidade"             VARCHAR(100),
+  "logradouro"             VARCHAR(100),
+  "numero"                 VARCHAR(10),
   "complemento"            VARCHAR(50),
   "bairro"                 VARCHAR(50),
   "uf"                     VARCHAR(2)   NOT NULL,
   "ponto_referencia"       VARCHAR(50),
   "dat_criacao"            TIMESTAMP    NOT NULL DEFAULT (now()),
   "dat_atualizacao"        TIMESTAMP    NOT NULL DEFAULT (now()),
-  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
-  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL
+  "nm_usuario_atualizacao" VARCHAR(255) NULL     DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255) NULL     DEFAULT NULL
 );
 
 CREATE TABLE "endereco_aud"
@@ -245,15 +245,15 @@ CREATE TABLE "endereco_aud"
   "id"               UUID         NOT NULL,
   "cep"              VARCHAR(8)   NOT NULL,
   "municipio"        VARCHAR(100) NOT NULL,
-  "localidade" VARCHAR(100),
-  "logradouro" VARCHAR(100),
-  "numero"     VARCHAR(10),
+  "localidade"       VARCHAR(100),
+  "logradouro"       VARCHAR(100),
+  "numero"           VARCHAR(10),
   "complemento"      VARCHAR(50),
   "bairro"           VARCHAR(50),
   "uf"               VARCHAR(2)   NOT NULL,
   "ponto_referencia" VARCHAR(50),
   "cd_auditoria"     BIGINT       NOT NULL,
-  "tp_movimento"     SMALLINT NULL DEFAULT NULL,
+  "tp_movimento"     SMALLINT     NULL DEFAULT NULL,
   CONSTRAINT "pk_tbendereco_aud" PRIMARY KEY ("id", "cd_auditoria"),
   CONSTRAINT "fk_tbendereco_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
@@ -261,23 +261,23 @@ CREATE TABLE "endereco_aud"
 CREATE TABLE "vinculo"
 (
   "id"                     UUID PRIMARY KEY,
-  "fl_cadastro_secaf" BOOLEAN DEFAULT FALSE,
-  "fl_servicos_ater"  BOOLEAN DEFAULT FALSE,
-  "fl_oferta_ceasa"   BOOLEAN DEFAULT FALSE,
-  "dat_criacao"            TIMESTAMP NOT NULL DEFAULT (now()),
-  "dat_atualizacao"        TIMESTAMP NOT NULL DEFAULT (now()),
-  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
-  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL
+  "fl_cadastro_secaf"      BOOLEAN               DEFAULT FALSE,
+  "fl_servicos_ater"       BOOLEAN               DEFAULT FALSE,
+  "fl_oferta_ceasa"        BOOLEAN               DEFAULT FALSE,
+  "dat_criacao"            TIMESTAMP    NOT NULL DEFAULT (now()),
+  "dat_atualizacao"        TIMESTAMP    NOT NULL DEFAULT (now()),
+  "nm_usuario_atualizacao" VARCHAR(255) NULL     DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255) NULL     DEFAULT NULL
 );
 
 CREATE TABLE "vinculo_aud"
 (
-  "id"                     UUID   NOT NULL,
+  "id"                UUID     NOT NULL,
   "fl_cadastro_secaf" BOOLEAN,
   "fl_servicos_ater"  BOOLEAN,
   "fl_oferta_ceasa"   BOOLEAN,
-  "cd_auditoria"           BIGINT NOT NULL,
-  "tp_movimento"           SMALLINT NULL DEFAULT NULL,
+  "cd_auditoria"      BIGINT   NOT NULL,
+  "tp_movimento"      SMALLINT NULL DEFAULT NULL,
   CONSTRAINT "pk_tbvinculo_aud" PRIMARY KEY ("id", "cd_auditoria"),
   CONSTRAINT "fk_tbvinculo_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
@@ -285,29 +285,29 @@ CREATE TABLE "vinculo_aud"
 CREATE TABLE "presidente"
 (
   "id"                     UUID PRIMARY KEY,
-  "documento" VARCHAR(11) NOT NULL,
-  "contato_id"             UUID        NOT NULL,
-  "dados_pessoa_id"        UUID        NOT NULL,
-  "pessoa_perfil_id"       UUID        NOT NULL,
-  "dat_inicio_mandato"     DATE        NOT NULL,
-  "dat_final_mandato"      DATE        NOT NULL,
-  "dat_criacao"            TIMESTAMP   NOT NULL DEFAULT (now()),
-  "dat_atualizacao"        TIMESTAMP   NOT NULL DEFAULT (now()),
-  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
-  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL
+  "documento"              VARCHAR(11)  NOT NULL,
+  "contato_id"             UUID         NOT NULL,
+  "dados_pessoa_id"        UUID         NOT NULL,
+  "pessoa_perfil_id"       UUID         NOT NULL,
+  "dat_inicio_mandato"     DATE         NOT NULL,
+  "dat_final_mandato"      DATE         NOT NULL,
+  "dat_criacao"            TIMESTAMP    NOT NULL DEFAULT (now()),
+  "dat_atualizacao"        TIMESTAMP    NOT NULL DEFAULT (now()),
+  "nm_usuario_atualizacao" VARCHAR(255) NULL     DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255) NULL     DEFAULT NULL
 );
 
 CREATE TABLE "presidente_aud"
 (
   "id"                 UUID        NOT NULL,
-  "documento" VARCHAR(11) NOT NULL,
+  "documento"          VARCHAR(11) NOT NULL,
   "contato_id"         UUID        NOT NULL,
   "dados_pessoa_id"    UUID        NOT NULL,
   "pessoa_perfil_id"   UUID        NOT NULL,
   "dat_inicio_mandato" DATE        NOT NULL,
   "dat_final_mandato"  DATE        NOT NULL,
   "cd_auditoria"       BIGINT      NOT NULL,
-  "tp_movimento"       SMALLINT NULL DEFAULT NULL,
+  "tp_movimento"       SMALLINT    NULL DEFAULT NULL,
   CONSTRAINT "pk_tbpresidente_aud" PRIMARY KEY ("id", "cd_auditoria"),
   CONSTRAINT "fk_tbpresidente_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
@@ -315,18 +315,18 @@ CREATE TABLE "presidente_aud"
 CREATE TABLE "perfil_acesso"
 (
   "id"                     UUID PRIMARY KEY,
-  "nome"                   VARCHAR   NOT NULL,
-  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
-  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,
-  "dat_criacao"            TIMESTAMP NOT NULL DEFAULT (now()),
-  "dat_atualizacao"        TIMESTAMP NOT NULL DEFAULT (now())
+  "nome"                   VARCHAR      NOT NULL,
+  "nm_usuario_atualizacao" VARCHAR(255) NULL     DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255) NULL     DEFAULT NULL,
+  "dat_criacao"            TIMESTAMP    NOT NULL DEFAULT (now()),
+  "dat_atualizacao"        TIMESTAMP    NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "perfil_acesso_aud"
 (
-  "id"           UUID    NOT NULL,
-  "nome"         VARCHAR NOT NULL,
-  "cd_auditoria" BIGINT  NOT NULL,
+  "id"           UUID     NOT NULL,
+  "nome"         VARCHAR  NOT NULL,
+  "cd_auditoria" BIGINT   NOT NULL,
   "tp_movimento" SMALLINT NULL DEFAULT NULL,
   CONSTRAINT "pk_tbperfil_acesso_aud" PRIMARY KEY ("id", "cd_auditoria"),
   CONSTRAINT "fk_tbperfil_acesso_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
@@ -335,18 +335,18 @@ CREATE TABLE "perfil_acesso_aud"
 CREATE TABLE "modulo"
 (
   "id"                     UUID PRIMARY KEY,
-  "nome"                   VARCHAR   NOT NULL,
-  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
-  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,
-  "dat_criacao"            TIMESTAMP NOT NULL DEFAULT (now()),
-  "dat_atualizacao"        TIMESTAMP NOT NULL DEFAULT (now())
+  "nome"                   VARCHAR      NOT NULL,
+  "nm_usuario_atualizacao" VARCHAR(255) NULL     DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255) NULL     DEFAULT NULL,
+  "dat_criacao"            TIMESTAMP    NOT NULL DEFAULT (now()),
+  "dat_atualizacao"        TIMESTAMP    NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "modulo_aud"
 (
-  "id"           UUID    NOT NULL,
-  "nome"         VARCHAR NOT NULL,
-  "cd_auditoria" BIGINT  NOT NULL,
+  "id"           UUID     NOT NULL,
+  "nome"         VARCHAR  NOT NULL,
+  "cd_auditoria" BIGINT   NOT NULL,
   "tp_movimento" SMALLINT NULL DEFAULT NULL,
   CONSTRAINT "pk_tbmodulo_aud" PRIMARY KEY ("id", "cd_auditoria"),
   CONSTRAINT "fk_tbmodulo_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
@@ -355,21 +355,21 @@ CREATE TABLE "modulo_aud"
 CREATE TABLE "permissao"
 (
   "id"                     UUID PRIMARY KEY,
-  "nome"                   VARCHAR   NOT NULL,
-  "modulo_id"       UUID      NOT NULL,
-  "nm_usuario_atualizacao" VARCHAR(255) NULL DEFAULT NULL,
-  "nm_usuario_cadastro"    VARCHAR(255) NULL DEFAULT NULL,
-  "dat_criacao"            TIMESTAMP NOT NULL DEFAULT (now()),
-  "dat_atualizacao" TIMESTAMP NOT NULL DEFAULT (now()),
+  "nome"                   VARCHAR      NOT NULL,
+  "modulo_id"              UUID         NOT NULL,
+  "nm_usuario_atualizacao" VARCHAR(255) NULL     DEFAULT NULL,
+  "nm_usuario_cadastro"    VARCHAR(255) NULL     DEFAULT NULL,
+  "dat_criacao"            TIMESTAMP    NOT NULL DEFAULT (now()),
+  "dat_atualizacao"        TIMESTAMP    NOT NULL DEFAULT (now()),
   CONSTRAINT "fk_tbpermissao_tbmodulo" FOREIGN KEY ("modulo_id") REFERENCES "modulo" ("id") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 CREATE TABLE "permissao_aud"
 (
-  "id"           UUID    NOT NULL,
-  "nome"         VARCHAR NOT NULL,
-  "modulo_id" UUID NOT NULL,
-  "cd_auditoria" BIGINT  NOT NULL,
+  "id"           UUID     NOT NULL,
+  "nome"         VARCHAR  NOT NULL,
+  "modulo_id"    UUID     NOT NULL,
+  "cd_auditoria" BIGINT   NOT NULL,
   "tp_movimento" SMALLINT NULL DEFAULT NULL,
   CONSTRAINT "pk_tbpermissao_aud" PRIMARY KEY ("id", "cd_auditoria"),
   CONSTRAINT "fk_tbpermissao_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
@@ -378,17 +378,17 @@ CREATE TABLE "permissao_aud"
 CREATE TABLE "perfil_permissao"
 (
   "perfil_acesso_id" UUID,
-  "permissao_id" UUID,
+  "permissao_id"     UUID,
   CONSTRAINT "fk_perfil_permissao_perfil" FOREIGN KEY ("perfil_acesso_id") REFERENCES "perfil_acesso" ("id"),
   CONSTRAINT "fk_perfil_permissao_permissao" FOREIGN KEY ("permissao_id") REFERENCES "permissao" ("id")
 );
 
 CREATE TABLE "perfil_permissao_aud"
 (
-  "perfil_acesso_id" UUID NOT NULL,
-  "permissao_id" UUID   NOT NULL,
-  "cd_auditoria" BIGINT NOT NULL,
-  "tp_movimento" SMALLINT NULL DEFAULT NULL,
+  "perfil_acesso_id" UUID     NOT NULL,
+  "permissao_id"     UUID     NOT NULL,
+  "cd_auditoria"     BIGINT   NOT NULL,
+  "tp_movimento"     SMALLINT NULL DEFAULT NULL,
   CONSTRAINT "pk_perfil_permissao_aud" PRIMARY KEY ("perfil_acesso_id", "permissao_id", "cd_auditoria"),
   CONSTRAINT "fk_perfil_permissao_aud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION
 );
@@ -403,9 +403,9 @@ CREATE TABLE "usuario_perfil_acesso"
 
 CREATE TABLE "usuario_perfil_acesso_aud"
 (
-  "cd_auditoria"     BIGINT NOT NULL,
-  "usuario_id"       UUID   NOT NULL,
-  "perfil_acesso_id" UUID   NOT NULL,
+  "cd_auditoria"     BIGINT   NOT NULL,
+  "usuario_id"       UUID     NOT NULL,
+  "perfil_acesso_id" UUID     NOT NULL,
   "tp_movimento"     SMALLINT NULL DEFAULT NULL,
   CONSTRAINT "pk_tbusuarioperfilacessoaud" PRIMARY KEY ("cd_auditoria", "usuario_id", "perfil_acesso_id"),
   CONSTRAINT "fk_tbusuarioperfilacessoaud_tbauditoria" FOREIGN KEY ("cd_auditoria") REFERENCES "tb_auditoria" ("ci_auditoria") ON UPDATE NO ACTION ON DELETE NO ACTION

@@ -60,6 +60,7 @@ public class AuthServiceImpl implements AuthService {
     return firebaseLogin(firebaseLoginRequestDto);
   }
 
+
   @Override
   public FirebaseToken verificarToken(String idToken) {
     return firebaseService.verificarToken(idToken);
@@ -80,6 +81,7 @@ public class AuthServiceImpl implements AuthService {
     return refreshTokenRequest(refreshTokenRequestDto);
   }
 
+  @Transactional(readOnly = true)
   @Override
   public void validateSelfOrAdmin(UUID idUsuario) {
     Usuario usuario = getUsuarioLogado();
@@ -93,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public Usuario getUsuarioLogado() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    return usuarioService.findByLogin(authentication.getName());
+    return usuarioService.getUsuarioLogadoByLogin(authentication.getName());
   }
 
 //  public Usuario teste() {

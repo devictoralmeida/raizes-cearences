@@ -64,7 +64,7 @@ public class PessoaPerfil extends BaseAuditoria implements Serializable {
   private Presidente presidente;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "pessoaPerfil")
-  private List<PessoaPerfilAnexo> anexos = new ArrayList<>();
+  private List<PessoaPerfilAnexo> pessoaPerfilAnexo = new ArrayList<>();
 
   public PessoaPerfil(PessoaPerfilRequestDto request, Usuario usuario, UUID dadosPessoaId) {
     this(request, usuario, dadosPessoaId, null);

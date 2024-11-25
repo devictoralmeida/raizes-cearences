@@ -34,7 +34,7 @@ public class PessoaPerfilAnexo extends BaseAuditoria implements Serializable {
   @JoinColumn(name = "id_pessoa_perfil", referencedColumnName = "id", nullable = false)
   private PessoaPerfil pessoaPerfil;
 
-  @ManyToOne
+  @OneToOne
   @JoinColumn(name = "id_anexo", referencedColumnName = "id", nullable = false)
   private Anexo anexo;
 
@@ -43,9 +43,7 @@ public class PessoaPerfilAnexo extends BaseAuditoria implements Serializable {
   private TipoDocumento tipoDocumento;
 
   public PessoaPerfilAnexo(AnexoRequestDto request, Usuario usuario) {
-    anexo = new Anexo(request);
     tipoDocumento = request.getTipoDocumento();
     pessoaPerfil = usuario.getPessoaPerfil();
   }
-
 }
