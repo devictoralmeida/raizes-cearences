@@ -16,7 +16,7 @@ public interface FirebaseService {
 
   void emailVerificado(String uid);
 
-  void deletarUsuarioFirebase(String uid) throws FirebaseAuthException;
+  void deletarUsuarioFirebase(String uid);
 
   void atualizarContatoUsuarioFirebase(String uid, ContatoUpdateRequestDto requestDto, boolean usuarioPossuiEmail) throws FirebaseAuthException;
 

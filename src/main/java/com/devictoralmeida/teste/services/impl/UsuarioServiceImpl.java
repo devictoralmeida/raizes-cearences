@@ -69,7 +69,7 @@ public class UsuarioServiceImpl implements UsuarioService {
       UserRecord usuarioFirebase = firebaseService.criarUsuarioFirebase(request);
       usuario.setFirebaseUID(usuarioFirebase.getUid());
       firebaseService.adicionarPermissoesTokenFirebase(usuarioFirebase.getUid(), usuario.getAuthorities());
-//      enviarCodigo(usuario, codigoVerificacao, usuario.getPessoaPerfil().getContato().getPreferenciaContato());
+      enviarCodigo(usuario, codigoVerificacao, usuario.getPessoaPerfil().getContato().getPreferenciaContato());
       usuarioRepository.save(usuario);
     } catch (FirebaseAuthException e) {
       throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_CRIAR_USUARIO);
@@ -90,7 +90,6 @@ public class UsuarioServiceImpl implements UsuarioService {
   public Usuario getUsuarioLogadoByLogin(String login) {
     return usuarioRepository.getUsuarioLogadoByLogin(login);
   }
-
 
   @Override
   public Usuario findByFirebaseUID(String uid) {
@@ -229,21 +228,17 @@ public class UsuarioServiceImpl implements UsuarioService {
       throw new RecursoNaoEncontradoException(UsuarioErrorsMessageConstants.USUARIO_NAO_ENCONTRADO);
     }
 
-    try {
-      List<PessoaPerfilAnexo> anexosPerfil = usuario.getPessoaPerfil().getPessoaPerfilAnexo();
+    List<PessoaPerfilAnexo> anexosPerfil = usuario.getPessoaPerfil().getPessoaPerfilAnexo();
 
-      if (!anexosPerfil.isEmpty()) {
-        List<Anexo> anexos = anexosPerfil.stream().map(PessoaPerfilAnexo::getAnexo).toList();
-        bucketService.deletarArquivos(anexos);
-        dadosPessoaPerfilTermoRepository.getAnexoRepository().deleteAll(anexos);
-      }
-
-      firebaseService.deletarUsuarioFirebase(usuario.getFirebaseUID());
-      usuarioRepository.delete(usuario);
-      deletarDadosPessoa(usuario);
-    } catch (FirebaseAuthException e) {
-      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_DELETAR_USUARIO);
+    if (!anexosPerfil.isEmpty()) {
+      List<Anexo> anexos = anexosPerfil.stream().map(PessoaPerfilAnexo::getAnexo).toList();
+      bucketService.deletarArquivos(anexos);
+      dadosPessoaPerfilTermoRepository.getAnexoRepository().deleteAll(anexos);
     }
+
+    firebaseService.deletarUsuarioFirebase(usuario.getFirebaseUID());
+    usuarioRepository.delete(usuario);
+    deletarDadosPessoa(usuario);
   }
 
   private void enviarCodigo(Usuario usuario, CodigoVerificacao codigoVerificacao, TipoContato preferenciaContato) {

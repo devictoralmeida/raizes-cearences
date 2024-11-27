@@ -12,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -43,7 +41,6 @@ public class BucketServiceImpl implements BucketService {
             .build();
   }
 
-  @Transactional
   @Override
   public void upload(AnexoRequestDto dto, UUID anexoId) {
     MultipartFile arquivo = dto.getAnexo();
@@ -65,7 +62,6 @@ public class BucketServiceImpl implements BucketService {
     }
   }
 
-  @Transactional(propagation = Propagation.SUPPORTS)
   @Override
   public void deletarArquivos(List<Anexo> anexos) {
     List<DeleteObject> deleteObjects = anexos.stream()
@@ -91,7 +87,6 @@ public class BucketServiceImpl implements BucketService {
 
   }
 
-  @Transactional(propagation = Propagation.SUPPORTS)
   @Override
   public void deletarArquivo(Anexo anexo) {
     try {

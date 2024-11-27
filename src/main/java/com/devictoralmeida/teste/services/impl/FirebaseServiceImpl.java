@@ -80,8 +80,12 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
-  public void deletarUsuarioFirebase(String uid) throws FirebaseAuthException {
-    firebaseAuth.deleteUser(uid);
+  public void deletarUsuarioFirebase(String uid) {
+    try {
+      firebaseAuth.deleteUser(uid);
+    } catch (FirebaseAuthException e) {
+      throw new RecursoNaoEncontradoException(FirebaseErrorsMessageConstants.ERRO_USUARIO_NAO_ENCONTRADO);
+    }
   }
 
   @Override
