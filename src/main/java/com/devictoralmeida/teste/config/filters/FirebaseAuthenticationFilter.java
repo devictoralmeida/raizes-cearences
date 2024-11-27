@@ -21,10 +21,9 @@ import java.io.IOException;
 
 @Component
 public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
-  @Autowired
-  @Lazy
   private final AuthService authService;
 
+  @Autowired
   public FirebaseAuthenticationFilter(@Lazy AuthService authService) {
     this.authService = authService;
   }

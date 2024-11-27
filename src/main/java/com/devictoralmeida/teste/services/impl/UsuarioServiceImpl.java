@@ -30,7 +30,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -58,10 +60,10 @@ public class UsuarioServiceImpl implements UsuarioService {
     usuario.setPessoaPerfil(pessoaPerfil);
     usuario.setCodigoVerificacao(codigoVerificacao);
 
-    if (!TipoPerfil.CONSUMIDOR.equals(usuario.getTipoPerfil())) {
-      Set<PerfilAcesso> perfilAcessos = new HashSet<>(dadosPessoaPerfilTermoRepository.getPerfilAcessoRepository().getPerfilAcessoOfertasPlanos());
-      usuario.setPerfisAcessos(perfilAcessos);
-    }
+//    if (!TipoPerfil.CONSUMIDOR.equals(usuario.getTipoPerfil())) {
+//      Set<PerfilAcesso> perfilAcessos = new HashSet<>(dadosPessoaPerfilTermoRepository.getPerfilAcessoRepository().getPerfilAcessoOfertasPlanos());
+//      usuario.setPerfisAcessos(perfilAcessos);
+//    }
 
     try {
       UserRecord usuarioFirebase = firebaseService.criarUsuarioFirebase(request);
