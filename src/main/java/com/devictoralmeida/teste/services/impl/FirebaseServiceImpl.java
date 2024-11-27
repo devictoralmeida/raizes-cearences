@@ -29,14 +29,17 @@ public class FirebaseServiceImpl implements FirebaseService {
   private final FirebaseAuth firebaseAuth;
 
   @Override
-  public UserRecord criarUsuarioFirebase(UsuarioRequestDto dto) throws FirebaseAuthException {
+  public UserRecord criarUsuarioFirebase(UsuarioRequestDto dto) {
     String nome = dto.getPessoaPerfil().getDadosPessoaFisica() != null
             ? dto.getPessoaPerfil().getDadosPessoaFisica().getNome() + " " + dto.getPessoaPerfil().getDadosPessoaFisica().getSobrenome()
             : dto.getPessoaPerfil().getDadosPessoaJuridica().getRazaoSocial();
 
-
-    UserRecord.CreateRequest request = createFirebaseUserRequest(dto, nome);
-    return firebaseAuth.createUser(request);
+    try {
+      UserRecord.CreateRequest request = createFirebaseUserRequest(dto, nome);
+      return firebaseAuth.createUser(request);
+    } catch (FirebaseAuthException e) {
+      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_CRIAR_USUARIO);
+    }
   }
 
   @Override
@@ -89,7 +92,7 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
-  public void atualizarContatoUsuarioFirebase(String uid, ContatoUpdateRequestDto requestDto, boolean usuarioPossuiEmail) throws FirebaseAuthException {
+  public void atualizarContatoUsuarioFirebase(String uid, ContatoUpdateRequestDto requestDto, boolean usuarioPossuiEmail) {
     UserRecord.UpdateRequest updateRequestFirebase = new UserRecord.UpdateRequest(uid);
 
     if (requestDto.getEmail() != null) {
@@ -103,8 +106,11 @@ public class FirebaseServiceImpl implements FirebaseService {
         updateRequestFirebase.setEmail(requestDto.getNumeroWhatsapp() + SharedConstants.EMAIL_DOMINIO_RAIZES);
       }
     }
-
-    firebaseAuth.updateUser(updateRequestFirebase);
+    try {
+      firebaseAuth.updateUser(updateRequestFirebase);
+    } catch (FirebaseAuthException e) {
+      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_ATUALIZAR_CONTATO);
+    }
   }
 
   @Override
@@ -117,9 +123,13 @@ public class FirebaseServiceImpl implements FirebaseService {
   }
 
   @Override
-  public void atualizarSenhaUsuarioFirebase(String firebaseUID, String senha) throws FirebaseAuthException {
-    UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(firebaseUID).setPassword(senha);
-    firebaseAuth.updateUser(request);
+  public void atualizarSenhaUsuarioFirebase(String firebaseUID, String senha) {
+    try {
+      UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(firebaseUID).setPassword(senha);
+      firebaseAuth.updateUser(request);
+    } catch (FirebaseAuthException e) {
+      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_ATUALIZAR_SENHA);
+    }
   }
 
   @Override
