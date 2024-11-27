@@ -17,6 +17,7 @@ import com.devictoralmeida.teste.helpers.UsuarioRequestHelper;
 import com.devictoralmeida.teste.repositories.UsuarioRepository;
 import com.devictoralmeida.teste.services.*;
 import com.devictoralmeida.teste.shared.auditoria.CustomRevisionListener;
+import com.devictoralmeida.teste.shared.constants.MessageCommonsConstants;
 import com.devictoralmeida.teste.shared.constants.errors.ContatoErrorsMessageConstants;
 import com.devictoralmeida.teste.shared.constants.errors.UsuarioErrorsMessageConstants;
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
@@ -66,7 +67,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     UserRecord usuarioFirebase = firebaseService.criarUsuarioFirebase(request);
     usuario.setFirebaseUID(usuarioFirebase.getUid());
     firebaseService.adicionarPermissoesTokenFirebase(usuarioFirebase.getUid(), usuario.getAuthorities());
-    enviarCodigo(usuario, codigoVerificacao, usuario.getPessoaPerfil().getContato().getPreferenciaContato());
+    enviarCodigo(usuario, codigoVerificacao, usuario.getPessoaPerfil().getContato().getPreferenciaContato(), MessageCommonsConstants.MENSAGEM_CODIGO_VALIDACAO_CADASTRO_USUARIO);
     usuarioRepository.save(usuario);
   }
 
@@ -111,7 +112,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO, usuario);
     usuario.setCodigoVerificacao(codigoVerificacao);
     usuarioRepository.save(usuario);
-    enviarCodigo(usuario, codigoVerificacao, canalEnvio);
+    enviarCodigo(usuario, codigoVerificacao, canalEnvio, MessageCommonsConstants.MENSAGEM_CODIGO_VALIDACAO_CADASTRO_USUARIO);
   }
 
   @Transactional
@@ -159,7 +160,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     Usuario updatedUser = usuarioRepository.save(usuario);
     boolean usuarioPossuiEmail = Objects.nonNull(updatedUser.getPessoaPerfil().getContato().getEmail());
     firebaseService.atualizarContatoUsuarioFirebase(updatedUser.getFirebaseUID(), request, usuarioPossuiEmail);
-    enviarCodigo(usuario, codigoVerificacao, updatedUser.getPessoaPerfil().getContato().getPreferenciaContato());
+    enviarCodigo(usuario, codigoVerificacao, updatedUser.getPessoaPerfil().getContato().getPreferenciaContato(), MessageCommonsConstants.MENSAGEM_CODIGO_VALIDACAO_CADASTRO_USUARIO);
   }
 
   @Transactional
@@ -199,7 +200,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.SENHA, usuario);
     usuario.setCodigoVerificacao(codigoVerificacao);
     usuarioRepository.save(usuario);
-    enviarCodigo(usuario, codigoVerificacao, usuario.getPessoaPerfil().getContato().getPreferenciaContato());
+    enviarCodigo(usuario, codigoVerificacao, usuario.getPessoaPerfil().getContato().getPreferenciaContato(), MessageCommonsConstants.MENSAGEM_CODIGO_RECUPERACAO_SENHA);
   }
 
   @Transactional
@@ -224,11 +225,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     deletarDadosPessoa(usuario);
   }
 
-  private void enviarCodigo(Usuario usuario, CodigoVerificacao codigoVerificacao, TipoContato preferenciaContato) {
+  private void enviarCodigo(Usuario usuario, CodigoVerificacao codigoVerificacao, TipoContato preferenciaContato, String mensagem) {
     if (TipoContato.EMAIL.equals(preferenciaContato)) {
-      emailService.enviarEmail(usuario.getPessoaPerfil().getContato().getEmail(), codigoVerificacao.getCodigo());
+      emailService.enviarEmail(usuario.getPessoaPerfil().getContato().getEmail(), codigoVerificacao.getCodigo(), mensagem);
     } else if (TipoContato.WHATSAPP.equals(preferenciaContato)) {
-      mensagemService.enviarWhatsapp(usuario.getPessoaPerfil().getContato().getNumeroWhatsapp(), codigoVerificacao.getCodigo());
+      mensagemService.enviarWhatsapp(usuario.getPessoaPerfil().getContato().getNumeroWhatsapp(), codigoVerificacao.getCodigo(), mensagem);
     }
   }
 

@@ -6,7 +6,7 @@ public class AuthErrorsMessageConstants {
   public static final String INVALID_CREDENTIALS_ERROR = "INVALID_LOGIN_CREDENTIALS";
   public static final String INVALID_REFRESH_TOKEN_ERROR = "INVALID_REFRESH_TOKEN";
   public static final String ERRO_REFRESH_TOKEN_INVALIDO = "Refresh token inválido!";
-  public static final String ERRO_CREDENCIAIS_INVALIDAS = "Login e/ou Senha incorretos. Verifique suas credenciais e tente novamente";
+  public static final String ERRO_CREDENCIAIS_INVALIDAS = "Login e/ou Senha incorretos. Verifique e tente novamente";
   public static final String ERRO_SEM_PERMISSAO = "Usuário não possui permissão para realizar esta operação";
 
   private AuthErrorsMessageConstants() {

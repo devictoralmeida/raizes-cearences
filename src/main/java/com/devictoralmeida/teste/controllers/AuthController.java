@@ -40,14 +40,14 @@ public class AuthController {
   }
 
   @PostMapping(value = "/codigo/recuperar-senha")
-  public ResponseEntity<?> codigoRecuperarSenha(@Valid @RequestBody RecuperarSenhaRequestDto request) {
+  public ResponseEntity<?> enviarCodigoRecuperacaoSenha(@Valid @RequestBody RecuperarSenhaRequestDto request) {
     authService.enviarCodigoRecuperacaoSenha(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.fromData(null, HttpStatus.CREATED, MessageCommonsConstants.MENSAGEM_CODIGO_ENVIADO_SUCESSO));
   }
 
-  @PatchMapping("/recuperar-senha/{login}")
-  public ResponseEntity<?> recuperarSenha(@PathVariable(name = "login") String login, @Valid @RequestBody SenhaRequestDto request) {
-    authService.recuperarSenha(login, request);
+  @PatchMapping("/redefinir-senha/{login}")
+  public ResponseEntity<?> redefinirSenha(@PathVariable(name = "login") String login, @Valid @RequestBody SenhaRequestDto request) {
+    authService.redefinirSenha(login, request);
     return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_SENHA_REDEFINIDA_SUCESSO));
   }
 

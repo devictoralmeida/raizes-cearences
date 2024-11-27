@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class MensagemServiceImpl implements MensagemService {
   @Override
-  public void enviarWhatsapp(String numero, String codigo) {
-    System.out.println("Enviando mensagem via WhatsApp para " + numero + " com o código " + codigo);
+  public void enviarWhatsapp(String numero, String codigo, String mensagem) {
+
   }
 }

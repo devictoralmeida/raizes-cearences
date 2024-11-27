@@ -1,5 +1,5 @@
 package com.devictoralmeida.teste.services;
 
 public interface MensagemService {
-  void enviarWhatsapp(String numero, String codigo);
+  void enviarWhatsapp(String numero, String codigo, String mensagem);
 }

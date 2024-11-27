@@ -23,7 +23,7 @@ public class SenhaUpdateRequestDto implements Serializable {
   private String senhaAtual;
 
   @NotBlank(message = UsuarioValidationMessages.NOVA_SENHA_OBRIGATORIA)
-  @Size(min = 8, max = 32, message = UsuarioValidationMessages.SENHA_TAMANHO)
+  @Size(min = 8, max = 32, message = UsuarioValidationMessages.ALTERAR_SENHA_TAMANHO)
   @Pattern(regexp = SharedConstants.REGEX_VALIDA_SENHA, message = UsuarioValidationMessages.SENHA_INVALIDA)
   private String novaSenha;
 

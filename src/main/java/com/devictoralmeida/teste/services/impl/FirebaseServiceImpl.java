@@ -75,8 +75,12 @@ public class FirebaseServiceImpl implements FirebaseService {
   @Override
   public void emailVerificado(String uid) {
     try {
-      UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(uid).setEmailVerified(true);
-      firebaseAuth.updateUser(request);
+      UserRecord user = firebaseAuth.getUser(uid);
+
+      if (!user.isEmailVerified()) {
+        UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(uid).setEmailVerified(true);
+        firebaseAuth.updateUser(request);
+      }
     } catch (FirebaseAuthException e) {
       throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_VERIFICACAO_EMAIL);
     }

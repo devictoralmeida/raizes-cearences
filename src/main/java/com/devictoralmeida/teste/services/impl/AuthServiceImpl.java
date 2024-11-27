@@ -5,12 +5,12 @@ import com.devictoralmeida.teste.dto.request.update.SenhaUpdateRequestDto;
 import com.devictoralmeida.teste.dto.response.FirebaseLoginResponseDto;
 import com.devictoralmeida.teste.dto.response.RefreshTokenResponseDto;
 import com.devictoralmeida.teste.entities.Usuario;
-import com.devictoralmeida.teste.enums.TipoCodigoVerificacao;
 import com.devictoralmeida.teste.services.AuthService;
 import com.devictoralmeida.teste.services.FirebaseService;
 import com.devictoralmeida.teste.services.UsuarioService;
 import com.devictoralmeida.teste.shared.constants.errors.AuthErrorsMessageConstants;
 import com.devictoralmeida.teste.shared.constants.errors.UsuarioErrorsMessageConstants;
+import com.devictoralmeida.teste.shared.exceptions.NegocioException;
 import com.devictoralmeida.teste.shared.exceptions.RecursoNaoEncontradoException;
 import com.devictoralmeida.teste.shared.exceptions.SemAutenticacaoException;
 import com.devictoralmeida.teste.shared.exceptions.SemAutorizacaoException;
@@ -66,7 +66,6 @@ public class AuthServiceImpl implements AuthService {
     return firebaseService.verificarToken(idToken);
   }
 
-  @Transactional(readOnly = true)
   @Override
   public UserDetails loadUserByUsername(String uid) {
     try {
@@ -81,7 +80,6 @@ public class AuthServiceImpl implements AuthService {
     return refreshTokenRequest(refreshTokenRequestDto);
   }
 
-  @Transactional(readOnly = true)
   @Override
   public void validateSelfOrAdmin(UUID idUsuario) {
     Usuario usuario = getUsuarioLogado();
@@ -91,7 +89,7 @@ public class AuthServiceImpl implements AuthService {
     }
   }
 
-  // Esse método deve ser protected (nome será autenticado)
+  // Esse metodo deve ser protected (nome será autenticado)
   @Override
   public Usuario getUsuarioLogado() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -105,10 +103,7 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   public void verificarUsuarioValido(Usuario usuario) {
-    if (TipoCodigoVerificacao.CONTATO.equals(usuario.getCodigoVerificacao().getTipoCodigo())) {
-      usuarioService.verificarValidacaoCodigo(usuario);
-    }
-
+    usuarioService.verificarValidacaoCodigo(usuario);
     usuarioService.verificarAceiteTermos(usuario);
   }
 
@@ -119,7 +114,7 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public void recuperarSenha(String login, SenhaRequestDto request) {
+  public void redefinirSenha(String login, SenhaRequestDto request) {
     usuarioService.criarSenha(login, request);
   }
 
@@ -164,7 +159,7 @@ public class AuthServiceImpl implements AuthService {
       if (exception.getResponseBodyAsString().contains(AuthErrorsMessageConstants.INVALID_CREDENTIALS_ERROR)) {
         throw new SemAutenticacaoException(AuthErrorsMessageConstants.ERRO_CREDENCIAIS_INVALIDAS);
       }
-      throw exception;
+      throw new NegocioException(exception.getResponseBodyAsString());
     }
   }
 
