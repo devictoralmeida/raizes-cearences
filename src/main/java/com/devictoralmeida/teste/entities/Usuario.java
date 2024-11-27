@@ -24,7 +24,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
@@ -38,7 +37,7 @@ import java.util.UUID;
 @Table(name = "usuario")
 @Audited
 @AuditTable("usuario_aud")
-public class Usuario extends BaseAuditoria implements UserDetails, Serializable {
+public class Usuario extends BaseAuditoria implements UserDetails {
   @Serial
   private static final long serialVersionUID = 5017933890529895923L;
 

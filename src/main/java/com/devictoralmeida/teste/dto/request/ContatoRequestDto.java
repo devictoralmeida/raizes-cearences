@@ -10,11 +10,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serial;
-import java.io.Serializable;
 
 @Getter
 @Setter
-public class ContatoRequestDto extends ContatoUpdateRequestDto implements Serializable {
+public class ContatoRequestDto extends ContatoUpdateRequestDto {
   @Serial
   private static final long serialVersionUID = -5356988558145183273L;
 

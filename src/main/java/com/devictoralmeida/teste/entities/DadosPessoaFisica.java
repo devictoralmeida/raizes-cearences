@@ -16,7 +16,6 @@ import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -27,7 +26,7 @@ import java.util.UUID;
 @Audited
 @AuditTable("dados_pessoa_fisica_aud")
 @NoArgsConstructor
-public class DadosPessoaFisica extends BaseAuditoria implements Serializable {
+public class DadosPessoaFisica extends BaseAuditoria {
   @Serial
   private static final long serialVersionUID = -9139757556305789780L;
 

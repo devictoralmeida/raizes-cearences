@@ -12,7 +12,6 @@ import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +23,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Audited
 @AuditTable("pessoa_perfil_aud")
-public class PessoaPerfil extends BaseAuditoria implements Serializable {
+public class PessoaPerfil extends BaseAuditoria {
   @Serial
   private static final long serialVersionUID = -7349150015441550944L;
 
