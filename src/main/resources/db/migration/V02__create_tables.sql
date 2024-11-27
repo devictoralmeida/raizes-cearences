@@ -437,3 +437,13 @@ ALTER TABLE "presidente"
 
 ALTER TABLE "presidente"
   ADD FOREIGN KEY ("dados_pessoa_id") REFERENCES "dados_pessoa_fisica" ("id");
+
+INSERT INTO "termo_condicao" (id, versao, conteudo, dat_criacao, dat_atualizacao, nm_usuario_cadastro,
+                              nm_usuario_atualizacao)
+VALUES ('eb1f62bf-9d16-45c1-be45-bd52f97dffb2',
+        '0.0.1',
+        'Este é um termo de condição genérico para a versão 0.0.1.',
+        now(),
+        now(),
+        'Assistente Virtual',
+        'Assistente Virtual');

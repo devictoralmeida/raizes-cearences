@@ -143,6 +143,10 @@ public class AuthServiceImpl implements AuthService {
     if (ValidarDadosUtils.isNullOrStringVazia(login)) {
       throw new NegocioException(UsuarioValidationMessages.LOGIN_OBRIGATORIO);
     }
+
+    if (!ValidarDadosUtils.contemApenasNumeros(login)) {
+      throw new NegocioException(UsuarioValidationMessages.LOGIN_APENAS_NUMEROS);
+    }
   }
 
   private FirebaseLoginResponseDto firebaseLogin(FirebaseLoginRequestDto request) {

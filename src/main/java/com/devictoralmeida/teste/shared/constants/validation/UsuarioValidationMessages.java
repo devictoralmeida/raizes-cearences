@@ -15,6 +15,7 @@ public class UsuarioValidationMessages {
   public static final String CONFIRMACAO_SENHA_OBRIGATORIA = "A confirmação da senha é obrigatória";
   public static final String CONFIRMAR_NOVA_SENHA_OBRIGATORIA = "A confirmação da nova senha é obrigatória";
   public static final String SENHA_NOVA_IGUAL_ATUAL = "A senha atual e a nova senha devem ser diferentes!";
+  public static final String LOGIN_APENAS_NUMEROS = "O login deve conter apenas números";
 
 
   private UsuarioValidationMessages() {
