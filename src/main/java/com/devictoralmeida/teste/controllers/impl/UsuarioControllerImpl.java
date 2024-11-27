@@ -30,18 +30,21 @@ import java.util.UUID;
 public class UsuarioControllerImpl implements UsuarioController {
   private final UsuarioService service;
 
+  @Override
   @PostMapping
   public ResponseEntity<?> save(@Valid @RequestBody UsuarioRequestDto request) {
     service.save(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.fromData(null, HttpStatus.CREATED, MessageCommonsConstants.MENSAGEM_SAVE_SUCESSO));
   }
 
+  @Override
   @PatchMapping("/criar-senha/{login}")
   public ResponseEntity<?> criarSenha(@PathVariable(name = "login") String login, @Valid @RequestBody SenhaRequestDto request) {
     service.criarSenha(login, request);
     return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_SENHA_CADASTRADA_SUCESSO));
   }
 
+  @Override
   @PostMapping("/upload/{login}")
   public ResponseEntity<?> upload(@PathVariable(name = "login") String login,
                                   @RequestParam("tipoDocumento") List<TipoDocumento> tipoDocumentos,
@@ -60,24 +63,28 @@ public class UsuarioControllerImpl implements UsuarioController {
     return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.fromData(null, HttpStatus.CREATED, MessageCommonsConstants.MENSAGEM_UPLOAD_SUCESSO));
   }
 
+  @Override
   @PostMapping("/reenviar-codigo/{login}")
   public ResponseEntity<?> reenvioCodigo(@PathVariable(name = "login") String login) {
     service.reenviarCodigo(login);
     return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.fromData(null, HttpStatus.CREATED, MessageCommonsConstants.MENSAGEM_CODIGO_ENVIADO_SUCESSO));
   }
 
+  @Override
   @PatchMapping("/validacao-codigo/{login}")
   public ResponseEntity<?> validarCodigo(@PathVariable(name = "login") String login, @Valid @RequestBody CodigoRequestDto request) {
     service.validarCodigo(login, request.getCodigo());
     return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_CODIGO_CONFIRMADO_SUCESSO));
   }
 
+  @Override
   @PatchMapping("/alterar-contato/{login}")
   public ResponseEntity<?> alterarContato(@PathVariable(name = "login") String login, @Valid @RequestBody ContatoUpdateRequestDto request) throws JsonProcessingException {
     service.alterarContato(login, request);
     return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_CONTATO_ALTERADO_SUCESSO));
   }
 
+  @Override
   @DeleteMapping("/{id}")
   public ResponseEntity<?> delete(@PathVariable(name = "id") UUID id) {
     service.delete(id);
