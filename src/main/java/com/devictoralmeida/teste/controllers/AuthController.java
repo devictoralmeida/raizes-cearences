@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
   private final AuthService authService;
 
+  // Metodo de teste para verificar se o usuário está logado
   @GetMapping(value = "/teste")
   public ResponseEntity<ResponseDto<Usuario>> getUsuario() {
     return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(authService.getUsuarioLogado(), HttpStatus.OK, null));

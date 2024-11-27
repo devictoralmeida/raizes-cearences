@@ -15,21 +15,6 @@ services:
       - docker-network
     restart: always
 
-  pgadmin:
-    container_name: pgadmin
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: "victoremmanuelmn@gmail.com"
-      PGADMIN_DEFAULT_PASSWORD: "123456"
-      TZ: "America/Sao_Paulo"
-    ports:
-      - "16543:80"
-    depends_on:
-      - postgres-db
-    networks:
-      - docker-network
-    restart: always
-
   minio:
     image: minio/minio:latest
     container_name: minio
