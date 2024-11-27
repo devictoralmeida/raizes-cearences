@@ -17,36 +17,36 @@ import org.springframework.http.ResponseEntity;
 @Tag(name = "Auth", description = "Operações para autenticação dos usuários")
 public interface AuthController {
 
-    @Operation(summary = "Contrato de rota para desativar um usuário", responses = {
-            @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
-            @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
-            @ApiResponse(responseCode = "500", ref = "internalServerError")
-    })
-    ResponseEntity<ResponseDto<FirebaseLoginResponseDto>> login(LoginRequestDto loginRequestDto);
+  @Operation(summary = "Contrato de rota para realizar o login do usuário", responses = {
+          @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
+          @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
+          @ApiResponse(responseCode = "500", ref = "internalServerError")
+  })
+  ResponseEntity<ResponseDto<FirebaseLoginResponseDto>> login(LoginRequestDto loginRequestDto);
 
-    @Operation(summary = "Contrato de rota para atualizar o token", responses = {
-            @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
-            @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
-            @ApiResponse(responseCode = "500", ref = "internalServerError")
-    })
-    ResponseEntity<ResponseDto<RefreshTokenResponseDto>> atualizarToken(RefreshTokenRequestDto request);
+  @Operation(summary = "Contrato de rota para atualizar o token", responses = {
+          @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
+          @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
+          @ApiResponse(responseCode = "500", ref = "internalServerError")
+  })
+  ResponseEntity<ResponseDto<RefreshTokenResponseDto>> atualizarToken(RefreshTokenRequestDto request);
 
-    @Operation(summary = "Contrato de rota para o codigo de recuperar a senha", responses = {
-            @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
-            @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
-    })
-    ResponseEntity<?> enviarCodigoRecuperacaoSenha(String login);
+  @Operation(summary = "Contrato de rota para obter o código de recuperação de senha", responses = {
+          @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
+          @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
+  })
+  ResponseEntity<?> enviarCodigoRecuperacaoSenha(String login);
 
-    @Operation(summary = "Contrato de rota para recuperar a senha", responses = {
-            @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
-            @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
-    })
-    ResponseEntity<?> redefinirSenha(String login, SenhaRequestDto request);
+  @Operation(summary = "Contrato de rota para redefinir a senha do usuário", responses = {
+          @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
+          @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
+  })
+  ResponseEntity<?> redefinirSenha(String login, SenhaRequestDto request);
 
-    @Operation(summary = "Contrato de rota para atualizar a senha do usuario", responses = {
-            @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
-            @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
-            @ApiResponse(responseCode = "404", ref = GlobalExceptionConstants.MENSAGEM_NAO_ENCONTRADO),
-    })
-    ResponseEntity<?> alterarSenha(String login, SenhaUpdateRequestDto request);
+  @Operation(summary = "Contrato de rota para atualizar a senha do usuário", responses = {
+          @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
+          @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
+          @ApiResponse(responseCode = "404", ref = GlobalExceptionConstants.MENSAGEM_NAO_ENCONTRADO),
+  })
+  ResponseEntity<?> alterarSenha(String login, SenhaUpdateRequestDto request);
 }
