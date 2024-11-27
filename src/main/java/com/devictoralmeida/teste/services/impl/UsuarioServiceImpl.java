@@ -18,12 +18,10 @@ import com.devictoralmeida.teste.repositories.UsuarioRepository;
 import com.devictoralmeida.teste.services.*;
 import com.devictoralmeida.teste.shared.auditoria.CustomRevisionListener;
 import com.devictoralmeida.teste.shared.constants.errors.ContatoErrorsMessageConstants;
-import com.devictoralmeida.teste.shared.constants.errors.FirebaseErrorsMessageConstants;
 import com.devictoralmeida.teste.shared.constants.errors.UsuarioErrorsMessageConstants;
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
 import com.devictoralmeida.teste.shared.exceptions.RecursoNaoEncontradoException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -65,15 +63,11 @@ public class UsuarioServiceImpl implements UsuarioService {
 //      usuario.setPerfisAcessos(perfilAcessos);
 //    }
 
-    try {
-      UserRecord usuarioFirebase = firebaseService.criarUsuarioFirebase(request);
-      usuario.setFirebaseUID(usuarioFirebase.getUid());
-      firebaseService.adicionarPermissoesTokenFirebase(usuarioFirebase.getUid(), usuario.getAuthorities());
-      enviarCodigo(usuario, codigoVerificacao, usuario.getPessoaPerfil().getContato().getPreferenciaContato());
-      usuarioRepository.save(usuario);
-    } catch (FirebaseAuthException e) {
-      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_CRIAR_USUARIO);
-    }
+    UserRecord usuarioFirebase = firebaseService.criarUsuarioFirebase(request);
+    usuario.setFirebaseUID(usuarioFirebase.getUid());
+    firebaseService.adicionarPermissoesTokenFirebase(usuarioFirebase.getUid(), usuario.getAuthorities());
+    enviarCodigo(usuario, codigoVerificacao, usuario.getPessoaPerfil().getContato().getPreferenciaContato());
+    usuarioRepository.save(usuario);
   }
 
   @Override
@@ -155,24 +149,17 @@ public class UsuarioServiceImpl implements UsuarioService {
       if (contato.getEmail() != null && !contato.getEmail().equals(request.getEmail())) {
         verificarEmailExistente(request.getEmail());
       }
+      CustomRevisionListener.setDadosAntigos(usuario.toStringMapper());
+      contato.aplicarMudancaUpdateCodigo(request);
     }
 
     CodigoVerificacao codigoVerificacao = codigoVerificacaoService.save(TipoCodigoVerificacao.CONTATO, usuario);
     usuario.setCodigoVerificacao(codigoVerificacao);
 
-    try {
-      if (houveMudanca) {
-        CustomRevisionListener.setDadosAntigos(usuario.toStringMapper());
-        contato.aplicarMudancaUpdateCodigo(request);
-      }
-
-      Usuario updatedUser = usuarioRepository.save(usuario);
-      boolean usuarioPossuiEmail = Objects.nonNull(updatedUser.getPessoaPerfil().getContato().getEmail());
-      firebaseService.atualizarContatoUsuarioFirebase(updatedUser.getFirebaseUID(), request, usuarioPossuiEmail);
-      enviarCodigo(usuario, codigoVerificacao, updatedUser.getPessoaPerfil().getContato().getPreferenciaContato());
-    } catch (FirebaseAuthException e) {
-      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_ATUALIZAR_CONTATO_USUARIO);
-    }
+    Usuario updatedUser = usuarioRepository.save(usuario);
+    boolean usuarioPossuiEmail = Objects.nonNull(updatedUser.getPessoaPerfil().getContato().getEmail());
+    firebaseService.atualizarContatoUsuarioFirebase(updatedUser.getFirebaseUID(), request, usuarioPossuiEmail);
+    enviarCodigo(usuario, codigoVerificacao, updatedUser.getPessoaPerfil().getContato().getPreferenciaContato());
   }
 
   @Transactional
@@ -186,12 +173,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 
   @Override
   public void alterarSenha(Usuario usuario, String senha) {
-    try {
-      firebaseService.atualizarSenhaUsuarioFirebase(usuario.getFirebaseUID(), senha);
-      usuarioRepository.save(usuario);
-    } catch (FirebaseAuthException e) {
-      throw new NegocioException(FirebaseErrorsMessageConstants.ERRO_ATUALIZAR_SENHA_USUARIO);
-    }
+    firebaseService.atualizarSenhaUsuarioFirebase(usuario.getFirebaseUID(), senha);
+    usuarioRepository.save(usuario);
   }
 
   @Override
