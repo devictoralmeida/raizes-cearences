@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,7 +15,7 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @Table(name = "termo_condicao")
-public class TermoCondicao extends BaseAuditoria implements Serializable {
+public class TermoCondicao extends BaseAuditoria {
   @Serial
   private static final long serialVersionUID = -13935003319858381L;
 

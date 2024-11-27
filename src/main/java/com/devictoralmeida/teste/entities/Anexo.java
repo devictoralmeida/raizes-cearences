@@ -12,7 +12,6 @@ import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.UUID;
 
 @Getter
@@ -22,7 +21,7 @@ import java.util.UUID;
 @Audited
 @AuditTable("anexo_aud")
 @NoArgsConstructor
-public class Anexo extends BaseAuditoria implements Serializable {
+public class Anexo extends BaseAuditoria {
   @Serial
   private static final long serialVersionUID = 5255144870691782603L;
 

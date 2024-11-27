@@ -1,4 +1,4 @@
-package com.devictoralmeida.teste.controllers;
+package com.devictoralmeida.teste.controllers.impl;
 
 import com.devictoralmeida.teste.shared.constants.SharedConstants;
 import org.springframework.security.core.Authentication;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-public class HomeController {
+public class HomeControllerImpl {
 
   @GetMapping(value = "/home")
   public Map<String, Object> test(Authentication authentication) {

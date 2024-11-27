@@ -1,85 +1,67 @@
 package com.devictoralmeida.teste.controllers;
 
-import com.devictoralmeida.teste.dto.request.AnexoRequestDto;
 import com.devictoralmeida.teste.dto.request.CodigoRequestDto;
 import com.devictoralmeida.teste.dto.request.SenhaRequestDto;
 import com.devictoralmeida.teste.dto.request.UsuarioRequestDto;
 import com.devictoralmeida.teste.dto.request.update.ContatoUpdateRequestDto;
-import com.devictoralmeida.teste.dto.response.ResponseDto;
 import com.devictoralmeida.teste.enums.TipoDocumento;
-import com.devictoralmeida.teste.services.UsuarioService;
+import com.devictoralmeida.teste.shared.constants.GlobalExceptionConstants;
 import com.devictoralmeida.teste.shared.constants.MessageCommonsConstants;
-import com.devictoralmeida.teste.shared.constants.validation.AnexoValidationMessages;
-import com.devictoralmeida.teste.shared.exceptions.NegocioException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@RestController
-@RequestMapping(value = "usuario")
-@RequiredArgsConstructor
-public class UsuarioController {
-  private final UsuarioService service;
+@Tag(name = "Users", description = "Rotas para gerenciar usuários")
+public interface UsuarioController {
 
-  @PostMapping
-  public ResponseEntity<?> save(@Valid @RequestBody UsuarioRequestDto request) {
-    service.save(request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.fromData(null, HttpStatus.CREATED, MessageCommonsConstants.MENSAGEM_SAVE_SUCESSO));
-  }
+    @Operation(summary = "Contrato de rota para salvar um usuario", responses = {
+            @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
+            @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
+    })
+    ResponseEntity<?> save(UsuarioRequestDto request);
 
-  @PatchMapping("/criar-senha/{login}")
-  public ResponseEntity<?> criarSenha(@PathVariable(name = "login") String login, @Valid @RequestBody SenhaRequestDto request) {
-    service.criarSenha(login, request);
-    return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_SENHA_CADASTRADA_SUCESSO));
-  }
+    @Operation(summary = "Contrato de rota para logar um usuario", responses = {
+            @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
+            @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
+    })
+    ResponseEntity<?> criarSenha(String login, SenhaRequestDto request);
 
-  @PostMapping("/upload/{login}")
-  public ResponseEntity<?> upload(@PathVariable(name = "login") String login,
-                                  @RequestParam("tipoDocumento") List<TipoDocumento> tipoDocumentos,
-                                  @RequestParam("arquivo") List<MultipartFile> arquivos) {
-    if (tipoDocumentos.size() != arquivos.size()) {
-      throw new NegocioException(AnexoValidationMessages.QUANTIDADE_TIPO_DOCUMENTO_ARQUIVO_DIFERENTE);
-    }
+    @Operation(summary = "Contrato de rota para atualizar os documentos de um user no login", responses = {
+            @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
+            @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
+    })
+    ResponseEntity<?> upload(String login, List<TipoDocumento> tipoDocumentos, List<MultipartFile> arquivos);
 
-    List<AnexoRequestDto> anexos = new ArrayList<>();
-    for (int i = 0; i < tipoDocumentos.size(); i++) {
-      AnexoRequestDto anexo = new AnexoRequestDto(tipoDocumentos.get(i), arquivos.get(i));
-      anexos.add(anexo);
-    }
 
-    service.uploadAnexos(login, anexos);
-    return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.fromData(null, HttpStatus.CREATED, MessageCommonsConstants.MENSAGEM_UPLOAD_SUCESSO));
-  }
+    @Operation(summary = "Contrato de rota para reenvio de codigo de varificação", responses = {
+            @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
+            @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
+    })
+    ResponseEntity<?> reenvioCodigo(String login);
 
-  @PostMapping("/reenviar-codigo/{login}")
-  public ResponseEntity<?> reenvioCodigo(@PathVariable(name = "login") String login) {
-    service.reenviarCodigo(login);
-    return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.fromData(null, HttpStatus.CREATED, MessageCommonsConstants.MENSAGEM_CODIGO_ENVIADO_SUCESSO));
-  }
+    @Operation(summary = "Contrato de rota para validar codigo", responses = {
+            @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
+            @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
+    })
+    ResponseEntity<?> validarCodigo(String login, CodigoRequestDto request);
 
-  @PatchMapping("/validacao-codigo/{login}")
-  public ResponseEntity<?> validarCodigo(@PathVariable(name = "login") String login, @Valid @RequestBody CodigoRequestDto request) {
-    service.validarCodigo(login, request.getCodigo());
-    return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_CODIGO_CONFIRMADO_SUCESSO));
-  }
+    @Operation(summary = "Contrato de rota para alterar contrato", responses = {
+            @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
+            @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
+            @ApiResponse(responseCode = "404", ref = GlobalExceptionConstants.MENSAGEM_NAO_ENCONTRADO),
+    })
+    ResponseEntity<?> alterarContato(String login, ContatoUpdateRequestDto request) throws JsonProcessingException;
 
-  @PatchMapping("/alterar-contato/{login}")
-  public ResponseEntity<?> alterarContato(@PathVariable(name = "login") String login, @Valid @RequestBody ContatoUpdateRequestDto request) throws JsonProcessingException {
-    service.alterarContato(login, request);
-    return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_CONTATO_ALTERADO_SUCESSO));
-  }
-
-  @DeleteMapping("/{id}")
-  public ResponseEntity<?> delete(@PathVariable(name = "id") UUID id) {
-    service.delete(id);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResponseDto.fromData(null, HttpStatus.NO_CONTENT, MessageCommonsConstants.MENSAGEM_DELETE_SUCESSO));
-  }
+    @Operation(summary = "Contrato de rota para desativar um usuário", responses = {
+            @ApiResponse(responseCode = "200", ref = MessageCommonsConstants.MENSAGEM_LOGIN_SUCESSO),
+            @ApiResponse(responseCode = "401", ref = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO),
+            @ApiResponse(responseCode = "404", ref = GlobalExceptionConstants.MENSAGEM_NAO_ENCONTRADO),
+    })
+    ResponseEntity<?> delete(UUID id);
 }

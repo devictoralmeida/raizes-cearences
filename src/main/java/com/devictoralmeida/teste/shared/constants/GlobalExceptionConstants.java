@@ -26,7 +26,8 @@ public class GlobalExceptionConstants {
   public static final String MENSAGEM_FORMATO_DATA_INVALIDO = "Formato de data inválido: ";
   public static final String MENSAGEM_FORMATO_ESPERADO_DATA = "O formato esperado é YYYY-MM-DD";
   public static final String MENSAGEM_USAR_FORMATOS_APROPRIADOS = "Use os formatos apropriados para data e hora.";
-
+  public static final String MENSAGEM_ERRO_AUTENTICACAO = "Não autorizado, precisa se autenticar!";
+  public static final String MENSAGEM_NAO_ENCONTRADO = "Recurso não encontrado!";
 
   private GlobalExceptionConstants() {
   }
