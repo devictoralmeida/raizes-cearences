@@ -1,6 +1,9 @@
 package com.devictoralmeida.teste.services.impl;
 
-import com.devictoralmeida.teste.dto.request.*;
+import com.devictoralmeida.teste.dto.request.FirebaseLoginRequestDto;
+import com.devictoralmeida.teste.dto.request.LoginRequestDto;
+import com.devictoralmeida.teste.dto.request.RefreshTokenRequestDto;
+import com.devictoralmeida.teste.dto.request.SenhaRequestDto;
 import com.devictoralmeida.teste.dto.request.update.SenhaUpdateRequestDto;
 import com.devictoralmeida.teste.dto.response.FirebaseLoginResponseDto;
 import com.devictoralmeida.teste.dto.response.RefreshTokenResponseDto;
@@ -10,10 +13,12 @@ import com.devictoralmeida.teste.services.FirebaseService;
 import com.devictoralmeida.teste.services.UsuarioService;
 import com.devictoralmeida.teste.shared.constants.errors.AuthErrorsMessageConstants;
 import com.devictoralmeida.teste.shared.constants.errors.UsuarioErrorsMessageConstants;
+import com.devictoralmeida.teste.shared.constants.validation.UsuarioValidationMessages;
 import com.devictoralmeida.teste.shared.exceptions.NegocioException;
 import com.devictoralmeida.teste.shared.exceptions.RecursoNaoEncontradoException;
 import com.devictoralmeida.teste.shared.exceptions.SemAutenticacaoException;
 import com.devictoralmeida.teste.shared.exceptions.SemAutorizacaoException;
+import com.devictoralmeida.teste.shared.utils.ValidarDadosUtils;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import lombok.RequiredArgsConstructor;
@@ -108,27 +113,36 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public void enviarCodigoRecuperacaoSenha(RecuperarSenhaRequestDto request) {
-    Usuario usuario = usuarioService.findByLogin(request.getLogin());
+  public void enviarCodigoRecuperacaoSenha(String login) {
+    validarLogin(login);
+    Usuario usuario = usuarioService.findByLogin(login);
     usuarioService.enviarCodigoRecuperacaoSenha(usuario);
   }
 
   @Override
   public void redefinirSenha(String login, SenhaRequestDto request) {
+    validarLogin(login);
     usuarioService.criarSenha(login, request);
   }
 
   @Transactional
   @Override
-  public void alterarSenha(SenhaUpdateRequestDto request) {
+  public void alterarSenha(String login, SenhaUpdateRequestDto request) {
+    validarLogin(login);
     request.validar();
-    Usuario usuario = usuarioService.findByLogin(request.getLogin());
+    Usuario usuario = usuarioService.findByLogin(login);
     verificarUsuarioValido(usuario);
     UserRecord firebaseUser = firebaseService.findUserByUid(usuario.getFirebaseUID());
     FirebaseLoginRequestDto firebaseLoginRequestDto = new FirebaseLoginRequestDto(firebaseUser.getEmail(), request.getSenhaAtual());
     checkPassword(firebaseLoginRequestDto);
     firebaseLogin(firebaseLoginRequestDto);
     usuarioService.alterarSenha(usuario, request.getNovaSenha());
+  }
+
+  private void validarLogin(String login) {
+    if (ValidarDadosUtils.isNullOrStringVazia(login)) {
+      throw new NegocioException(UsuarioValidationMessages.LOGIN_OBRIGATORIO);
+    }
   }
 
   private FirebaseLoginResponseDto firebaseLogin(FirebaseLoginRequestDto request) {

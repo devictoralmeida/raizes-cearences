@@ -1,7 +1,6 @@
 package com.devictoralmeida.teste.services;
 
 import com.devictoralmeida.teste.dto.request.LoginRequestDto;
-import com.devictoralmeida.teste.dto.request.RecuperarSenhaRequestDto;
 import com.devictoralmeida.teste.dto.request.RefreshTokenRequestDto;
 import com.devictoralmeida.teste.dto.request.SenhaRequestDto;
 import com.devictoralmeida.teste.dto.request.update.SenhaUpdateRequestDto;
@@ -26,11 +25,11 @@ public interface AuthService extends UserDetailsService {
 
   void verificarUsuarioValido(Usuario usuario);
 
-  void enviarCodigoRecuperacaoSenha(RecuperarSenhaRequestDto request);
+  void enviarCodigoRecuperacaoSenha(String login);
 
   void redefinirSenha(String login, SenhaRequestDto request);
 
-  void alterarSenha(SenhaUpdateRequestDto request);
+  void alterarSenha(String login, SenhaUpdateRequestDto request);
 
   Usuario getUsuarioLogado();
 }

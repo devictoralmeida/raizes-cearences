@@ -1,7 +1,6 @@
 package com.devictoralmeida.teste.controllers;
 
 import com.devictoralmeida.teste.dto.request.LoginRequestDto;
-import com.devictoralmeida.teste.dto.request.RecuperarSenhaRequestDto;
 import com.devictoralmeida.teste.dto.request.RefreshTokenRequestDto;
 import com.devictoralmeida.teste.dto.request.SenhaRequestDto;
 import com.devictoralmeida.teste.dto.request.update.SenhaUpdateRequestDto;
@@ -39,9 +38,9 @@ public class AuthController {
     return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.fromData(authService.atualizarToken(request), HttpStatus.CREATED, MessageCommonsConstants.MENSAGEM_TOKEN_ATUALIZADO_SUCESSO));
   }
 
-  @PostMapping(value = "/codigo/recuperar-senha")
-  public ResponseEntity<?> enviarCodigoRecuperacaoSenha(@Valid @RequestBody RecuperarSenhaRequestDto request) {
-    authService.enviarCodigoRecuperacaoSenha(request);
+  @PostMapping(value = "/recuperar-senha/{login}")
+  public ResponseEntity<?> enviarCodigoRecuperacaoSenha(@PathVariable(name = "login") String login) {
+    authService.enviarCodigoRecuperacaoSenha(login);
     return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.fromData(null, HttpStatus.CREATED, MessageCommonsConstants.MENSAGEM_CODIGO_ENVIADO_SUCESSO));
   }
 
@@ -51,9 +50,9 @@ public class AuthController {
     return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_SENHA_REDEFINIDA_SUCESSO));
   }
 
-  @PatchMapping("/alterar-senha")
-  public ResponseEntity<?> alterarSenha(@Valid @RequestBody SenhaUpdateRequestDto request) {
-    authService.alterarSenha(request);
+  @PatchMapping("/alterar-senha/{login}")
+  public ResponseEntity<?> alterarSenha(@PathVariable(name = "login") String login, @Valid @RequestBody SenhaUpdateRequestDto request) {
+    authService.alterarSenha(login, request);
     return ResponseEntity.status(HttpStatus.OK).body(ResponseDto.fromData(null, HttpStatus.OK, MessageCommonsConstants.MENSAGEM_SENHA_ALTERADA_SUCESSO));
   }
 }
