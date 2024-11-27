@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ContatoRequestDtoTest {
+
   public static ContatoRequestDto getContatoCompleto() {
     ContatoRequestDto dto = new ContatoRequestDto();
     dto.setNumeroContato("85999999999");
@@ -40,7 +41,6 @@ public class ContatoRequestDtoTest {
   @Test
   void teste_contato_valido() {
     ContatoRequestDto dto = ContatoRequestDtoTest.getContatoCompleto();
-//    dto.validar();
     assertEquals(TipoContato.WHATSAPP, dto.getPreferenciaContato());
     assertEquals("85999999999", dto.getNumeroContato());
     assertEquals("85999999999", dto.getNumeroWhatsapp());
@@ -50,8 +50,7 @@ public class ContatoRequestDtoTest {
 
   @Test
   void teste_contato_presidente_valido() {
-    ContatoRequestDto dto = ContatoRequestDtoTest.getContatoCompleto();
-//    dto.validacoesPresidente();
+    ContatoRequestDto dto = ContatoRequestDtoTest.getContatoPresidente();
     assertNull(dto.getPreferenciaContato());
     assertNull(dto.getNumeroWhatsapp());
     assertNotNull(dto.getNumeroContato());
