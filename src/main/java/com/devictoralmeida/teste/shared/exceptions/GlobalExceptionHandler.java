@@ -183,7 +183,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     LOGGER.error(" =============== RecursoNaoEncontradoException ==========================");
 
     String field = ex.getMessage();
-    String error = ex.getMessage();
+    String error = GlobalExceptionConstants.MENSAGEM_NAO_ENCONTRADO;
 
     Object obj = ResponseDto.fromData(null, HttpStatus.NOT_FOUND, error, Arrays.asList(field));
     return handleExceptionInternal(ex, obj, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
@@ -194,7 +194,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     LOGGER.error(" =============== SemAutenticacaoException ==========================");
 
     String field = ex.getMessage();
-    String error = ex.getMessage();
+    String error = GlobalExceptionConstants.MENSAGEM_ERRO_AUTENTICACAO;
 
     Object obj = ResponseDto.fromData(null, HttpStatus.UNAUTHORIZED, error, Arrays.asList(field));
     return handleExceptionInternal(ex, obj, new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
