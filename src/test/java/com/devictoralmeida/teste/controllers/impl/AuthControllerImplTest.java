@@ -2,7 +2,10 @@ package com.devictoralmeida.teste.controllers.impl;
 
 import com.devictoralmeida.teste.dto.request.LoginRequestDto;
 import com.devictoralmeida.teste.dto.request.LoginRequestDtoTest;
+import com.devictoralmeida.teste.dto.request.RefreshTokenRequestDto;
+import com.devictoralmeida.teste.dto.request.RefreshTokenRequestDtoTest;
 import com.devictoralmeida.teste.dto.response.FirebaseLoginResponseDto;
+import com.devictoralmeida.teste.dto.response.RefreshTokenResponseDto;
 import com.devictoralmeida.teste.dto.response.ResponseDto;
 import com.devictoralmeida.teste.services.AuthService;
 import com.devictoralmeida.teste.shared.constants.MessageCommonsConstants;
@@ -101,6 +104,39 @@ class AuthControllerImplTest {
             when(authService.login(loginRequestDto)).thenThrow(new SemAutenticacaoException("Credenciais inválidas"));
             try {
                 authController.login(loginRequestDto);
+            } catch (SemAutenticacaoException e) {
+                assertEquals("Credenciais inválidas", e.getMessage());
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("Testes para o endpoint /auth/atualizar-token")
+    class AtualizarToken {
+
+        @Test
+        @DisplayName("Deve retornar status 201 ao atualizar token")
+        void deveRetornarStatus201AoAtualizarToken() {
+            RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDtoTest.getValidRefreshTokenRequest();
+            RefreshTokenResponseDto mockResponse = new RefreshTokenResponseDto();
+            when(authService.atualizarToken(refreshTokenRequestDto)).thenReturn(mockResponse);
+
+            ResponseEntity<ResponseDto<RefreshTokenResponseDto>> response = authController.atualizarToken(refreshTokenRequestDto);
+
+            assertEquals(HttpStatus.CREATED, response.getStatusCode());
+            assertNotNull(response.getBody());
+            assertNotNull(response.getBody().getData());
+            assertEquals(mockResponse, response.getBody().getData());
+
+        }
+
+        @Test
+        @DisplayName("Deve retornar status 401 ao atualizar token com credenciais inválidas")
+        void deveRetornarStatus401AoAtualizarTokenComCredenciaisInvalidas() {
+            RefreshTokenRequestDto refreshTokenRequestDto = RefreshTokenRequestDtoTest.getInvalidRefreshTokenRequestWithBlankToken();
+            when(authService.atualizarToken(refreshTokenRequestDto)).thenThrow(new SemAutenticacaoException("Credenciais inválidas"));
+            try {
+                authController.atualizarToken(refreshTokenRequestDto);
             } catch (SemAutenticacaoException e) {
                 assertEquals("Credenciais inválidas", e.getMessage());
             }

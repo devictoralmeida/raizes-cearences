@@ -1,25 +1,52 @@
 package com.devictoralmeida.teste.dto.request;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class LoginRequestDtoTest {
 
-    @Test
-    public void test_criacao_loginRequestDto() {
-        LoginRequestDto dto = getValidLoginRequest();
+    @Nested
+    @DisplayName("Testes para o LoginRequestDto")
+    class LoginRequestDtoTests {
 
-        Assertions.assertNotNull(dto);
-        Assertions.assertEquals("usuario@teste.com", dto.getLogin());
-        Assertions.assertEquals("senha123", dto.getSenha());
-    }
+        @Test
+        @DisplayName("Deve criar o LoginRequestDto com sucesso")
+        void test_criacao_loginRequestDto() {
+            LoginRequestDto dto = getValidLoginRequest();
 
-    @Test
-    public void test_loginRequestDto_com_campos_nulos() {
-        LoginRequestDto dto = getInvalidLoginRequestWithNullFields();
+            Assertions.assertNotNull(dto);
+            Assertions.assertEquals("usuario@teste.com", dto.getLogin());
+            Assertions.assertEquals("senha123", dto.getSenha());
+        }
 
-        Assertions.assertNull(dto.getLogin());
-        Assertions.assertNull(dto.getSenha());
+        @Test
+        @DisplayName("Deve criar LoginRequestDto com campos nulos")
+        void test_loginRequestDto_com_campos_nulos() {
+            LoginRequestDto dto = getInvalidLoginRequestWithNullFields();
+
+            Assertions.assertNull(dto.getLogin());
+            Assertions.assertNull(dto.getSenha());
+        }
+
+        @Test
+        @DisplayName("Deve criar LoginRequestDto com login em branco")
+        void test_loginRequestDto_com_login_em_branco() {
+            LoginRequestDto dto = getInvalidLoginRequestWithBlankLogin();
+
+            Assertions.assertEquals("", dto.getLogin());
+            Assertions.assertEquals("senha123", dto.getSenha());
+        }
+
+        @Test
+        @DisplayName("Deve criar LoginRequestDto com senha em branco")
+        void test_loginRequestDto_com_senha_em_branco() {
+            LoginRequestDto dto = getInvalidLoginRequestWithBlankSenha();
+
+            Assertions.assertEquals("usuario@teste.com", dto.getLogin());
+            Assertions.assertEquals("", dto.getSenha());
+        }
     }
 
     public static LoginRequestDto getValidLoginRequest() {
